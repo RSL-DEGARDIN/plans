@@ -1674,7 +1674,11 @@ function rkpGate(){
     </div>`;
   document.body.appendChild(g);
 
-  g.querySelector('#rkpDemo').onclick = ()=>{ rkpClose(); toast('Mode démonstration'); };
+  g.querySelector('#rkpDemo').onclick = ()=>{
+    RKP.lic = null; RKP.demo = true; RKP.lastOk = 0;
+    rkpBadge(); rkpClose();
+    toast('Mode démonstration — accès conservé pour la prochaine ouverture');
+  };
   g.querySelector('#rkpGo').onclick = rkpSubmit;
   g.querySelector('#rkpForget').onclick = rkpForget;
   ['#rkpKey', '#rkpMail'].forEach(sel=>

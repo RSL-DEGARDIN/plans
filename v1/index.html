@@ -1641,12 +1641,16 @@ function rkpGate(){
         <button id="rkpGo" class="btn primary" style="flex:1;justify-content:center">Activer</button>
       </div>
       <p style="font-size:.7rem;color:var(--txt-mute);margin-top:14px;line-height:1.5">
-        Version ${RKP.version} · La clé est nominative. Les exports portent le nom du titulaire.</p>
+        Version ${RKP.version} · La clé est nominative. Les exports portent le nom du titulaire.<br>
+        <button id="rkpForget" type="button" style="background:none;border:0;padding:4px 0;
+          color:var(--txt-dim);font-size:.7rem;text-decoration:underline;cursor:pointer">
+          Oublier la licence enregistrée sur ce poste</button></p>
     </div>`;
   document.body.appendChild(g);
 
   g.querySelector('#rkpDemo').onclick = ()=>{ rkpClose(); toast('Mode démonstration'); };
   g.querySelector('#rkpGo').onclick = rkpSubmit;
+  g.querySelector('#rkpForget').onclick = rkpForget;
   g.querySelector('#rkpKey').addEventListener('keydown', e=>{ if(e.key === 'Enter') rkpSubmit(); });
   return g;
 }
@@ -1659,6 +1663,13 @@ function rkpOpen(){
 }
 function rkpClose(){ const g = document.getElementById('rkpGate'); if(g) g.style.display = 'none'; }
 function rkpMsg(t){ const m = document.getElementById('rkpMsg'); if(m) m.textContent = t || ''; }
+
+function rkpForget(){
+  try { localStorage.removeItem('rkp.key'); } catch(e){}
+  RKP.key = ''; RKP.lic = null; RKP.demo = true; RKP.lastOk = 0;
+  const i = document.getElementById('rkpKey'); if(i) i.value = '';
+  rkpBadge(); rkpMsg('Licence oubliée sur ce poste. Mode démonstration actif.');
+}
 
 async function rkpSubmit(){
   const btn = document.getElementById('rkpGo');
@@ -1674,23 +1685,35 @@ async function rkpSubmit(){
 }
 
 /* ---------- plafond du mode démo ---------- */
-function rkpCap(){
+function rkpCap(n){
   if(!RKP.demo) return false;
-  if(state.bays.length < RKP.demoMaxBays) return false;
+  if(state.bays.length + (n || 1) <= RKP.demoMaxBays) return false;
   toast('Démo limitée à ' + RKP.demoMaxBays + ' travées — activez votre licence');
   rkpOpen();
   return true;
 }
-const _rkpAddDepart = addDepart, _rkpAddSuite = addSuite, _rkpDupSel = dupSel;
+const _rkpAddDepart = addDepart, _rkpAddSuite = addSuite,
+      _rkpDupSel = dupSel, _rkpLoadData = loadData;
 addDepart = function(x, y, run){
-  if(rkpCap()) return state.bays[state.bays.length - 1];
+  if(rkpCap(1)) return state.bays[state.bays.length - 1];
   return _rkpAddDepart(x, y, run);
 };
 addSuite = function(){
-  if(rkpCap()) return state.bays[state.bays.length - 1];
+  if(rkpCap(1)) return state.bays[state.bays.length - 1];
   return _rkpAddSuite();
 };
-dupSel = function(){ if(rkpCap()) return; return _rkpDupSel(); };
+dupSel = function(){ if(rkpCap(state.selected.length || 1)) return; return _rkpDupSel(); };
+loadData = function(d){
+  const r = _rkpLoadData(d);
+  if(RKP.demo && state.bays.length > RKP.demoMaxBays){
+    state.bays = state.bays.slice(0, RKP.demoMaxBays);
+    state.selected = [];
+    try { buildItems(); refreshList(); renderStats(); renderBom(); renderJSON(); } catch(e){}
+    toast('Démo : plan tronqué à ' + RKP.demoMaxBays + ' travées');
+    rkpOpen();
+  }
+  return r;
+};
 
 /* ---------- verrou sur les livrables ---------- */
 async function rkpAllowExport(){

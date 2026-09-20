@@ -3,11 +3,1736 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>RackPlan 2D</title>
-<meta http-equiv="refresh" content="0; url=./v1/">
-<link rel="canonical" href="./v1/">
+<title>RackPlan 2D — Prototype plan d'entrepôt</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230b1017'/%3E%3Crect x='7' y='6' width='4' height='20' fill='%233b82f6'/%3E%3Crect x='21' y='6' width='4' height='20' fill='%233b82f6'/%3E%3Crect x='11' y='6' width='10' height='3' fill='%23f97316'/%3E%3Crect x='11' y='23' width='10' height='3' fill='%23f97316'/%3E%3C/svg%3E">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/konva@9.3.16/konva.min.js"></script>
+<style>
+:root{
+  --bg:#0b1017; --panel:#111823; --panel-2:#161f2c; --line:#243044;
+  --txt:#e6edf7; --txt-dim:#8fa0b8; --txt-mute:#61728a;
+  --blue:#3b82f6; --orange:#f97316; --accent:#38bdf8; --danger:#f43f5e;
+  --text-xs:0.75rem; --text-sm:0.875rem; --text-base:1rem; --text-lg:1.25rem;
+  --s1:4px;--s2:8px;--s3:12px;--s4:16px;--s6:24px; --r:8px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--bg);color:var(--txt);font-family:Inter,system-ui,sans-serif;font-size:var(--text-sm);
+  -webkit-font-smoothing:antialiased;overflow:hidden}
+.mono{font-family:'JetBrains Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums}
+.app{display:grid;grid-template-columns:284px 1fr 268px;grid-template-rows:56px 1fr 32px;height:100vh}
+header{grid-column:1/-1;display:flex;align-items:center;gap:var(--s4);padding:0 var(--s4);
+  background:var(--panel);border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;letter-spacing:-0.01em}
+.brand svg{color:var(--accent)}
+.brand small{display:block;font-weight:400;font-size:var(--text-xs);color:var(--txt-mute);letter-spacing:0}
+.toolbar{display:flex;gap:6px;margin-left:auto;flex-wrap:nowrap;align-items:center;overflow-x:auto;scrollbar-width:none}
+.toolbar::-webkit-scrollbar{display:none}
+.toolbar .btn{white-space:nowrap;flex:0 0 auto}
+@media (max-width:1500px){.toolbar .btn kbd{display:none}}
+@media (max-width:1450px){.toolbar .btn{padding:6px 9px;font-size:12px}}
+button,select,input{font-family:inherit;font-size:var(--text-sm);color:var(--txt)}
+.btn{background:var(--panel-2);border:1px solid var(--line);border-radius:var(--r);padding:7px 12px;cursor:pointer;
+  display:inline-flex;align-items:center;gap:6px;transition:background .15s,border-color .15s,transform .1s}
+.btn:hover{background:#1d2836;border-color:#31405a}
+.btn:disabled{opacity:.34;cursor:not-allowed}
+.btn:disabled:hover{background:var(--panel-2);border-color:var(--line)}
+.btn:active{transform:translateY(1px)}
+.btn.on{background:rgba(56,189,248,.14);border-color:var(--accent);color:#bfe9ff}
+.btn.ghost{background:transparent}
+.btn.danger:hover{border-color:var(--danger);color:#ffc6d1}
+.btn.warn{border-color:rgba(244,63,94,.55);color:#ffb3c0;letter-spacing:.06em}
+.btn.warn:hover{background:rgba(244,63,94,.16);border-color:var(--danger);color:#ffd7de}
+.btn.primary{background:rgba(59,130,246,.16);border-color:#2f5ea8;color:#cfe2ff}
+.btn.primary:hover{background:rgba(59,130,246,.26)}
+.btn kbd{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--txt-mute);
+  border:1px solid var(--line);border-radius:4px;padding:0 4px}
+aside{background:var(--panel);overflow-y:auto;padding:var(--s4);display:flex;flex-direction:column;gap:var(--s6)}
+aside.left{border-right:1px solid var(--line)}
+aside.right{border-left:1px solid var(--line)}
+h2{font-size:var(--text-xs);text-transform:uppercase;letter-spacing:.09em;color:var(--txt-mute);font-weight:600;margin-bottom:var(--s3)}
+.swatch{width:10px;height:10px;border-radius:3px;display:inline-block}
+.card{background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:var(--s3)}
+.card + .card{margin-top:var(--s2)}
+.card h3{font-size:var(--text-sm);font-weight:600;display:flex;align-items:center;gap:8px;margin-bottom:2px}
+.card p{font-size:var(--text-xs);color:var(--txt-dim);line-height:1.55}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:9px}
+.stepper{display:flex;align-items:stretch;gap:0;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#0e1622}
+.stepper button{width:26px;flex:0 0 26px;border:0;background:#131d2b;color:var(--txt);font:600 15px/1 Inter,sans-serif;cursor:pointer;transition:background .15s,color .15s}
+.stepper button:hover{background:#1b2a3d;color:var(--accent)}
+.stepper button:disabled{opacity:.32;cursor:not-allowed;background:#131d2b;color:var(--txt)}
+.stepper .sv{min-width:60px;padding:6px 6px;text-align:center;font:600 12px/1.4 'JetBrains Mono',monospace;color:var(--accent);
+  border-left:1px solid var(--line);border-right:1px solid var(--line);display:flex;align-items:center;justify-content:center;white-space:nowrap}
+.row .stepper{flex:0 0 auto}
+.dims{display:flex;align-items:center;gap:8px}
+.dims input{flex:1 1 0;min-width:0;text-align:center;font-family:'JetBrains Mono',monospace;color:var(--accent)}
+.dims input::-webkit-outer-spin-button,.dims input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.dims .x{color:var(--txt-dim);font:600 13px/1 'JetBrains Mono',monospace}
+.dims .u{color:var(--txt-dim);font-size:var(--text-xs)}
+.row label{min-width:0}
+.stepper input.sv{background:transparent;color:var(--accent);border-radius:0;width:70px;text-align:center}
+.stepper input.sv::-webkit-outer-spin-button,.stepper input.sv::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.chip{background:#0e151f;border:1px solid var(--line);border-radius:999px;padding:4px 10px;font-size:var(--text-xs);
+  cursor:pointer;font-family:'JetBrains Mono',monospace;color:var(--txt-dim)}
+.chip:hover{border-color:var(--accent);color:#bfe9ff}
+.chip.sel{background:rgba(56,189,248,.14);border-color:var(--accent);color:#bfe9ff}
+.row{display:flex;align-items:center;justify-content:space-between;gap:var(--s2);padding:5px 0}
+.row label{font-size:var(--text-xs);color:var(--txt-dim)}
+.val{font-size:var(--text-sm)}
+input[type=number],select{background:#0e151f;border:1px solid var(--line);border-radius:6px;padding:5px 8px;width:100px;
+  text-align:right;font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums}
+select{text-align:left;width:112px}
+input:focus,select:focus{outline:2px solid rgba(56,189,248,.5)}
+input.plainnum{background:transparent;border:0;border-radius:4px;padding:1px 2px;width:5.6ch;text-align:right;
+  color:var(--accent);font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums}
+input.plainnum::-webkit-outer-spin-button,input.plainnum::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+input.plainnum:hover{background:#0e151f}
+input.plainnum:focus{outline:1px solid rgba(56,189,248,.55);background:#0e151f}
+main{position:relative;background:#080c12;overflow:hidden}
+#stage{position:absolute;inset:0}
+.hintwrap{position:absolute;left:16px;bottom:16px;display:flex;align-items:flex-end;gap:8px}
+.hintbtn{width:32px;height:32px;flex:0 0 32px;border-radius:50%;border:1px solid var(--line);cursor:pointer;
+  background:rgba(11,16,23,.86);color:var(--txt-dim);backdrop-filter:blur(6px);font:600 14px/1 Inter,sans-serif;
+  display:flex;align-items:center;justify-content:center;transition:color .15s,border-color .15s,background .15s}
+.hintbtn:hover{color:var(--accent);border-color:var(--accent)}
+.hintbtn.on{color:var(--accent);border-color:var(--accent);background:rgba(56,189,248,.14)}
+.hint{background:rgba(11,16,23,.86);border:1px solid var(--line);
+  border-radius:var(--r);padding:8px 12px;font-size:var(--text-xs);color:var(--txt-dim);backdrop-filter:blur(6px);
+  pointer-events:none;max-width:340px;line-height:1.65}
+.hint[hidden]{display:none}
+.modal{position:fixed;inset:0;z-index:50;background:rgba(4,7,11,.72);backdrop-filter:blur(3px);
+  display:flex;align-items:center;justify-content:center}
+.modal[hidden]{display:none}
+.dialog{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:20px;max-width:380px;
+  box-shadow:0 24px 60px rgba(0,0,0,.55)}
+.dialog h3{font-size:var(--text-md);font-weight:600;margin-bottom:8px}
+.dialog p{font-size:var(--text-xs);color:var(--txt-dim);line-height:1.6}
+.dialog .acts{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
+.hint b{color:var(--txt)}
+.hint kbd{font-family:'JetBrains Mono',monospace;background:#0e151f;border:1px solid var(--line);
+  border-radius:4px;padding:0 4px;color:#bfe9ff}
+.zoombar{position:absolute;right:16px;bottom:16px;display:flex;gap:var(--s1);background:rgba(11,16,23,.86);
+  border:1px solid var(--line);border-radius:var(--r);padding:5px;backdrop-filter:blur(6px)}
+.zoombar .btn{padding:5px 9px}
+footer{grid-column:1/-1;display:flex;align-items:center;gap:var(--s4);padding:0 var(--s4);background:var(--panel);
+  border-top:1px solid var(--line);font-size:var(--text-xs);color:var(--txt-mute)}
+footer .sep{width:1px;height:14px;background:var(--line)}
+footer b{color:var(--txt-dim);font-weight:500}
+.empty{font-size:var(--text-xs);color:var(--txt-mute);line-height:1.6}
+.list{display:flex;flex-direction:column;gap:4px;max-height:200px;overflow-y:auto}
+.item{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:6px;cursor:pointer;
+  border:1px solid transparent;font-size:var(--text-xs)}
+.item:hover{background:var(--panel-2)}
+.item.sel{background:rgba(56,189,248,.12);border-color:rgba(56,189,248,.45)}
+.item .tag{font-family:'JetBrains Mono',monospace;font-size:10px;padding:1px 5px;border-radius:4px;
+  background:#0e151f;border:1px solid var(--line);color:var(--txt-mute)}
+.item span.n{margin-left:auto;color:var(--txt-mute);font-family:'JetBrains Mono',monospace}
+.stat{display:flex;justify-content:space-between;font-size:var(--text-xs);padding:3px 0;color:var(--txt-dim)}
+.stat b{color:var(--txt);font-weight:500;font-family:'JetBrains Mono',monospace}
+pre{background:#0a0f16;border:1px solid var(--line);border-radius:8px;padding:10px;font-family:'JetBrains Mono',monospace;
+  font-size:11px;color:#a8c3e0;max-height:196px;overflow:auto;line-height:1.5}
+.toast{position:fixed;left:50%;bottom:56px;transform:translate(-50%,20px);opacity:0;background:var(--panel-2);
+  border:1px solid var(--accent);color:#d8f2ff;padding:9px 16px;border-radius:999px;font-size:var(--text-sm);
+  transition:.25s ease;pointer-events:none}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.notice{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) scale(.96);opacity:0;pointer-events:none;
+  background:var(--panel-2);border:1px solid #3a4a66;border-radius:12px;padding:18px 22px;max-width:420px;
+  text-align:center;line-height:1.5;font-size:var(--text-sm);color:var(--txt);z-index:40;
+  box-shadow:0 18px 50px rgba(0,0,0,.55);transition:opacity .18s,transform .18s}
+.notice.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
+#printArea{display:none}
+@media print{
+  @page{size:A4 landscape;margin:10mm}
+  body{background:#fff;color:#111;display:block!important;height:auto!important;overflow:visible!important}
+  .app,header,aside,main,footer,.toast,.notice,.modal{display:none!important}
+  #printArea{display:block!important;font-family:Inter,system-ui,sans-serif;color:#111}
+  #printArea img{display:block;margin:0 auto;width:auto;max-width:100%;max-height:120mm;border:1px solid #ccc;border-radius:4px}
+  #printArea .p-head{display:flex;justify-content:space-between;align-items:flex-end;
+    border-bottom:2px solid #111;padding-bottom:6px;margin-bottom:10px}
+  #printArea h1{font-size:15pt;margin:0}
+  #printArea h2{font-size:10pt;margin:12px 0 5px;text-transform:uppercase;letter-spacing:.06em}
+  #printArea .p-sub{font-size:8.5pt;color:#555}
+  #printArea .p-cols{display:grid;grid-template-columns:1fr 1.6fr;gap:22px;margin-top:8px}
+  #printArea table{width:100%;border-collapse:collapse;font-size:8.5pt}
+  #printArea th{text-align:left;border-bottom:1px solid #111;padding:3px 4px;font-size:8pt}
+  #printArea td{border-bottom:1px solid #ddd;padding:3px 4px}
+  #printArea td.n,#printArea th.n{text-align:right;font-variant-numeric:tabular-nums}
+}
+::-webkit-scrollbar{width:9px;height:9px}
+::-webkit-scrollbar-thumb{background:#243044;border-radius:9px}
+::-webkit-scrollbar-track{background:transparent}
+</style>
 </head>
-<body style="background:#0b1017;color:#e6edf7;font-family:system-ui,sans-serif;padding:40px">
-<p>RackPlan 2D — <a href="./v1/" style="color:#38bdf8">ouvrir l'application</a></p>
+<body>
+<div class="app">
+<header>
+  <div class="brand">
+    <svg width="26" height="26" viewBox="0 0 32 32" aria-label="RackPlan 2D">
+      <rect x="6" y="5" width="4" height="22" rx="1" fill="currentColor"/>
+      <rect x="22" y="5" width="4" height="22" rx="1" fill="currentColor"/>
+      <rect x="10" y="5" width="12" height="3" rx="1" fill="#f97316"/>
+      <rect x="10" y="24" width="12" height="3" rx="1" fill="#f97316"/>
+    </svg>
+    <div>RackPlan 2D</div>
+  </div>
+  <div class="toolbar">
+    <button class="btn ghost" id="bUndo" title="Annuler (Ctrl+Z)" aria-label="Annuler" disabled>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round"><path d="M9 14 4 9l5-5"/><path d="M4 9h9a7 7 0 0 1 0 14h-3"/></svg>
+    </button>
+    <button class="btn ghost" id="bRedo" title="Rétablir (Ctrl+Y)" aria-label="Rétablir" disabled>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round"><path d="m15 14 5-5-5-5"/><path d="M20 9h-9a7 7 0 0 0 0 14h3"/></svg>
+    </button>
+    <span style="width:1px;height:22px;background:var(--line);margin:0 2px"></span>
+    <button class="btn" id="tSnap" title="Aimantation sur la grille">Magnétisme <kbd>G</kbd></button>
+    <button class="btn" id="tMeasure" title="Outil mesure libre">Mesurer <kbd>M</kbd></button>
+    <button class="btn ghost" id="bLabel" title="Ajouter une étiquette à la file sélectionnée">Étiquettes</button>
+    <button class="btn ghost on" id="tTotals" title="Cotes hors-tout des ensembles">Hors-tout</button>
+    <button class="btn ghost" id="bRot" title="Rotation 90° de la sélection">Rotation <kbd>R</kbd></button>
+    <button class="btn ghost" id="bDup">Dupliquer <kbd>D</kbd></button>
+    <button class="btn ghost danger" id="bDel">Supprimer <kbd>Suppr</kbd></button>
+    <span style="width:1px;height:22px;background:var(--line);margin:0 4px"></span>
+    <button class="btn warn" id="bReset" title="Tout effacer et repartir de zéro">RESET</button>
+    <button class="btn" id="bPrint" title="Imprimer le plan (Ctrl+P)">Imprimer</button>
+    <button class="btn" id="bBom" title="Télécharger la nomenclature CSV">Nomenclature</button>
+    <button class="btn" id="bSave" title="Enregistrer le plan dans un fichier .json sur votre ordinateur">Enregistrer</button>
+    <button class="btn" id="bLoad" title="Recharger un plan .json enregistré précédemment">Ouvrir</button>
+    <input type="file" id="fLoad" accept=".json,application/json" hidden>
+    <span style="width:1px;height:22px;background:var(--line);margin:0 4px"></span>
+    <button class="btn danger" id="bQuit" title="Quitter l'application">Quitter</button>
+  </div>
+</header>
+
+<aside class="left">
+  <section>
+    <h2>Entrepôt</h2>
+    <div class="card">
+      <div class="dims">
+        <input type="number" id="whW" step="500" value="30000" aria-label="Largeur de l'entrepôt en mm">
+        <span class="x">×</span>
+        <input type="number" id="whD" step="500" value="18000" aria-label="Profondeur de l'entrepôt en mm">
+        <span class="u">mm</span>
+      </div>
+      <div class="row">
+        <button class="btn ghost" id="bRotAll" style="padding:5px 10px;font-size:var(--text-xs)"
+          title="Pivoter tout le plan de 90° (horizontal / vertical)">Pivoter le plan</button>
+        <select id="gridSel" title="Pas de grille">
+          <option value="25">25 mm</option><option value="50" selected>50 mm</option>
+          <option value="100">100 mm</option><option value="500">500 mm</option>
+        </select></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Données</h2>
+    <div class="card">
+      <div class="row"><label>Largeur échelle</label><select id="echSel"></select></div>
+      <div class="row"><label>Longueur lisse</label><select id="lisSel"></select></div>
+      <div class="row"><label>Niveaux de lisses</label>
+        <div class="stepper">
+          <button type="button" id="levMinus" aria-label="Moins de niveaux">−</button>
+          <span class="sv" id="levVal">2 niv.</span>
+          <button type="button" id="levPlus" aria-label="Plus de niveaux">+</button>
+        </div></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Ajouter une travée</h2>
+    <div class="card">
+      <button class="btn primary" style="width:100%;justify-content:center" id="addDepart">
+        + Travée DÉPART</button>
+      <div style="display:flex;gap:6px;margin-top:8px">
+        <button class="btn" id="suiteMinus" style="flex:0 0 36px;justify-content:center;padding:7px 0;font:600 16px/1 Inter,sans-serif"
+          title="Retirer la dernière travée SUITE de la file sélectionnée" aria-label="Retirer une travée SUITE">−</button>
+        <button class="btn primary" style="flex:1 1 auto;justify-content:center" id="addSuite">
+          + Travée SUITE</button>
+        <button class="btn" id="suitePlus" style="flex:0 0 36px;justify-content:center;padding:7px 0;font:600 16px/1 Inter,sans-serif"
+          title="Ajouter une travée SUITE à la file sélectionnée" aria-label="Ajouter une travée SUITE">+</button>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Travées du plan</h2>
+    <div class="list" id="list"></div>
+  </section>
+</aside>
+
+<div class="modal" id="confirm" hidden>
+  <div class="dialog">
+    <h3>Tout effacer ?</h3>
+    <p id="confirmTxt">Le plan sera remis à zéro : une seule travée DÉPART, comme au démarrage. Cette action est irréversible — pensez à exporter le JSON avant.</p>
+    <div class="acts">
+      <button class="btn" id="confirmNo">Annuler</button>
+      <button class="btn warn" id="confirmYes">Oui, tout effacer</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="gapDlg" hidden>
+  <div class="dialog">
+    <h3 id="gapTitle">Largeur d'allée</h3>
+    <p>Nouvelle valeur en mm. La file sélectionnée sera déplacée pour respecter cette cote (arrondie au pas de grille).</p>
+    <input id="gapVal" type="number" step="50" min="0"
+      style="width:100%;margin-top:12px;background:var(--panel-2);border:1px solid var(--line);border-radius:var(--r);padding:9px 11px;font-family:'JetBrains Mono',monospace">
+    <div class="acts">
+      <button class="btn" id="gapNo">Annuler</button>
+      <button class="btn primary" id="gapYes">Appliquer</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="quitDlg" hidden>
+  <div class="dialog">
+    <h3>Quitter RackPlan 2D ?</h3>
+    <p>Voulez-vous enregistrer le plan avant de quitter ? Les modifications non enregistrées seront perdues définitivement.</p>
+    <div class="acts">
+      <button class="btn" id="quitCancel">Annuler</button>
+      <button class="btn danger" id="quitNoSave">Quitter sans enregistrer</button>
+      <button class="btn primary" id="quitSave">Enregistrer et quitter</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="lblDlg" hidden>
+  <div class="dialog">
+    <h3>Nom de l'étiquette</h3>
+    <p>Ce nom suit la première travée de la file. Vous pouvez déplacer l'étiquette en la glissant sur le plan.</p>
+    <input id="lblVal" type="text" maxlength="28"
+      style="width:100%;margin-top:12px;background:var(--panel-2);border:1px solid var(--line);border-radius:var(--r);padding:9px 11px;font-family:'JetBrains Mono',monospace">
+    <div class="acts">
+      <button class="btn danger" id="lblDel">Supprimer</button>
+      <button class="btn" id="lblNo">Annuler</button>
+      <button class="btn primary" id="lblYes">Valider</button>
+    </div>
+  </div>
+</div>
+
+<main>
+  <div id="stage"></div>
+  <div class="notice" id="notice"></div>
+  <div class="hintwrap">
+  <button class="hintbtn" id="hintBtn" aria-expanded="false" aria-controls="hint"
+    title="Afficher les raccourcis" aria-label="Afficher les raccourcis">?</button>
+  <div class="hint" id="hint" hidden>
+    <kbd>+</kbd> travée DÉPART · <kbd>−</kbd> travée SUITE chaînée · <kbd>R</kbd> rotation 90°<br>
+    <b>Travée DÉPART sélectionnée</b> : <kbd>+</kbd> ajoute une travée SUITE à la file, <kbd>−</kbd> la retire<br>
+    <b>Glisser</b> pour déplacer (une travée = un bloc) · <b>Maj+clic</b> sélection multiple<br>
+    <b>Molette</b> zoom · <b>clic droit / espace</b> panoramique · cotes en mm en direct<br>
+    <b>Mesurer</b> : accroche aux angles d'échelle, cotes horizontales ou verticales<br>
+    <b>Clic sur une cote bleue</b> : saisir la largeur d'allée — la file sélectionnée se recale<br>
+    <b>Ctrl+Z / Ctrl+Y</b> annuler / rétablir · <b>Ctrl+P</b> imprimer · <b>Pivoter le plan</b> : bascule H ↔ V<br>
+    <b>Étiquettes</b> : nom de rack accroché à la 1ère travée · glisser pour placer, double-clic pour renommer<br>
+    <b>Cotes vertes</b> : restées sur le plan, clic sur l'étiquette pour les retirer · <b>Hors-tout</b> en violet<br>
+    <kbd>D</kbd> dupliquer · <kbd>Suppr</kbd> supprimer · <kbd>G</kbd> magnétisme · <kbd>M</kbd> mesurer<br>
+    <b>Flèches</b> déplacement fin (<kbd>Maj</kbd> × 10) · <kbd>Échap</kbd> désélectionner
+  </div>
+  </div>
+  <div class="zoombar">
+    <button class="btn" id="zOut" aria-label="Zoom arrière">−</button>
+    <button class="btn" id="zFit">Ajuster</button>
+    <button class="btn" id="zIn" aria-label="Zoom avant">+</button>
+  </div>
+</main>
+
+<aside class="right">
+  <section>
+    <h2>Propriétés</h2>
+    <div id="props"></div>
+  </section>
+  <section>
+    <h2>Nomenclature</h2>
+    <div class="card" id="bom"></div>
+    <button class="btn" style="width:100%;justify-content:center;margin-top:8px" id="bBom2">Télécharger la nomenclature (CSV)</button>
+  </section>
+  <section>
+    <h2>Cotes placées</h2>
+    <div class="card">
+      <div id="coteList"></div>
+      <button class="btn" style="width:100%;justify-content:center;margin-top:10px" id="bCoteClr">Effacer les cotes</button>
+    </div>
+  </section>
+
+  <section>
+    <h2>Métré</h2>
+    <div class="card" id="stats"></div>
+  </section>
+  <section>
+    <h2>Structure JSON</h2>
+    <pre id="json"></pre>
+  </section>
+</aside>
+
+<footer>
+  <span>Curseur <b class="mono" id="fCur">—</b></span><span class="sep"></span>
+  <span>Zoom <b class="mono" id="fZoom">100 %</b></span><span class="sep"></span>
+  <span>Grille <b class="mono" id="fGrid">50 mm</b></span><span class="sep"></span>
+  <span>Sélection <b class="mono" id="fSel">0</b></span><span class="sep"></span>
+  <span id="fMsg">Prêt</span>
+</footer>
+</div>
+<div class="toast" id="toast"></div>
+<div id="printArea"></div>
+
+<script>
+/* ==========================================================================
+   RackPlan 2D — modèle de données (unités : millimètres)
+   --------------------------------------------------------------------------
+   L'objet dessiné est la TRAVÉE, jamais la lisse ou l'échelle seule.
+     mode "depart" : 2 échelles + 2 lisses   emprise = 2*upright + beam
+     mode "suite"  : 1 échelle  + 2 lisses   emprise =   upright + beam
+   La lisse part de la face intérieure de l'échelle et son angle est en
+   contact avec l'angle de l'échelle (lisses affleurantes avant / arrière).
+   {
+     version, unit:"mm",
+     warehouse:{ width, depth, gridSize },
+     bays:[ { id, mode, x, y, upright, beam, depth:1100, section:50, rotation, run } ]
+   }
+   x / y = angle avant-gauche de la travée avant rotation (pivot de rotation).
+   ========================================================================== */
+
+const UPRIGHTS = [80, 85, 100, 110];
+const BEAMS = [1825, 1850, 2225, 2700, 3300, 3600];
+const DEPTH = 1100, SECTION = 50;
+
+const state = {
+  warehouse:{ width:30000, depth:18000, gridSize:50 },
+  bays:[], selected:[], snap:true, measureMode:false, cotes:[], showTotals:true, labels:[],
+  upright:100, beam:2700, levels:2, seq:1, runSeq:1
+};
+const LEVELS = [1,2,3,4,5,6];
+
+const C = { blue:'#3b82f6', blueDark:'#1d4ed8', orange:'#f97316', orangeDark:'#b4520c',
+  accent:'#38bdf8', grid:'#18222f', gridMajor:'#22303f', floor:'#0d131b', wall:'#2b3a4f', lbl:'#556982' };
+
+/* ---------- Konva ---------- */
+const host = document.getElementById('stage');
+const stage = new Konva.Stage({ container:'stage', width:host.clientWidth, height:host.clientHeight });
+const lGrid = new Konva.Layer({ listening:false });
+const lItems = new Konva.Layer();
+const lDim = new Konva.Layer();
+const lSnap = new Konva.Layer({ listening:false });
+const lCote = new Konva.Layer();
+const lLab = new Konva.Layer();
+stage.add(lGrid, lItems, lCote, lLab, lDim, lSnap);
+
+const MM = 0.1;
+let zoom = 1;
+const scale = () => MM * zoom;
+function applyScale(){ stage.scale({x:scale(), y:scale()});
+  document.getElementById('fZoom').textContent = Math.round(zoom*100)+' %';
+  if(typeof drawCotes === 'function' && state.bays.length){ drawCotes(); drawLabels(); } }
+
+/* ---------- Géométrie de la travée ---------- */
+const uid = () => 'TRV-' + String(state.seq++).padStart(3,'0');
+const fmt = n => Math.round(n).toLocaleString('fr-FR');
+const snapV = v => state.snap ? Math.round(v/state.warehouse.gridSize)*state.warehouse.gridSize : Math.round(v);
+const bayW = b => b.mode==='depart' ? b.upright*2 + b.beam : b.upright + b.beam;
+const size = b => ({ w: bayW(b), h: b.depth });
+
+// pièces internes, coordonnées locales (avant rotation)
+function parts(b){
+  const u = b.upright, L = b.beam, d = b.depth, s = b.section;
+  const ladders = b.mode==='depart' ? [0, u + L] : [L];
+  const beamX = b.mode==='depart' ? u : 0;          // départ de la lisse = face intérieure de l'échelle
+  return {
+    ladders: ladders.map(x=>({x, y:0, w:u, h:d})),
+    beams: [ {x:beamX, y:0, w:L, h:s},              // lisse avant, angle en contact
+             {x:beamX, y:d - s, w:L, h:s} ]         // lisse arrière, angle en contact
+  };
+}
+function aabb(b){
+  const {w,h} = size(b), r = (b.rotation||0)*Math.PI/180, cs=Math.cos(r), sn=Math.sin(r);
+  const p = [[0,0],[w,0],[w,h],[0,h]].map(([x,y])=>[b.x+x*cs-y*sn, b.y+x*sn+y*cs]);
+  const xs=p.map(v=>v[0]), ys=p.map(v=>v[1]);
+  return { x1:Math.min(...xs), x2:Math.max(...xs), y1:Math.min(...ys), y2:Math.max(...ys) };
+}
+let noticeT = null;
+function notice(m){ const n=document.getElementById('notice'); n.textContent=m; n.classList.add('show');
+  clearTimeout(noticeT); noticeT = setTimeout(()=>n.classList.remove('show'), 3200); }
+function toast(m){ const t=document.getElementById('toast'); t.textContent=m; t.classList.add('show');
+  clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('show'),1900);
+  document.getElementById('fMsg').textContent = m; }
+
+/* ---------- Grille ---------- */
+function drawGrid(){
+  lGrid.destroyChildren();
+  const W=state.warehouse.width, D=state.warehouse.depth, g=state.warehouse.gridSize, s=scale();
+  lGrid.add(new Konva.Rect({x:0,y:0,width:W,height:D,fill:C.floor,stroke:C.wall,strokeWidth:24,
+    shadowColor:'#000',shadowBlur:40,shadowOpacity:.5}));
+  const px = g*s, step = px < 5 ? g*Math.ceil(5/px) : g, major = 1000;
+  for(let x=0;x<=W;x+=step) lGrid.add(new Konva.Line({points:[x,0,x,D],
+    stroke:x%major===0?C.gridMajor:C.grid, strokeWidth:(x%major===0?1.5:1)/s}));
+  for(let y=0;y<=D;y+=step) lGrid.add(new Konva.Line({points:[0,y,W,y],
+    stroke:y%major===0?C.gridMajor:C.grid, strokeWidth:(y%major===0?1.5:1)/s}));
+  const mkLbl = text=>{ const t = new Konva.Text({text, fontSize:11, fontFamily:'JetBrains Mono', fill:C.lbl});
+    t.scale({x:1/s, y:1/s}); return t; };
+  // graduations horizontales : centrées sur leur trait
+  for(let x=0;x<=W;x+=5000){ const t = mkLbl((x/1000)+' m');
+    t.position({ x: x - (t.width()/s)/2, y: -24/s }); lGrid.add(t); }
+  // graduations verticales : calées à gauche de la grille, centrées sur leur trait
+  for(let y=0;y<=D;y+=5000){ const t = mkLbl((y/1000)+' m');
+    t.position({ x: -14/s - t.width()/s, y: y - (t.height()/s)/2 }); lGrid.add(t); }
+  lGrid.batchDraw();
+}
+
+/* ---------- Rendu des travées ---------- */
+function buildItems(){
+  lItems.destroyChildren();
+  const s = scale();
+  const bad = overlapping();
+  state.bays.forEach(b=>{
+    const {w,h} = size(b), sel = state.selected.includes(b.id), ko = bad.includes(b.id);
+    const g = new Konva.Group({ id:b.id, x:b.x, y:b.y, rotation:b.rotation||0, draggable:true });
+    // zone de préhension de toute la travée
+    g.add(new Konva.Rect({ width:w, height:h, fill:'rgba(56,189,248,0.045)',
+      stroke: ko ? '#f43f5e' : (sel ? C.accent : 'rgba(90,120,160,.35)'), strokeWidth:(ko?3:sel?2.5:1)/s,
+      dash: ko ? [40,30] : (sel ? null : [90,70]), cornerRadius:0 }));
+    const p = parts(b);
+    p.beams.forEach(r=> g.add(new Konva.Rect({ x:r.x, y:r.y, width:r.w, height:r.h,
+      fill:C.orange, stroke:C.orangeDark, strokeWidth:1/s })));
+    p.ladders.forEach(r=>{
+      g.add(new Konva.Rect({ x:r.x, y:r.y, width:r.w, height:r.h, fill:C.blue, stroke:C.blueDark, strokeWidth:1/s }));
+      for(let i=1;i<6;i++) g.add(new Konva.Line({ points:[r.x, r.h*i/6, r.x+r.w, r.h*i/6],
+        stroke:'#0b1017', strokeWidth:12, opacity:.4 }));
+    });
+    // étiquette : longueur de lisse + nombre de niveaux, seulement si lisible
+    if(w*s > 70){
+      const t = new Konva.Text({ text:`${b.beam} · ${b.levels}N`, fontSize:15,
+        fontFamily:'JetBrains Mono', fontStyle:'700', fill: sel?'#bfe9ff':'#7f94b0', listening:false });
+      t.scale({x:1/s,y:1/s});
+      t.position({ x: w/2 - (t.width()/s)/2, y: h/2 - (t.height()/s)/2 });
+      g.add(t);
+    }
+    g.on('dragstart', ()=>{
+      if(!state.selected.includes(b.id)) selectLive([b.id]);
+      stage.container().style.cursor = 'grabbing';
+      g.moveToTop();
+      // déplacement groupé : on mémorise la position de départ de toute la sélection
+      dragRef = { ox:b.x, oy:b.y, others: state.bays
+        .filter(o=>state.selected.includes(o.id) && o.id!==b.id)
+        .map(o=>({ bay:o, x:o.x, y:o.y })) };
+    });
+    g.on('dragmove', ()=>{
+      const pos = g.position(); g.position({x:snapV(pos.x), y:snapV(pos.y)});
+      b.x = g.x(); b.y = g.y();
+      if(dragRef){
+        const dx = b.x - dragRef.ox, dy = b.y - dragRef.oy;
+        dragRef.others.forEach(o=>{
+          o.bay.x = o.x + dx; o.bay.y = o.y + dy;
+          const n = lItems.findOne('#'+o.bay.id); if(n) n.position({x:o.bay.x, y:o.bay.y});
+        });
+      }
+      drawDims(b, true); renderProps(); renderJSON();
+    });
+    g.on('dragend', ()=>{
+      stage.container().style.cursor = state.measureMode ? 'crosshair' : 'move';
+      const multi = dragRef && dragRef.others.length;
+      if(!multi) magnetChain(b);
+      dragRef = null;
+      buildItems(); drawDims(b,false); refreshList(); renderProps(); renderJSON();
+      const ov = overlapping();
+      if(ov.length) toast(`⚠ Chevauchement : ${ov.join(', ')} — déplacez ou supprimez`);
+      else if(multi) toast(`${multi+1} travées déplacées ensemble → X ${fmt(b.x)} · Y ${fmt(b.y)} mm`);
+      else toast(`${b.id} → X ${fmt(b.x)} · Y ${fmt(b.y)} mm`);
+    });
+    g.on('mousedown touchstart', e=>{
+      if(state.measureMode) return;
+      e.cancelBubble = true;
+      if(e.evt.shiftKey){ const l=[...state.selected]; const i=l.indexOf(b.id); i<0?l.push(b.id):l.splice(i,1); selectLive(l); }
+      else if(!state.selected.includes(b.id)) selectLive([b.id]);
+    });
+    g.on('mouseenter', ()=> stage.container().style.cursor = state.measureMode?'crosshair':'move');
+    g.on('mouseleave', ()=> stage.container().style.cursor = state.measureMode?'crosshair':'default');
+    lItems.add(g);
+  });
+  lItems.batchDraw();
+  drawCotes();
+  drawLabels();
+}
+
+/* ---------- Cotation ---------- */
+function dimLine(x1,y1,x2,y2,label,color,edit){
+  const s = scale(), g = new Konva.Group({ listening: !!edit });
+  g.add(new Konva.Line({points:[x1,y1,x2,y2],stroke:color,strokeWidth:1.5/s,dash:[8/s,6/s],listening:false}));
+  const tick = 6/s, vert = Math.abs(x2-x1) < Math.abs(y2-y1);
+  if(vert){
+    g.add(new Konva.Line({points:[x1-tick,y1,x1+tick,y1],stroke:color,strokeWidth:1.5/s,listening:false}));
+    g.add(new Konva.Line({points:[x2-tick,y2,x2+tick,y2],stroke:color,strokeWidth:1.5/s,listening:false}));
+  } else {
+    g.add(new Konva.Line({points:[x1,y1-tick,x1,y1+tick],stroke:color,strokeWidth:1.5/s,listening:false}));
+    g.add(new Konva.Line({points:[x2,y2-tick,x2,y2+tick],stroke:color,strokeWidth:1.5/s,listening:false}));
+  }
+  const mx=(x1+x2)/2, my=(y1+y2)/2;
+  const txt = new Konva.Text({text:label,fontSize:12,fontFamily:'JetBrains Mono',fontStyle:'700',
+    fill:'#04070c',padding:4,align:'center',listening:!!edit});
+  txt.scale({x:1/s,y:1/s});
+  const wpx = txt.width()/s, hpx = txt.height()/s;
+  const bg = new Konva.Rect({x:mx-wpx/2,y:my-hpx/2,width:wpx,height:hpx,fill:color,cornerRadius:3/s,opacity:.95,listening:!!edit});
+  txt.position({x:mx-wpx/2,y:my-hpx/2});
+  g.add(bg, txt);
+  if(edit){
+    bg.stroke('#04070c'); bg.strokeWidth(1.5/s);
+    [bg, txt].forEach(n=>{
+      n.on('mouseenter', ()=>{ stage.container().style.cursor='pointer'; bg.opacity(1); bg.strokeWidth(3/s); lDim.batchDraw(); });
+      n.on('mouseleave', ()=>{ stage.container().style.cursor = state.measureMode?'crosshair':'default'; bg.opacity(.95); bg.strokeWidth(1.5/s); lDim.batchDraw(); });
+      n.on('click tap', e=>{ e.cancelBubble = true; openGapDlg(edit); });
+    });
+  }
+  return g;
+}
+/* ---------- Cotes d'allée modifiables ---------- */
+let gapEdit = null;
+function openGapDlg(ed){
+  if(state.measureMode) return;
+  gapEdit = ed;
+  document.getElementById('gapTitle').textContent = ed.title;
+  const i = document.getElementById('gapVal');
+  i.step = state.warehouse.gridSize; i.value = Math.round(ed.value);
+  document.getElementById('gapDlg').hidden = false;
+  i.focus(); i.select();
+}
+function applyGap(){
+  const v = parseFloat(document.getElementById('gapVal').value);
+  document.getElementById('gapDlg').hidden = true;
+  if(!gapEdit || !isFinite(v) || v < 0){ gapEdit = null; return; }
+  const target = snapV(v), d = (target - gapEdit.value) * gapEdit.sign;
+  const sel = state.bays.filter(b=>state.selected.includes(b.id));
+  const runs = new Set(sel.map(b=>b.run));
+  const move = state.bays.filter(b=>runs.has(b.run));
+  move.forEach(b=>{ if(gapEdit.axis==='x') b.x = snapV(b.x + d); else b.y = snapV(b.y + d); });
+  const title = gapEdit.title; gapEdit = null;
+  buildItems(); refreshList(); renderProps(); renderJSON();
+  drawDims(sel.length===1?sel[0]:null);
+  toast(`${title} : ${fmt(target)} mm — ${move.length} travée(s) déplacée(s)`);
+}
+(function(){
+  const dlg = document.getElementById('gapDlg');
+  document.getElementById('gapNo').onclick = ()=>{ dlg.hidden = true; gapEdit = null; };
+  document.getElementById('gapYes').onclick = applyGap;
+  dlg.onclick = e=>{ if(e.target === dlg){ dlg.hidden = true; gapEdit = null; } };
+  document.getElementById('gapVal').addEventListener('keydown', e=>{
+    e.stopPropagation();
+    if(e.key === 'Enter') applyGap();
+    if(e.key === 'Escape'){ dlg.hidden = true; gapEdit = null; }
+  });
+})();
+function drawDims(b, moving){
+  lDim.destroyChildren();
+  if(!b){ lDim.batchDraw(); return; }
+  const s = scale(), a = aabb(b), W = state.warehouse.width, D = state.warehouse.depth;
+  lDim.add(new Konva.Rect({x:a.x1,y:a.y1,width:a.x2-a.x1,height:a.y2-a.y1,stroke:C.accent,
+    strokeWidth:1/s,dash:[14/s,10/s],opacity:.5,listening:false}));
+  const others = state.bays.filter(o=>!state.selected.includes(o.id)).map(o=>aabb(o));
+  let L=null,R=null,T=null,B=null;
+  others.forEach(o=>{
+    if(o.y1 < a.y2 && o.y2 > a.y1){
+      if(o.x2 <= a.x1 && (L===null || o.x2 > L)) L = o.x2;
+      if(o.x1 >= a.x2 && (R===null || o.x1 < R)) R = o.x1;
+    }
+    if(o.x1 < a.x2 && o.x2 > a.x1){
+      if(o.y2 <= a.y1 && (T===null || o.y2 > T)) T = o.y2;
+      if(o.y1 >= a.y2 && (B===null || o.y1 < B)) B = o.y1;
+    }
+  });
+  const yc=(a.y1+a.y2)/2, xc=(a.x1+a.x2)/2, cN=C.accent, cW='#7b8ca6';
+  const gL = a.x1-(L??0), gR = (R??W)-a.x2, gT = a.y1-(T??0), gB = (B??D)-a.y2;
+  const ed = (axis, sign, value, title) => ({axis, sign, value, title});
+  lDim.add(dimLine(L??0, yc, a.x1, yc, fmt(gL), L===null?cW:cN,
+    ed('x', 1, gL, L===null?'Distance au bord gauche':"Largeur d'allée (gauche)")));
+  lDim.add(dimLine(a.x2, yc, R??W, yc, fmt(gR), R===null?cW:cN,
+    ed('x', -1, gR, R===null?'Distance au bord droit':"Largeur d'allée (droite)")));
+  lDim.add(dimLine(xc, T??0, xc, a.y1, fmt(gT), T===null?cW:cN,
+    ed('y', 1, gT, T===null?'Distance au bord haut':"Largeur d'allée (haut)")));
+  lDim.add(dimLine(xc, a.y2, xc, B??D, fmt(gB), B===null?cW:cN,
+    ed('y', -1, gB, B===null?'Distance au bord bas':"Largeur d'allée (bas)")));
+  // cote d'emprise de la travée
+  lDim.add(dimLine(a.x1, a.y2 + 260, a.x2, a.y2 + 260, fmt(a.x2-a.x1)+' mm', '#a3e635'));
+  if(moving) others.forEach(o=>{
+    if(Math.abs(o.x1-a.x1)<1) lDim.add(new Konva.Line({points:[a.x1,0,a.x1,D],stroke:'#f472b6',strokeWidth:1/s,dash:[20/s,12/s],listening:false}));
+    if(Math.abs(o.y1-a.y1)<1) lDim.add(new Konva.Line({points:[0,a.y1,W,a.y1],stroke:'#f472b6',strokeWidth:1/s,dash:[20/s,12/s],listening:false}));
+  });
+  lDim.batchDraw();
+}
+
+/* ---------- Outil mesure : accroche aux angles d'échelle, cotes orthogonales ---------- */
+let mA = null;
+// tous les angles d'échelle du plan, en coordonnées monde
+function ladderCorners(){
+  const out = [];
+  state.bays.forEach(b=>{
+    const r=(b.rotation||0)*Math.PI/180, cs=Math.cos(r), sn=Math.sin(r);
+    parts(b).ladders.forEach(l=>{
+      [[l.x,l.y],[l.x+l.w,l.y],[l.x+l.w,l.y+l.h],[l.x,l.y+l.h]].forEach(([x,y])=>{
+        out.push({ x: b.x + x*cs - y*sn, y: b.y + x*sn + y*cs, id:b.id });
+      });
+    });
+  });
+  return out;
+}
+function nearestCorner(p){
+  const tol = 26/scale(); // 26 px à l'écran
+  let best=null, bd=Infinity;
+  ladderCorners().forEach(c=>{ const d=Math.hypot(c.x-p.x, c.y-p.y); if(d<bd){ bd=d; best=c; } });
+  return (best && bd <= tol) ? best : null;
+}
+function drawSnapHints(p){
+  lSnap.destroyChildren();
+  if(!state.measureMode){ lSnap.batchDraw(); return; }
+  const s = scale();
+  ladderCorners().forEach(c=> lSnap.add(new Konva.Rect({ x:c.x-3/s, y:c.y-3/s, width:6/s, height:6/s,
+    stroke:'#a3e635', strokeWidth:1/s, opacity:.55 })));
+  const n = p ? nearestCorner(p) : null;
+  if(n) lSnap.add(new Konva.Circle({ x:n.x, y:n.y, radius:7/s, stroke:'#a3e635', strokeWidth:2/s, fill:'rgba(163,230,53,.25)' }));
+  if(mA) lSnap.add(new Konva.Circle({ x:mA.x, y:mA.y, radius:5/s, fill:'#a3e635' }));
+  lSnap.batchDraw();
+}
+function measureClick(p){
+  const c = nearestCorner(p);
+  if(!c){ toast("Accrochage : cliquez sur un angle d'échelle (repères verts)"); return; }
+  if(!mA){ mA = {x:c.x, y:c.y}; lDim.destroyChildren(); lDim.batchDraw(); drawSnapHints(p);
+    toast("Angle d'échelle accroché — cliquez le second angle"); return; }
+  // cote strictement horizontale ou verticale, selon l'axe dominant
+  const dx = c.x - mA.x, dy = c.y - mA.y, s = scale();
+  lDim.destroyChildren();
+  if(Math.abs(dx) >= Math.abs(dy)){
+    addCote(mA.x, mA.y, c.x, mA.y, Math.abs(dx));
+    toast('Cote horizontale placée : '+fmt(Math.abs(dx))+' mm ('+(Math.abs(dx)/1000).toFixed(3)+' m) — clic sur l\'étiquette pour la retirer');
+  } else {
+    addCote(mA.x, mA.y, mA.x, c.y, Math.abs(dy));
+    toast('Cote verticale placée : '+fmt(Math.abs(dy))+' mm ('+(Math.abs(dy)/1000).toFixed(3)+' m) — clic sur l\'étiquette pour la retirer');
+  }
+  lDim.batchDraw(); mA = null; drawSnapHints(p);
+}
+
+/* ---------- Cotes manuelles permanentes + hors-tout automatique ---------- */
+function drawCotes(){
+  lCote.destroyChildren();
+  const s = scale();
+  // hors-tout de chaque ensemble (1 travée DÉPART + ses travées SUITE)
+  if(state.showTotals){
+    const runs = {};
+    state.bays.forEach(b=>{ (runs[b.run] = runs[b.run] || []).push(b); });
+    Object.values(runs).forEach(list=>{
+      if(list.length < 2) return;
+      const bx = list.map(aabb);
+      const x1 = Math.min(...bx.map(a=>a.x1)), x2 = Math.max(...bx.map(a=>a.x2));
+      const y1 = Math.min(...bx.map(a=>a.y1)), y2 = Math.max(...bx.map(a=>a.y2));
+      const horiz = (x2-x1) >= (y2-y1);
+      if(horiz) lCote.add(dimLine(x1, y1-620, x2, y1-620, 'hors-tout '+fmt(x2-x1)+' mm', '#c084fc'));
+      else      lCote.add(dimLine(x1-620, y1, x1-620, y2, 'hors-tout '+fmt(y2-y1)+' mm', '#c084fc'));
+    });
+  }
+  // cotes placées à la main : clic sur l'étiquette = suppression
+  state.cotes.forEach(c=>{
+    const g = dimLine(c.x1, c.y1, c.x2, c.y2, fmt(c.value)+' mm', '#a3e635');
+    g.listening(true);
+    g.getChildren().forEach(n=>{
+      if(n.getClassName()==='Line') return;
+      n.listening(true);
+      n.on('mouseenter', ()=>{ stage.container().style.cursor='not-allowed'; });
+      n.on('mouseleave', ()=>{ stage.container().style.cursor = state.measureMode?'crosshair':'default'; });
+      n.on('click tap', e=>{ e.cancelBubble = true;
+        state.cotes = state.cotes.filter(o=>o.id!==c.id);
+        drawCotes(); refreshCoteList(); toast('Cote supprimée');
+      });
+    });
+    lCote.add(g);
+  });
+  lCote.batchDraw();
+}
+function addCote(x1,y1,x2,y2,value){
+  state.cotes.push({ id:'COT-'+String(state.cotes.length+1).padStart(3,'0'), x1,y1,x2,y2, value:Math.round(value) });
+  drawCotes(); refreshCoteList();
+}
+/* ---------- Étiquettes de rack ---------- */
+function firstBay(run){
+  const list = state.bays.filter(b=>b.run===run);
+  if(!list.length) return null;
+  return list.reduce((a,b)=> (b.x < a.x || (b.x===a.x && b.y < a.y)) ? b : a);
+}
+const LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+function nextLabelName(){
+  const used = new Set(state.labels.map(l=>l.text));
+  for(const c of LETTERS){ const n = 'Rack '+c; if(!used.has(n)) return n; }
+  return 'Rack '+(state.labels.length+1);
+}
+function drawLabels(){
+  lLab.destroyChildren();
+  const s = scale();
+  state.labels.forEach(l=>{
+    const b = firstBay(l.run); if(!b) return;
+    const a = aabb(b);
+    const g = new Konva.Group({ x:a.x1 + l.dx, y:a.y1 + l.dy, draggable:true, id:'lab-'+l.id });
+    const t = new Konva.Text({ text:l.text, fontSize:15/s, fontStyle:'700',
+      fontFamily:'Inter, sans-serif', fill:'#0b1220', padding:6/s });
+    const bg = new Konva.Rect({ width:t.width(), height:t.height(), fill:'#fbbf24',
+      cornerRadius:5/s, stroke:'#facc15', strokeWidth:1/s,
+      shadowColor:'#000', shadowBlur:8/s, shadowOpacity:.45 });
+    g.add(bg, t);
+    // trait de rattachement à l'angle de la première travée
+    lLab.add(new Konva.Line({ points:[a.x1, a.y1, a.x1 + l.dx + t.width()/2, a.y1 + l.dy + t.height()/2],
+      stroke:'#fbbf24', strokeWidth:1/s, dash:[8/s,6/s], opacity:.45, listening:false }));
+    g.on('mouseenter', ()=>{ stage.container().style.cursor='move'; });
+    g.on('mouseleave', ()=>{ stage.container().style.cursor = state.measureMode?'crosshair':'default'; });
+    g.on('dragend', ()=>{ const f = firstBay(l.run); if(!f) return; const aa = aabb(f);
+      l.dx = Math.round(g.x() - aa.x1); l.dy = Math.round(g.y() - aa.y1);
+      drawLabels(); renderJSON(); });
+    g.on('dblclick dbltap', e=>{ e.cancelBubble = true; openLblDlg(l); });
+    g.on('click tap', e=>{ e.cancelBubble = true; });
+    lLab.add(g);
+  });
+  lLab.batchDraw();
+}
+let lblEdit = null;
+function openLblDlg(l){
+  lblEdit = l;
+  const i = document.getElementById('lblVal');
+  i.value = l.text;
+  document.getElementById('lblDlg').hidden = false;
+  i.focus(); i.select();
+}
+function closeLblDlg(){ document.getElementById('lblDlg').hidden = true; lblEdit = null; }
+function addLabel(){
+  if(state.measureMode) return toast("Désactivez l'outil Mesurer avant d'ajouter une étiquette");
+  if(!state.bays.length) return toast('Ajoutez une travée avant de poser une étiquette');
+  const sel = state.bays.filter(b=>state.selected.includes(b.id));
+  const runs = sel.length ? [...new Set(sel.map(b=>b.run))]
+                          : [...new Set(state.bays.map(b=>b.run))];
+  const created = [];
+  runs.forEach(r=>{
+    if(state.labels.some(l=>l.run===r)) return;
+    const l = { id:'ETQ-'+String(state.labels.length+1).padStart(3,'0'), run:r,
+      text:nextLabelName(), dx:0, dy:-1500 };
+    state.labels.push(l); created.push(l);
+  });
+  drawLabels(); renderJSON();
+  if(!created.length) return notice("Ce rack a déjà une étiquette — double-clic dessus pour la renommer ou sélectionnez un autre rack");
+  toast(created.length===1
+    ? 'Étiquette « '+created[0].text+' » ajoutée — glissez-la, double-clic pour la renommer'
+    : created.length+' étiquettes ajoutées — double-clic sur une étiquette pour la renommer');
+  if(created.length===1) openLblDlg(created[0]);
+}
+
+function refreshCoteList(){
+  const el = document.getElementById('coteList');
+  if(!el) return;
+  el.innerHTML = state.cotes.length
+    ? state.cotes.map(c=>`<div class="row"><label>${c.id} · ${c.y1===c.y2?'horizontale':'verticale'}</label>`
+        + `<span class="val mono">${fmt(c.value)} mm</span></div>`).join('')
+    : '<div class="row"><label>Aucune cote placée</label><span class="val mono">—</span></div>';
+}
+
+/* ---------- Création des travées ---------- */
+function freeSpot(){
+  const rowH = DEPTH + 3000, margin = 2000;
+  const rows = Math.max(1, Math.floor((state.warehouse.depth - margin) / rowH));
+  for(let col=0; col<12; col++){
+    for(let r=0; r<rows; r++){
+      const x = margin + col*12000, y = margin + r*rowH;
+      if(x + 3000 > state.warehouse.width) break;
+      const busy = state.bays.some(b=>{ const a=aabb(b);
+        return a.x1 < x+3000 && a.x2 > x && a.y1 < y+DEPTH && a.y2 > y; });
+      if(!busy) return { x:snapV(x), y:snapV(y) };
+    }
+  }
+  return { x:snapV(margin), y:snapV(margin) };
+}
+// recentre la vue si la travée n'est pas visible
+function ensureVisible(b){
+  const a = aabb(b), s = scale();
+  const sx1 = stage.x() + a.x1*s, sx2 = stage.x() + a.x2*s;
+  const sy1 = stage.y() + a.y1*s, sy2 = stage.y() + a.y2*s;
+  if(sx1 < 20 || sy1 < 20 || sx2 > stage.width()-20 || sy2 > stage.height()-20){
+    stage.position({ x: stage.width()/2 - ((a.x1+a.x2)/2)*s, y: stage.height()/2 - ((a.y1+a.y2)/2)*s });
+    stage.batchDraw();
+  }
+}
+function addDepart(x, y, run){
+  const p = (x===undefined) ? freeSpot() : {x,y};
+  const b = { id:uid(), mode:'depart', x:snapV(p.x), y:snapV(p.y), upright:state.upright, beam:state.beam,
+    levels:state.levels, depth:DEPTH, section:SECTION, rotation:0, run: run || ('R'+state.runSeq++) };
+  state.bays.push(b); return b;
+}
+// SUITE : chaînée sur la dernière travée de la file (contact d'angle garanti)
+function addSuite(){
+  const prev = lastBay();
+  if(!prev){ const b = addDepart(); toast('Aucune travée : une travée DÉPART a été créée'); return b; }
+  const r = (prev.rotation||0)*Math.PI/180, adv = bayW(prev);
+  const b = { id:uid(), mode:'suite', x:Math.round(prev.x + adv*Math.cos(r)), y:Math.round(prev.y + adv*Math.sin(r)),
+    upright:prev.upright, beam:state.beam, levels:state.levels, depth:DEPTH, section:SECTION,
+    rotation:prev.rotation||0, run:prev.run };
+  state.bays.push(b); return b;
+}
+function lastBay(){
+  if(!state.selected.length) return state.bays[state.bays.length-1];
+  const sel = state.bays.find(b=>b.id===state.selected[state.selected.length-1]);
+  if(!sel) return state.bays[state.bays.length-1];
+  const run = state.bays.filter(b=>b.run===sel.run);
+  return run[run.length-1];
+}
+// aimantation de chaînage après un déplacement : recolle l'angle sur la travée voisine
+let dragRef = null;
+/* deux travées se recouvrent-elles ? (tolérance 1 mm) */
+function hit(a1, a2){ return a1.x1 < a2.x2-1 && a1.x2 > a2.x1+1 && a1.y1 < a2.y2-1 && a1.y2 > a2.y1+1; }
+function overlapping(){
+  const bad = new Set(), box = state.bays.map(b=>({id:b.id, a:aabb(b)}));
+  for(let i=0;i<box.length;i++) for(let j=i+1;j<box.length;j++)
+    if(hit(box[i].a, box[j].a)){ bad.add(box[i].id); bad.add(box[j].id); }
+  return [...bad];
+}
+/* premier emplacement libre sous (x,y), par pas d'allée */
+function freeZone(cand, ignore){
+  const others = state.bays.filter(b=>!ignore.includes(b.id));
+  for(let k=0;k<40;k++){
+    const test = cand.map(c=>({...c, y:c.y + k*(DEPTH+1500)}));
+    const clash = test.some(t=>others.some(o=>hit(aabb(t), aabb(o))) )
+      || test.some((t,i)=>test.some((u,j)=>j>i && hit(aabb(t), aabb(u))));
+    if(!clash) return test;
+  }
+  return cand;
+}
+function magnetChain(b){
+  const tol = 400;
+  for(const o of state.bays){
+    if(o.id===b.id || (o.rotation||0)!==(b.rotation||0)) continue;
+    const r=(o.rotation||0)*Math.PI/180, adv=bayW(o);
+    const tx = o.x + adv*Math.cos(r), ty = o.y + adv*Math.sin(r);
+    if(Math.abs(b.x-tx)<tol && Math.abs(b.y-ty)<tol){
+      b.x = Math.round(tx); b.y = Math.round(ty); b.run = o.run;
+      toast('Travée chaînée sur '+o.id+' (contact d\'angle)'); return;
+    }
+    const bx = o.x - bayW(b)*Math.cos(r), by = o.y - bayW(b)*Math.sin(r);
+    if(Math.abs(b.x-bx)<tol && Math.abs(b.y-by)<tol){
+      b.x = Math.round(bx); b.y = Math.round(by); b.run = o.run;
+      toast('Travée chaînée avant '+o.id+' (contact d\'angle)'); return;
+    }
+  }
+}
+
+/* ---------- Sélection / panneaux ---------- */
+/* sélection sans reconstruction des nœuds : indispensable pendant un mousedown/drag,
+   sinon le groupe en cours de glissement est détruit et la travée ne bouge plus */
+function selectLive(ids){
+  state.selected = ids;
+  const bad = overlapping(), s = scale();
+  lItems.getChildren().forEach(g=>{
+    const r = g.getChildren()[0], sel = ids.includes(g.id()), ko = bad.includes(g.id());
+    r.stroke(ko ? '#f43f5e' : (sel ? C.accent : 'rgba(90,120,160,.35)'));
+    r.strokeWidth((ko?3:sel?2.5:1)/s);
+    r.dash(ko ? [40,30] : (sel ? null : [90,70]));
+  });
+  lItems.batchDraw();
+  drawDims(ids.length===1 ? state.bays.find(b=>b.id===ids[0]) : null, false);
+  document.getElementById('fSel').textContent = ids.length;
+  renderProps(); refreshList();
+}
+function select(ids){
+  state.selected = ids; buildItems();
+  drawDims(ids.length===1 ? state.bays.find(b=>b.id===ids[0]) : null, false);
+  document.getElementById('fSel').textContent = ids.length;
+  renderProps(); refreshList();
+}
+function renderProps(){
+  updateSuiteBtns();
+  const box = document.getElementById('props');
+  if(!state.selected.length){
+    box.innerHTML = '<p class="empty">Sélectionnez une travée pour éditer sa position, son gabarit et son orientation.</p>'; return; }
+  if(state.selected.length>1){
+    box.innerHTML = `<div class="card"><h3>${state.selected.length} travées sélectionnées</h3>
+      <p>Rotation, duplication et suppression s'appliquent à l'ensemble.</p></div>`; return; }
+  const b = state.bays.find(x=>x.id===state.selected[0]); if(!b) return;
+  box.innerHTML = `<div class="card">
+    <h3><i class="swatch" style="background:${b.mode==='depart'?'var(--blue)':'var(--orange)'}"></i>${b.id}</h3>
+    <p>Travée ${b.mode==='depart'?'DÉPART — 2 échelles + 2 lisses':'SUITE — 1 échelle + 2 lisses'} · file ${b.run}</p>
+    <div class="row"><label>Largeur échelle</label><select id="pU">${UPRIGHTS.map(v=>`<option ${v===b.upright?'selected':''}>${v}</option>`).join('')}</select></div>
+    <div class="row"><label>Longueur lisse</label><select id="pB">${BEAMS.map(v=>`<option ${v===b.beam?'selected':''}>${v}</option>`).join('')}</select></div>
+    <div class="row"><label>Niveaux de lisses</label><select id="pL">${LEVELS.map(v=>`<option ${v===b.levels?'selected':''}>${v}</option>`).join('')}</select></div>
+    <div class="row"><label>Mode</label><select id="pM">
+      <option value="depart" ${b.mode==='depart'?'selected':''}>DÉPART</option>
+      <option value="suite" ${b.mode==='suite'?'selected':''}>SUITE</option></select></div>
+    <div class="row"><label>Rotation (°)</label><input type="number" id="pR" step="15" value="${Math.round(b.rotation||0)}"></div>
+    ${b.mode==='depart' ? `<div class="row"><label>Travées SUITE de la file</label>
+      <div class="stepper">
+        <button type="button" id="pSMinus" title="Retirer la dernière travée SUITE" aria-label="Retirer une travée SUITE">−</button>
+        <span class="sv" id="pSVal">${suitesOf(b.run).length}</span>
+        <button type="button" id="pSPlus" title="Ajouter une travée SUITE" aria-label="Ajouter une travée SUITE">+</button>
+      </div></div>` : ''}
+    <div class="row"><label>Profondeur</label><span class="val mono">1100 mm</span></div>
+    <div class="row"><label style="white-space:nowrap">POS.</label>
+      <span class="val mono" style="white-space:nowrap;color:var(--txt-dim)"><input type="number" class="plainnum"
+        id="pX" step="${state.warehouse.gridSize}" value="${Math.round(b.x)}" aria-label="Position X en mm"> x <input
+        type="number" class="plainnum" id="pY" step="${state.warehouse.gridSize}" value="${Math.round(b.y)}"
+        aria-label="Position Y en mm"> mm</span></div>
+  </div>`;
+  const upd = ()=>{
+    b.x=+document.getElementById('pX').value; b.y=+document.getElementById('pY').value;
+    b.rotation=+document.getElementById('pR').value;
+    b.upright=+document.getElementById('pU').value; b.beam=+document.getElementById('pB').value;
+    b.levels=+document.getElementById('pL').value; b.mode=document.getElementById('pM').value;
+    buildItems(); drawDims(b,false); refreshList(); renderJSON(); renderProps();
+  };
+  ['pX','pY','pR','pU','pB','pL','pM'].forEach(id=>document.getElementById(id).addEventListener('change',upd));
+  const sp = document.getElementById('pSPlus'), sm = document.getElementById('pSMinus');
+  if(sp && sm){
+    sm.disabled = !suitesOf(b.run).length;   // plus de SUITE : le « − » ne fait plus rien
+    sp.onclick = ()=> addSuiteToRun(b);
+    sm.onclick = ()=> removeLastSuite(b);
+  }
+}
+function refreshList(){
+  const box = document.getElementById('list');
+  if(!state.bays.length){ box.innerHTML='<p class="empty">Aucune travée. Touche <b>+</b> pour une travée DÉPART.</p>';
+    renderStats(); renderJSON(); return; }
+  box.innerHTML = state.bays.map(b=>`<div class="item ${state.selected.includes(b.id)?'sel':''}" data-id="${b.id}">
+    <i class="swatch" style="background:${b.mode==='depart'?'var(--blue)':'var(--orange)'}"></i>
+    <span>${b.id}</span><span class="tag">${b.mode==='depart'?'DÉPART':'SUITE'}</span>
+    <span class="n">${b.upright}/${b.beam}/${b.levels}N</span></div>`).join('');
+  box.querySelectorAll('.item').forEach(n=>n.onclick = e =>
+    select(e.shiftKey ? [...state.selected, n.dataset.id] : [n.dataset.id]));
+  renderStats(); renderJSON();
+}
+/* ---------- Métré + nomenclature ---------- */
+// 2 lisses par niveau (avant + arrière)
+const beamsOf = b => 2 * (b.levels || 2);
+const laddersOf = b => b.mode==='depart' ? 2 : 1;
+function bom(){
+  const ladders = UPRIGHTS.map(u=>({ famille:'Échelle', ref:`ECH-${u}x${DEPTH}`,
+    designation:`Échelle ${u} × ${DEPTH} mm`, dim:`${u} × ${DEPTH}`,
+    qte: state.bays.filter(b=>b.upright===u).reduce((s,b)=>s+laddersOf(b),0), ml:0 }))
+    .filter(r=>r.qte);
+  const beams = BEAMS.map(l=>{
+    const qte = state.bays.filter(b=>b.beam===l).reduce((s,b)=>s+beamsOf(b),0);
+    return { famille:'Lisse', ref:`LIS-${l}`, designation:`Lisse ${l} mm (section ${SECTION} mm)`,
+      dim:`${l} × ${SECTION}`, qte, ml: qte*l/1000 };
+  }).filter(r=>r.qte);
+  return [...ladders, ...beams];
+}
+function renderStats(){
+  const dep = state.bays.filter(b=>b.mode==='depart').length, sui = state.bays.length - dep;
+  const ladders = state.bays.reduce((s,b)=>s+laddersOf(b),0);
+  const beams = state.bays.reduce((s,b)=>s+beamsOf(b),0);
+  const ml = state.bays.reduce((s,b)=>s + b.beam*beamsOf(b), 0);
+  const byLev = LEVELS.map(n=>[n, state.bays.filter(b=>b.levels===n).length]).filter(([,n])=>n);
+  const runs = new Set(state.bays.map(b=>b.run)).size;
+  document.getElementById('stats').innerHTML = `
+    <div class="stat"><span>Travées</span><b>${state.bays.length}</b></div>
+    <div class="stat"><span>↳ DÉPART / SUITE</span><b>${dep} / ${sui}</b></div>
+    <div class="stat"><span>Files de racks</span><b>${runs}</b></div>
+    ${byLev.map(([n,c])=>`<div class="stat"><span>↳ travées à ${n} niveau${n>1?'x':''}</span><b>${c}</b></div>`).join('')}
+    <div class="stat"><span>Échelles</span><b>${ladders}</b></div>
+    <div class="stat"><span>Lisses (tous niveaux)</span><b>${beams}</b></div>
+    <div class="stat"><span>Linéaire de lisses</span><b>${(ml/1000).toFixed(2)} m</b></div>
+    <div class="stat"><span>Surface au sol</span><b>${((state.warehouse.width*state.warehouse.depth)/1e6).toFixed(1)} m²</b></div>`;
+  renderBom();
+}
+function renderBom(){
+  const rows = bom(), box = document.getElementById('bom');
+  if(!rows.length){ box.innerHTML = '<p class="empty">La nomenclature se remplit dès la première travée.</p>'; return; }
+  const total = rows.reduce((s,r)=>s+r.qte,0);
+  box.innerHTML = rows.map(r=>`<div class="stat"><span>${r.ref}</span><b>${r.qte}</b></div>`).join('')
+    + `<div class="stat" style="border-top:1px solid var(--line);margin-top:6px;padding-top:6px">
+         <span>Total articles</span><b>${total}</b></div>`;
+}
+function downloadBom(){
+  const rows = bom();
+  if(!rows.length) return toast('Aucune travée : nomenclature vide');
+  const sep = ';';
+  const head = ['Famille','Référence','Désignation','Dimensions (mm)','Quantité','Linéaire (m)'];
+  const lines = [head.join(sep)];
+  rows.forEach(r=>lines.push([r.famille, r.ref, r.designation, r.dim, r.qte,
+    r.ml ? r.ml.toFixed(2).replace('.',',') : ''].join(sep)));
+  const bays = state.bays.length, dep = state.bays.filter(b=>b.mode==='depart').length;
+  lines.push('');
+  lines.push(['Récapitulatif','','Travées DEPART',' ',dep,''].join(sep));
+  lines.push(['Récapitulatif','','Travées SUITE',' ',bays-dep,''].join(sep));
+  lines.push(['Récapitulatif','','Linéaire total de lisses (m)',' ','',
+    (rows.reduce((s,r)=>s+r.ml,0)).toFixed(2).replace('.',',')].join(sep));
+  lines.push('');
+  lines.push(['Licence', RKP.lic ? RKP.lic.licence : 'DEMO', RKP.lic ? RKP.lic.nomExport : 'version de demonstration', '', '', ''].join(sep));
+  const blob = new Blob(['\ufeff'+lines.join('\r\n')], {type:'text/csv;charset=utf-8'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = 'nomenclature-racks.csv'; a.click(); URL.revokeObjectURL(a.href);
+  toast('Nomenclature exportée ('+rows.length+' références)');
+}
+function toJSON(){
+  return { version:3, unit:'mm', warehouse:{...state.warehouse},
+    cotes: state.cotes.map(c=>({...c})),
+    labels: state.labels.map(l=>({...l})),
+    bays: state.bays.map(b=>({ id:b.id, mode:b.mode, x:Math.round(b.x), y:Math.round(b.y),
+      upright:b.upright, beam:b.beam, levels:b.levels, depth:b.depth, section:b.section,
+      rotation:Math.round(b.rotation||0), run:b.run })) };
+}
+function renderJSON(){
+  const d = toJSON();
+  const head = JSON.stringify({version:d.version, unit:d.unit, warehouse:d.warehouse}, null, 2).slice(0,-2);
+  const rows = d.bays.slice(0,3).map(b=>'    '+JSON.stringify(b)).join(',\n');
+  document.getElementById('json').textContent = head + ',\n  "bays": [\n' + rows +
+    (d.bays.length>3 ? `\n    … ${d.bays.length-3} autres` : '') + '\n  ]\n}';
+}
+function renderPitch(){ /* bloc d'info retiré */ }
+
+/* ---------- Import ---------- */
+function loadData(d){
+  const rows = d.bays || d.elements;
+  if(!Array.isArray(rows)) throw new Error('JSON invalide');
+  state.warehouse = Object.assign({width:30000,depth:18000,gridSize:50}, d.warehouse||{});
+  state.seq = 1; state.runSeq = 1;
+  state.bays = rows.filter(r=>r.mode||r.type==='travee').map(r=>({
+    id:r.id||uid(), mode:r.mode==='suite'?'suite':'depart', x:+r.x, y:+r.y,
+    upright:+r.upright||100, beam:+r.beam||2700, levels:+r.levels||2, depth:DEPTH, section:SECTION,
+    rotation:+r.rotation||0, run:r.run||'R1' }));
+  state.cotes = Array.isArray(d.cotes) ? d.cotes.map((c,i)=>({ id:c.id||('COT-'+String(i+1).padStart(3,'0')),
+    x1:+c.x1, y1:+c.y1, x2:+c.x2, y2:+c.y2, value:Math.round(+c.value) })) : [];
+  refreshCoteList();
+  state.labels = Array.isArray(d.labels) ? d.labels.map((l,i)=>({ id:l.id||('ETQ-'+String(i+1).padStart(3,'0')),
+    run:l.run||'R1', text:String(l.text||('Rack '+LETTERS[i%26])), dx:+l.dx||0, dy:+l.dy||-1500 })) : [];
+  state.seq = state.bays.length + 1;
+  const rn = [...new Set(state.bays.map(b=>b.run))]; state.runSeq = rn.length + 1;
+  document.getElementById('whW').value = state.warehouse.width;
+  document.getElementById('whD').value = state.warehouse.depth;
+  document.getElementById('gridSel').value = String(state.warehouse.gridSize);
+  document.getElementById('fGrid').textContent = state.warehouse.gridSize+' mm';
+  state.selected = [];
+  drawGrid(); buildItems(); drawDims(null); refreshList(); renderProps(); fit();
+}
+
+/* ---------- Vue ---------- */
+function fit(){
+  const pad = 2800;
+  zoom = Math.min(stage.width()/((state.warehouse.width+pad*2)*MM), stage.height()/((state.warehouse.depth+pad*2)*MM));
+  applyScale();
+  stage.position({x:(stage.width()-state.warehouse.width*scale())/2, y:(stage.height()-state.warehouse.depth*scale())/2});
+  drawGrid(); buildItems();
+  drawDims(state.selected.length===1?state.bays.find(b=>b.id===state.selected[0]):null);
+}
+function zoomAt(f, center){
+  const old = scale();
+  zoom = Math.max(0.12, Math.min(16, zoom*f)); applyScale();
+  const ns = scale(), c = center || {x:stage.width()/2, y:stage.height()/2};
+  const rel = {x:(c.x-stage.x())/old, y:(c.y-stage.y())/old};
+  stage.position({x:c.x-rel.x*ns, y:c.y-rel.y*ns});
+  drawGrid(); buildItems();
+  drawDims(state.selected.length===1?state.bays.find(b=>b.id===state.selected[0]):null);
+  if(state.measureMode) drawSnapHints(null);
+}
+stage.on('wheel', e=>{ e.evt.preventDefault(); zoomAt(e.evt.deltaY>0?0.9:1.1, stage.getPointerPosition()); });
+stage.on('mousemove', ()=>{ const p=stage.getPointerPosition(); if(!p) return;
+  const w = {x:(p.x-stage.x())/scale(), y:(p.y-stage.y())/scale()};
+  document.getElementById('fCur').textContent = `X ${fmt(w.x)} · Y ${fmt(w.y)} mm`;
+  if(state.measureMode) drawSnapHints(w); });
+stage.on('mousedown', e=>{
+  const p = stage.getPointerPosition();
+  const w = {x:(p.x-stage.x())/scale(), y:(p.y-stage.y())/scale()};
+  if(state.measureMode){ measureClick(w); return; }
+  if(e.target === stage || e.target.getLayer() === lGrid) select([]);
+});
+let panning=false, panStart=null, spaceDown=false;
+stage.container().addEventListener('contextmenu', e=>e.preventDefault());
+stage.container().addEventListener('mousedown', e=>{
+  if(e.button===2 || spaceDown){ panning=true; panStart={x:e.clientX-stage.x(), y:e.clientY-stage.y()};
+    stage.container().style.cursor='grabbing'; }});
+window.addEventListener('mousemove', e=>{ if(panning){ stage.position({x:e.clientX-panStart.x,y:e.clientY-panStart.y}); stage.batchDraw(); }});
+window.addEventListener('mouseup', ()=>{ if(panning){ panning=false;
+  stage.container().style.cursor = state.measureMode?'crosshair':'default'; }});
+window.addEventListener('resize', ()=>{ stage.size({width:host.clientWidth,height:host.clientHeight}); stage.batchDraw(); });
+
+/* ---------- Actions ---------- */
+/* ---------- Historique : annuler / rétablir ---------- */
+const hist = { stack:[], i:-1, lock:false };
+function snapKey(){ return JSON.stringify(toJSON()); }
+function histBtns(){
+  const u = document.getElementById('bUndo'), r = document.getElementById('bRedo');
+  if(u) u.disabled = hist.i <= 0;
+  if(r) r.disabled = hist.i >= hist.stack.length - 1;
+}
+function histInit(){ hist.stack = [snapKey()]; hist.i = 0; histBtns(); }
+function histWatch(){
+  if(hist.lock) return;
+  const k = snapKey();
+  if(hist.i >= 0 && hist.stack[hist.i] === k) return;
+  hist.stack = hist.stack.slice(0, hist.i + 1);
+  hist.stack.push(k);
+  if(hist.stack.length > 80) hist.stack.shift();
+  hist.i = hist.stack.length - 1;
+  histBtns();
+}
+function histApply(k){
+  hist.lock = true;
+  const z = zoom, pos = stage.position(), sel = state.selected.slice();
+  loadData(JSON.parse(k));
+  zoom = z; applyScale(); stage.position(pos);
+  state.selected = sel.filter(id=>state.bays.some(b=>b.id===id));
+  drawGrid(); buildItems(); refreshList(); renderProps(); renderJSON();
+  drawDims(state.selected.length===1 ? state.bays.find(b=>b.id===state.selected[0]) : null);
+  hist.lock = false;
+  histBtns();
+}
+function undo(){
+  if(hist.i <= 0) return notice("Rien à annuler");
+  hist.i--; histApply(hist.stack[hist.i]); toast('Annulé');
+}
+function redo(){
+  if(hist.i >= hist.stack.length - 1) return notice("Rien à rétablir");
+  hist.i++; histApply(hist.stack[hist.i]); toast('Rétabli');
+}
+
+/* ---------- Rotation de tout le plan (horizontal <-> vertical) ---------- */
+function rotatePlan(){
+  if(!state.bays.length) return notice('Ajoutez au moins une travée avant de pivoter le plan');
+  const D = state.warehouse.depth;
+  const f = (x,y) => ({ x: D - y, y: x });   // rotation 90° sens horaire
+  const oldA = {}; state.bays.forEach(b=>{ oldA[b.id] = aabb(b); });
+  const oldFirst = {}; state.labels.forEach(l=>{ const b = firstBay(l.run); if(b) oldFirst[l.id] = oldA[b.id]; });
+  const labAbs = {}; state.labels.forEach(l=>{ const a = oldFirst[l.id];
+    if(a) labAbs[l.id] = f(a.x1 + l.dx, a.y1 + l.dy); });
+  state.bays.forEach(b=>{ const p = f(b.x, b.y); b.x = p.x; b.y = p.y; b.rotation = ((b.rotation||0) + 90) % 360; });
+  state.cotes.forEach(c=>{ const p1 = f(c.x1,c.y1), p2 = f(c.x2,c.y2);
+    c.x1 = p1.x; c.y1 = p1.y; c.x2 = p2.x; c.y2 = p2.y; });
+  const w = state.warehouse.width; state.warehouse.width = state.warehouse.depth; state.warehouse.depth = w;
+  state.labels.forEach(l=>{ const b = firstBay(l.run); if(!b || !labAbs[l.id]) return;
+    const a = aabb(b); l.dx = Math.round(labAbs[l.id].x - a.x1); l.dy = Math.round(labAbs[l.id].y - a.y1); });
+  document.getElementById('whW').value = state.warehouse.width;
+  document.getElementById('whD').value = state.warehouse.depth;
+  drawGrid(); buildItems(); refreshList(); renderProps(); renderJSON();
+  drawDims(state.selected.length===1 ? state.bays.find(b=>b.id===state.selected[0]) : null);
+  fit();
+  toast('Plan pivoté de 90° — entrepôt '+fmt(state.warehouse.width)+' × '+fmt(state.warehouse.depth)+' mm');
+}
+
+/* ---------- Impression ---------- */
+function printPlan(){
+  if(!state.bays.length) return notice('Le plan est vide — ajoutez une travée avant d\'imprimer');
+  const sel = state.selected.slice();
+  state.selected = []; buildItems(); drawDims(null);
+  const box = { x1:0, y1:0, x2:state.warehouse.width, y2:state.warehouse.depth };
+  const zBak = zoom, pBak = stage.position(), wBak = stage.width(), hBak = stage.height();
+  const px = 1600 / (box.x2 - box.x1);
+  zoom = px / MM; applyScale();
+  const M = 90;
+  stage.width((box.x2-box.x1)*scale() + M*2); stage.height((box.y2-box.y1)*scale() + M*2);
+  stage.position({ x:M, y:M });
+  // thème clair, lisible à l'encre
+  const bak = { floor:C.floor, grid:C.grid, gridMajor:C.gridMajor, wall:C.wall, lbl:C.lbl };
+  C.floor = '#ffffff'; C.grid = '#e6ebf2'; C.gridMajor = '#c3cedd'; C.wall = '#94a3b8'; C.lbl = '#475569';
+  lGrid.visible(true); drawGrid(); buildItems();
+  const url = stage.toDataURL({ pixelRatio:1.5, mimeType:'image/png' });
+  // restauration de la vue à l'écran
+  Object.assign(C, bak);
+  stage.width(wBak); stage.height(hBak); zoom = zBak; applyScale(); stage.position(pBak);
+  state.selected = sel; drawGrid(); buildItems();
+  drawDims(sel.length===1 ? state.bays.find(b=>b.id===sel[0]) : null);
+
+  const rows = bom();
+  const dep = state.bays.filter(b=>b.mode==='depart').length;
+  const st = [
+    ['Travées', state.bays.length],
+    ['dont DÉPART / SUITE', dep+' / '+(state.bays.length-dep)],
+    ['Files de racks', new Set(state.bays.map(b=>b.run)).size],
+    ['Échelles', state.bays.reduce((a,b)=>a+laddersOf(b),0)],
+    ['Lisses (tous niveaux)', state.bays.reduce((a,b)=>a+beamsOf(b),0)],
+    ['Linéaire de lisses', (state.bays.reduce((a,b)=>a+b.beam*beamsOf(b),0)/1000).toFixed(2)+' m'],
+    ['Surface entrepôt', ((state.warehouse.width*state.warehouse.depth)/1e6).toFixed(1)+' m²']
+  ];
+  const d = new Date();
+  const wrap = document.getElementById('printArea');
+  wrap.innerHTML = `
+    <div class="p-head">
+      <div><h1>Plan d'entrepôt — implantation racks</h1>
+        <div class="p-sub">Entrepôt ${fmt(state.warehouse.width)} × ${fmt(state.warehouse.depth)} mm · grille ${state.warehouse.gridSize} mm · cotes en mm</div></div>
+      <div class="p-sub">Édité le ${d.toLocaleDateString('fr-FR')} à ${d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}</div>
+    </div>
+    <img src="${url}" alt="Plan">
+    <div class="p-cols">
+      <div><h2>Métré</h2><table>${st.map(r=>`<tr><td>${r[0]}</td><td class="n">${r[1]}</td></tr>`).join('')}</table></div>
+      <div><h2>Nomenclature</h2><table><tr><th>Référence</th><th>Désignation</th><th class="n">Qté</th></tr>
+        ${rows.map(r=>`<tr><td>${r.ref}</td><td>${r.designation}</td><td class="n">${r.qte}</td></tr>`).join('')}</table></div>
+    </div>
+    <div class="p-sub" style="margin-top:12px;border-top:1px solid #ddd;padding-top:6px">
+      RackPlan 2D — licence ${RKP.lic ? RKP.lic.licence : 'DÉMONSTRATION'}${RKP.lic ? ' — ' + RKP.lic.nomExport : ''}
+    </div>`;
+  document.body.classList.add('printing');
+  setTimeout(()=>{ window.print(); document.body.classList.remove('printing'); }, 260);
+}
+
+function rotateSel(){
+  if(!state.selected.length) return toast('Sélectionnez une travée à pivoter');
+  state.selected.forEach(id=>{ const b=state.bays.find(x=>x.id===id); b.rotation=((b.rotation||0)+90)%360; });
+  buildItems(); if(state.selected.length===1) drawDims(state.bays.find(b=>b.id===state.selected[0]),false);
+  renderProps(); toast('Rotation +90°');
+}
+function dupSel(){
+  if(!state.selected.length) return toast('Rien à dupliquer');
+  // on conserve le chaînage interne : une nouvelle file par file d'origine
+  const runMap = {};
+  let copies = state.selected.map(id=>{
+    const b = state.bays.find(x=>x.id===id);
+    if(!runMap[b.run]) runMap[b.run] = 'R'+state.runSeq++;
+    return {...b, id:uid(), x:b.x, y:b.y + DEPTH + 3000, run:runMap[b.run]};
+  });
+  // on décale vers le bas jusqu'à trouver une zone libre (jamais de doublon caché)
+  copies = freeZone(copies, []);
+  copies.forEach(c=>state.bays.push(c));
+  select(copies.map(c=>c.id));
+  ensureVisible(copies[0]);
+  toast(copies.length+' travée(s) dupliquée(s) sur une zone libre'
+    + (copies.length>1 ? ' — sélection groupée, glissez-les ensemble' : ''));
+}
+function delSel(){
+  if(!state.selected.length) return toast('Rien à supprimer');
+  const n = state.selected.length;
+  state.bays = state.bays.filter(b=>!state.selected.includes(b.id));
+  select([]); toast(n+' travée(s) supprimée(s)');
+}
+function doDepart(){ const b = addDepart(); select([b.id]); refreshList(); ensureVisible(b);
+  toast(`Travée DÉPART ${b.beam} mm · échelles ${b.upright} mm (emprise ${fmt(bayW(b))} mm)`); }
+function doSuite(){ const b = addSuite(); select([b.id]); refreshList(); ensureVisible(b);
+  toast(`Travée SUITE ${b.beam} mm chaînée (file ${b.run})`); }
+
+/* ---------- + / − contextuels sur une travée DÉPART sélectionnée ---------- */
+// nombre de travées SUITE de la file
+const suitesOf = run => state.bays.filter(b=>b.run===run && b.mode==='suite');
+// travée unique sélectionnée (quel que soit son mode)
+function selBay(){
+  if(state.selected.length !== 1) return null;
+  return state.bays.find(x=>x.id===state.selected[0]) || null;
+}
+// la sélection est-elle une unique travée DÉPART ?
+function selDepart(){ const b = selBay(); return (b && b.mode==='depart') ? b : null; }
+// état des boutons − / + du panneau « Ajouter une travée »
+function updateSuiteBtns(){
+  const b = selBay(), m = document.getElementById('suiteMinus');
+  if(m) m.disabled = !b || !suitesOf(b.run).length;
+}
+// « + » : allonge la file d'une travée SUITE, la sélection ne bouge pas
+function addSuiteToRun(ref){
+  const b = addSuite();                 // chaînée sur la dernière travée de la file
+  select([ref.id]); refreshList(); renderJSON(); ensureVisible(b);
+  toast(`Travée SUITE ajoutée à la file ${ref.run} — ${suitesOf(ref.run).length} SUITE`);
+  return b;
+}
+// « − » : retire la dernière travée SUITE ; ne touche jamais à la travée DÉPART
+function removeLastSuite(ref){
+  const s = suitesOf(ref.run);
+  if(!s.length) return toast(`File ${ref.run} : plus aucune travée SUITE à retirer`);
+  const last = s[s.length-1];
+  const keep = (last.id === ref.id) ? s[s.length-2] || state.bays.find(b=>b.run===ref.run && b.mode==='depart') : ref;
+  state.bays = state.bays.filter(b=>b.id!==last.id);
+  select(keep ? [keep.id] : []); refreshList(); renderJSON();
+  toast(`Travée SUITE ${last.id} retirée — ${suitesOf(ref.run).length} SUITE restante(s)`);
+}
+
+document.getElementById('addDepart').onclick = doDepart;
+document.getElementById('addSuite').onclick = doSuite;
+document.getElementById('suitePlus').onclick = ()=>{
+  const b = selBay(); b ? addSuiteToRun(b) : doSuite(); };
+document.getElementById('suiteMinus').onclick = ()=>{
+  const b = selBay();
+  if(!b) return toast('Sélectionnez une travée de la file à raccourcir');
+  removeLastSuite(b); };
+document.getElementById('bRot').onclick = rotateSel;
+document.getElementById('bDup').onclick = dupSel;
+document.getElementById('tTotals').onclick = e=>{
+  state.showTotals = !state.showTotals;
+  e.currentTarget.classList.toggle('on', state.showTotals);
+  drawCotes();
+  toast(state.showTotals ? 'Cotes hors-tout affichées' : 'Cotes hors-tout masquées');
+};
+document.getElementById('bPrint').onclick = printPlan;
+document.getElementById('bRotAll').onclick = rotatePlan;
+document.getElementById('bUndo').onclick = undo;
+document.getElementById('bRedo').onclick = redo;
+document.getElementById('bLabel').onclick = addLabel;
+document.getElementById('lblNo').onclick = closeLblDlg;
+document.getElementById('lblYes').onclick = ()=>{
+  const v = document.getElementById('lblVal').value.trim();
+  if(lblEdit && v){ lblEdit.text = v; }
+  closeLblDlg(); drawLabels(); renderJSON(); toast(v ? 'Étiquette renommée : '+v : 'Étiquette inchangée');
+};
+document.getElementById('lblDel').onclick = ()=>{
+  if(lblEdit) state.labels = state.labels.filter(o=>o.id!==lblEdit.id);
+  closeLblDlg(); drawLabels(); renderJSON(); toast('Étiquette supprimée');
+};
+document.getElementById('lblDlg').onclick = e=>{ if(e.target.id==='lblDlg') closeLblDlg(); };
+document.getElementById('lblVal').onkeydown = e=>{
+  if(e.key==='Enter') document.getElementById('lblYes').click();
+  if(e.key==='Escape') closeLblDlg();
+};
+document.getElementById('bCoteClr').onclick = ()=>{
+  if(!state.cotes.length) return toast('Aucune cote à effacer');
+  const n = state.cotes.length; state.cotes = [];
+  drawCotes(); refreshCoteList(); toast(n+' cote(s) effacée(s)');
+};
+document.getElementById('bDel').onclick = delSel;
+document.getElementById('tSnap').onclick = e=>{ state.snap=!state.snap;
+  e.currentTarget.classList.toggle('on', state.snap); toast('Magnétisme '+(state.snap?'activé':'désactivé')); };
+document.getElementById('tMeasure').onclick = e=>{
+  state.measureMode=!state.measureMode; mA=null;
+  e.currentTarget.classList.toggle('on', state.measureMode);
+  stage.container().style.cursor = state.measureMode?'crosshair':'default';
+  lDim.destroyChildren(); lDim.batchDraw(); drawSnapHints(null);
+  toast(state.measureMode?"Outil mesure : accrochez deux angles d'échelle (cotes H ou V)":'Outil mesure désactivé'); };
+// pavé des raccourcis, réduit par défaut
+(function(){
+  const btn = document.getElementById('hintBtn'), box = document.getElementById('hint');
+  btn.onclick = ()=>{
+    const open = box.hidden;
+    box.hidden = !open;
+    btn.classList.toggle('on', open);
+    btn.setAttribute('aria-expanded', String(open));
+    btn.textContent = open ? '×' : '?';
+    btn.title = btn.ariaLabel = open ? 'Masquer les raccourcis' : 'Afficher les raccourcis';
+  };
+})();
+document.getElementById('zIn').onclick = ()=>zoomAt(1.25);
+document.getElementById('zOut').onclick = ()=>zoomAt(0.8);
+document.getElementById('zFit').onclick = fit;
+document.getElementById('bSave').onclick = ()=>{
+  const blob = new Blob([JSON.stringify(toJSON(),null,2)],{type:'application/json'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  const d = new Date(), pad = n=>String(n).padStart(2,'0');
+  a.download = 'plan-entrepot-'+d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate())+'-'+pad(d.getHours())+pad(d.getMinutes())+'.json';
+  a.click(); URL.revokeObjectURL(a.href);
+  toast('Plan enregistré : '+a.download); };
+document.getElementById('bBom').onclick = downloadBom;
+document.getElementById('bBom2').onclick = downloadBom;
+document.getElementById('bLoad').onclick = ()=>document.getElementById('fLoad').click();
+document.getElementById('fLoad').onchange = e=>{
+  const f = e.target.files[0]; if(!f) return;
+  const r = new FileReader();
+  r.onload = ()=>{ try{ loadData(JSON.parse(r.result)); toast('Plan rechargé : '+state.bays.length+' travée(s), '+state.cotes.length+' cote(s), '+state.labels.length+' étiquette(s)'); }
+    catch(err){ notice('Fichier illisible : '+err.message); } };
+  r.readAsText(f); e.target.value=''; };
+function applyWarehouse(){
+  const wi = document.getElementById('whW'), di = document.getElementById('whD');
+  state.warehouse.width = Math.max(3000, Math.round((+wi.value||3000)/500)*500);
+  state.warehouse.depth = Math.max(3000, Math.round((+di.value||3000)/500)*500);
+  wi.value = state.warehouse.width; di.value = state.warehouse.depth;
+  drawGrid(); renderStats(); renderJSON(); fit();
+}
+['whW','whD'].forEach(id=>document.getElementById(id).onchange = applyWarehouse);
+// sélecteurs déroulants (échelle, lisse)
+function selList(id, values, key, suffix){
+  const el = document.getElementById(id);
+  el.innerHTML = values.map(v=>`<option value="${v}">${v}${suffix||''}</option>`).join('');
+  el.value = state[key];
+  el.onchange = ()=>{ state[key] = +el.value; renderPitch(); };
+  return ()=>{ el.value = state[key]; };
+}
+// curseurs − / + sur les valeurs discrètes (niveaux)
+function stepList(minusId, plusId, valId, values, key, fmtV){
+  const vEl = document.getElementById(valId),
+        mi = document.getElementById(minusId), pl = document.getElementById(plusId);
+  const paint = ()=>{
+    const i = values.indexOf(state[key]);
+    vEl.textContent = fmtV(state[key]);
+    mi.disabled = i <= 0; pl.disabled = i >= values.length-1;
+  };
+  const move = d => ()=>{
+    const i = values.indexOf(state[key]) + d;
+    if(i < 0 || i >= values.length) return;
+    state[key] = values[i]; paint(); renderPitch();
+  };
+  mi.onclick = move(-1); pl.onclick = move(1);
+  return paint;
+}
+document.getElementById('gridSel').onchange = e=>{
+  state.warehouse.gridSize = +e.target.value;
+  document.getElementById('fGrid').textContent = state.warehouse.gridSize+' mm';
+  drawGrid(); renderJSON(); toast('Pas de grille : '+state.warehouse.gridSize+' mm'); };
+
+const paintEch = selList('echSel', UPRIGHTS, 'upright', '');
+const paintLis = selList('lisSel', BEAMS, 'beam', '');
+const paintLev = stepList('levMinus','levPlus','levVal', LEVELS, 'levels', v=>v+' niv.');
+function chipsAll(){ paintEch(); paintLis(); paintLev(); renderPitch(); }
+document.getElementById('tSnap').classList.add('on');
+
+window.addEventListener('keydown', e=>{
+  if(['INPUT','SELECT','TEXTAREA'].includes(e.target.tagName)) return;
+  const k = e.key.toLowerCase();
+  if((e.ctrlKey||e.metaKey) && k==='z'){ e.preventDefault(); return e.shiftKey ? redo() : undo(); }
+  if((e.ctrlKey||e.metaKey) && k==='y'){ e.preventDefault(); return redo(); }
+  if((e.ctrlKey||e.metaKey) && k==='p'){ e.preventDefault(); return printPlan(); }
+  if(e.ctrlKey||e.metaKey) return;
+  if(e.code==='Space'){ spaceDown=true; e.preventDefault(); }
+  if(e.key==='+' || e.key==='=' || e.code==='NumpadAdd'){ e.preventDefault();
+    const d = selDepart(); d ? addSuiteToRun(d) : doDepart(); }
+  else if(e.key==='-' || e.key==='_' || e.code==='NumpadSubtract'){ e.preventDefault();
+    const d = selDepart(); d ? removeLastSuite(d) : doSuite(); }
+  else if(k==='r') rotateSel();
+  else if(k==='d') dupSel();
+  else if(e.key==='Delete'||e.key==='Backspace'){ e.preventDefault(); delSel(); }
+  else if(k==='g') document.getElementById('tSnap').click();
+  else if(k==='m') document.getElementById('tMeasure').click();
+  else if(k==='escape') select([]);
+  else if(e.key.startsWith('Arrow') && state.selected.length){
+    e.preventDefault();
+    const st = e.shiftKey ? state.warehouse.gridSize*10 : state.warehouse.gridSize;
+    const dx = e.key==='ArrowLeft'?-st:e.key==='ArrowRight'?st:0;
+    const dy = e.key==='ArrowUp'?-st:e.key==='ArrowDown'?st:0;
+    state.selected.forEach(id=>{ const b=state.bays.find(x=>x.id===id); b.x+=dx; b.y+=dy; });
+    buildItems(); if(state.selected.length===1) drawDims(state.bays.find(b=>b.id===state.selected[0]),true);
+    renderProps(); renderJSON();
+  }
+});
+window.addEventListener('keyup', e=>{ if(e.code==='Space') spaceDown=false; });
+
+/* ---------- Démo ---------- */
+/* ---------- État initial : une seule travée DÉPART ---------- */
+function resetPlan(silent){
+  state.warehouse = { width:30000, depth:18000, gridSize:50 };
+  state.bays = []; state.selected = []; state.seq = 1; state.runSeq = 1; state.cotes = []; state.labels = []; refreshCoteList();
+  state.upright = 80; state.beam = 2700; state.levels = 2;
+  state.measureMode = false;
+  document.getElementById('tMeasure').classList.remove('on');
+  stage.container().style.cursor = 'default';
+  lDim.destroyChildren(); lDim.batchDraw(); lSnap.destroyChildren(); lSnap.batchDraw(); mA = null;
+  document.getElementById('whW').value = state.warehouse.width;
+  document.getElementById('whD').value = state.warehouse.depth;
+  document.getElementById('gridSel').value = state.warehouse.gridSize;
+  document.getElementById('fGrid').textContent = state.warehouse.gridSize+' mm';
+  chipsAll(); drawGrid();
+  const b0 = addDepart(200, 200);
+  // vue de départ : zoom 50 %, centrée sur la travée
+  zoom = 0.5; applyScale();
+  stage.position({ x: stage.width()/2 - (b0.x + bayW(b0)/2)*scale(),
+                   y: stage.height()/2 - (b0.y + DEPTH/2)*scale() });
+  drawGrid(); buildItems(); refreshList(); select([state.bays[0].id]);
+  // vue de départ propre : pas de cotation affichée
+  lDim.destroyChildren(); lDim.batchDraw();
+  if(!silent) toast('Plan remis à zéro : une travée DÉPART');
+}
+/* ---------- Confirmation RESET ---------- */
+(function(){
+  const modal = document.getElementById('confirm');
+  const open = ()=>{ modal.hidden = false; document.getElementById('confirmNo').focus(); };
+  const close = ()=>{ modal.hidden = true; };
+  document.getElementById('bReset').onclick = open;
+  document.getElementById('confirmNo').onclick = close;
+  document.getElementById('confirmYes').onclick = ()=>{ close(); resetPlan(); histInit(); };
+  modal.onclick = e=>{ if(e.target === modal) close(); };
+  window.addEventListener('keydown', e=>{ if(!modal.hidden && e.key === 'Escape'){ e.stopPropagation(); close(); } }, true);
+})();
+/* ---------- Bouton Quitter ---------- */
+(function(){
+  const modal = document.getElementById('quitDlg');
+  function doQuit(){
+    try { window.close(); } catch(e) {}
+    // Fallback si window.close() n'est pas autorisé par le navigateur
+    setTimeout(()=>{
+      document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;background:#0b1017;color:#8fa0b8;font-family:Inter,sans-serif;font-size:1rem;">Vous pouvez fermer cet onglet.</div>';
+    }, 200);
+  }
+  function saveAndQuit(){
+    // Déclenche le téléchargement JSON
+    const blob = new Blob([JSON.stringify(toJSON(),null,2)],{type:'application/json'});
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+    const d = new Date(), pad = n=>String(n).padStart(2,'0');
+    a.download = 'plan-entrepot-'+d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate())+'-'+pad(d.getHours())+pad(d.getMinutes())+'.json';
+    a.click(); URL.revokeObjectURL(a.href);
+    toast('Plan enregistré — fermeture…');
+    setTimeout(doQuit, 800);
+  }
+  document.getElementById('bQuit').onclick = ()=>{
+    modal.hidden = false;
+    document.getElementById('quitCancel').focus();
+  };
+  document.getElementById('quitCancel').onclick = ()=>{ modal.hidden = true; };
+  document.getElementById('quitNoSave').onclick = ()=>{ modal.hidden = true; doQuit(); };
+  document.getElementById('quitSave').onclick = ()=>{ modal.hidden = true; saveAndQuit(); };
+  modal.onclick = e=>{ if(e.target === modal) modal.hidden = true; };
+  window.addEventListener('keydown', e=>{
+    if(!modal.hidden && e.key === 'Escape'){ e.stopPropagation(); modal.hidden = true; }
+  }, true);
+})();
+
+resetPlan(true);
+histInit();
+setInterval(histWatch, 450);
+toast('Nouveau plan : travée DÉPART 2700 mm · échelles 80 mm · + et − pour ajouter / retirer une travée SUITE');
+
+/* ====================== LICENCE RACKPLAN ======================
+   Contrôle de licence côté serveur : webhook Make → base Airtable.
+   RKP.version est propre au dossier de déploiement (v1, v2, v3…).
+   Le serveur refuse une clé dont « Version max » est inférieure.
+   ============================================================== */
+const RKP = {
+  api: 'https://hook.eu2.make.com/y6lu0d6cpwwvtgwuwcq32ab5hmsr5q7c',
+  version: 1,
+  demoMaxBays: 12,
+  revalidateMs: 15 * 60 * 1000,
+  key: '', lic: null, demo: true, lastOk: 0
+};
+
+const RKP_MOTIFS = {
+  KO_STATUT : 'Cette licence est suspendue ou révoquée.',
+  KO_VERSION: 'Cette licence ne couvre pas cette version de RackPlan.',
+  KO_ORIGINE: "Cette licence n'est pas autorisée depuis cette adresse.",
+  INCONNUE  : 'Clé inconnue.',
+  VIDE      : 'Saisissez une clé de licence.',
+  RESEAU    : 'Serveur de licences injoignable. Réessayez.'
+};
+
+function rkpSet(k, v){ try { localStorage.setItem(k, v); } catch(e){} }
+function rkpGet(k){ try { return localStorage.getItem(k) || ''; } catch(e){ return ''; } }
+
+async function rkpValidate(key){
+  if(!key) return { ok:false, motif:'VIDE' };
+  try{
+    const r = await fetch(RKP.api, {
+      method : 'POST',
+      headers: { 'Content-Type':'application/x-www-form-urlencoded;charset=UTF-8' },
+      body   : new URLSearchParams({ key:key, v:String(RKP.version), action:'validate' }).toString()
+    });
+    let d = null;
+    try { d = JSON.parse(await r.text()); } catch(e){}
+    if(d && d.ok === true) return d;
+    return { ok:false, motif:(d && d.motif) || 'INCONNUE' };
+  }catch(e){ return { ok:false, motif:'RESEAU' }; }
+}
+
+/* ---------- bandeau d'état dans l'en-tête ---------- */
+function rkpBadge(){
+  let b = document.getElementById('rkpBadge');
+  if(!b){
+    b = document.createElement('button');
+    b.id = 'rkpBadge'; b.type = 'button';
+    b.style.cssText = 'margin-left:14px;background:transparent;border:1px solid var(--line);'
+      + 'border-radius:8px;padding:5px 10px;font-size:11px;letter-spacing:.05em;cursor:pointer';
+    b.onclick = rkpOpen;
+    const brand = document.querySelector('header .brand');
+    if(brand && brand.parentNode) brand.parentNode.insertBefore(b, brand.nextSibling);
+    else document.querySelector('header').appendChild(b);
+  }
+  if(RKP.demo){
+    b.textContent = 'DÉMO — activer une licence';
+    b.style.color = '#ffb3c0'; b.style.borderColor = 'rgba(244,63,94,.55)';
+  } else {
+    b.textContent = 'Licence ' + (RKP.lic.revendeur || RKP.lic.licence);
+    b.style.color = '#bfe9ff'; b.style.borderColor = '#2f5ea8';
+  }
+}
+
+/* ---------- fenêtre d'activation ---------- */
+function rkpGate(){
+  let g = document.getElementById('rkpGate');
+  if(g) return g;
+  g = document.createElement('div');
+  g.id = 'rkpGate';
+  g.style.cssText = 'position:fixed;inset:0;z-index:9999;display:none;align-items:center;'
+    + 'justify-content:center;background:rgba(7,11,17,.82);backdrop-filter:blur(3px)';
+  g.innerHTML = `
+    <div style="width:min(440px,92vw);background:var(--panel);border:1px solid var(--line);
+                border-radius:14px;padding:26px 24px;box-shadow:0 24px 64px rgba(0,0,0,.55)">
+      <h3 style="font-size:1.05rem;font-weight:700;margin-bottom:6px">Activer RackPlan 2D</h3>
+      <p style="font-size:.8rem;color:var(--txt-dim);line-height:1.55;margin-bottom:16px">
+        Saisissez la clé de licence qui vous a été remise. Sans clé, l'application reste
+        utilisable en démonstration&nbsp;: ${RKP.demoMaxBays} travées maximum, exports désactivés.</p>
+      <input id="rkpKey" type="text" autocomplete="off" spellcheck="false"
+             placeholder="RKP-XXXX-XXXX-XXXX"
+             style="width:100%;background:#0e1622;border:1px solid var(--line);border-radius:8px;
+                    padding:10px 12px;font-family:'JetBrains Mono',monospace;letter-spacing:.06em;
+                    text-transform:uppercase">
+      <div id="rkpMsg" style="min-height:20px;font-size:.78rem;margin:10px 2px 0;color:#ffb3c0"></div>
+      <div style="display:flex;gap:8px;margin-top:14px">
+        <button id="rkpDemo" class="btn ghost" style="flex:1;justify-content:center">Continuer en démo</button>
+        <button id="rkpGo" class="btn primary" style="flex:1;justify-content:center">Activer</button>
+      </div>
+      <p style="font-size:.7rem;color:var(--txt-mute);margin-top:14px;line-height:1.5">
+        Version ${RKP.version} · La clé est nominative. Les exports portent le nom du titulaire.</p>
+    </div>`;
+  document.body.appendChild(g);
+
+  g.querySelector('#rkpDemo').onclick = ()=>{ rkpClose(); toast('Mode démonstration'); };
+  g.querySelector('#rkpGo').onclick = rkpSubmit;
+  g.querySelector('#rkpKey').addEventListener('keydown', e=>{ if(e.key === 'Enter') rkpSubmit(); });
+  return g;
+}
+function rkpOpen(){
+  const g = rkpGate();
+  g.style.display = 'flex';
+  const i = g.querySelector('#rkpKey');
+  i.value = RKP.key || rkpGet('rkp.key');
+  setTimeout(()=>i.focus(), 40);
+}
+function rkpClose(){ const g = document.getElementById('rkpGate'); if(g) g.style.display = 'none'; }
+function rkpMsg(t){ const m = document.getElementById('rkpMsg'); if(m) m.textContent = t || ''; }
+
+async function rkpSubmit(){
+  const btn = document.getElementById('rkpGo');
+  const key = document.getElementById('rkpKey').value.trim().toUpperCase();
+  btn.disabled = true; rkpMsg('Vérification…');
+  const d = await rkpValidate(key);
+  btn.disabled = false;
+  if(!d.ok){ rkpMsg(RKP_MOTIFS[d.motif] || 'Licence refusée.'); return; }
+  RKP.key = key; RKP.lic = d; RKP.demo = false; RKP.lastOk = Date.now();
+  rkpSet('rkp.key', key);
+  rkpBadge(); rkpClose();
+  toast('Licence active — ' + (d.revendeur || key));
+}
+
+/* ---------- plafond du mode démo ---------- */
+function rkpCap(){
+  if(!RKP.demo) return false;
+  if(state.bays.length < RKP.demoMaxBays) return false;
+  toast('Démo limitée à ' + RKP.demoMaxBays + ' travées — activez votre licence');
+  rkpOpen();
+  return true;
+}
+const _rkpAddDepart = addDepart, _rkpAddSuite = addSuite, _rkpDupSel = dupSel;
+addDepart = function(x, y, run){
+  if(rkpCap()) return state.bays[state.bays.length - 1];
+  return _rkpAddDepart(x, y, run);
+};
+addSuite = function(){
+  if(rkpCap()) return state.bays[state.bays.length - 1];
+  return _rkpAddSuite();
+};
+dupSel = function(){ if(rkpCap()) return; return _rkpDupSel(); };
+
+/* ---------- verrou sur les livrables ---------- */
+async function rkpAllowExport(){
+  if(RKP.demo){
+    toast('Export réservé aux licences actives');
+    rkpOpen();
+    return false;
+  }
+  if(Date.now() - RKP.lastOk > RKP.revalidateMs){
+    const d = await rkpValidate(RKP.key);
+    if(!d.ok){
+      RKP.demo = true; RKP.lic = null; rkpBadge();
+      toast(RKP_MOTIFS[d.motif] || 'Licence refusée');
+      rkpOpen();
+      return false;
+    }
+    RKP.lic = d; RKP.lastOk = Date.now();
+  }
+  return true;
+}
+const _rkpBom = downloadBom, _rkpPrint = printPlan;
+const rkpBomClick   = async ()=>{ if(await rkpAllowExport()) _rkpBom(); };
+const rkpPrintClick = async ()=>{ if(await rkpAllowExport()) _rkpPrint(); };
+document.getElementById('bBom').onclick   = rkpBomClick;
+document.getElementById('bBom2').onclick  = rkpBomClick;
+document.getElementById('bPrint').onclick = rkpPrintClick;
+
+/* ---------- démarrage ---------- */
+(async function rkpBoot(){
+  rkpBadge();
+  const k = rkpGet('rkp.key');
+  if(k){
+    const d = await rkpValidate(k);
+    if(d.ok){
+      RKP.key = k; RKP.lic = d; RKP.demo = false; RKP.lastOk = Date.now();
+      rkpBadge();
+      return;
+    }
+  }
+  rkpOpen();
+})();
+
+</script>
 </body>
 </html>

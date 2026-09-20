@@ -1572,10 +1572,22 @@ const RKP_MOTIFS = {
   KO_STATUT : 'Cette licence est suspendue ou révoquée.',
   KO_VERSION: 'Cette licence ne couvre pas cette version de RackPlan.',
   KO_ORIGINE: "Cette licence n'est pas autorisée depuis cette adresse.",
+  KO_POSTES : 'Nombre de postes atteint pour cette licence. Contactez RSL pour ajouter un poste,'
+            + ' ou libérez un poste inutilisé.',
   INCONNUE  : 'Clé inconnue.',
   VIDE      : 'Saisissez une clé de licence.',
   RESEAU    : 'Serveur de licences injoignable. Réessayez.'
 };
+
+function rkpDevice(){
+  let d = rkpGet('rkp.device');
+  if(!d){
+    d = (crypto && crypto.randomUUID) ? crypto.randomUUID()
+      : 'dev-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 10);
+    rkpSet('rkp.device', d);
+  }
+  return d;
+}
 
 function rkpSet(k, v){ try { localStorage.setItem(k, v); } catch(e){} }
 function rkpGet(k){ try { return localStorage.getItem(k) || ''; } catch(e){ return ''; } }
@@ -1586,7 +1598,8 @@ async function rkpValidate(key){
     const r = await fetch(RKP.api, {
       method : 'POST',
       headers: { 'Content-Type':'application/x-www-form-urlencoded;charset=UTF-8' },
-      body   : new URLSearchParams({ key:key, v:String(RKP.version), action:'validate' }).toString()
+      body   : new URLSearchParams({ key:key, v:String(RKP.version),
+                 device:rkpDevice(), action:'validate' }).toString()
     });
     let d = null;
     try { d = JSON.parse(await r.text()); } catch(e){}

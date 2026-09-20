@@ -1,0 +1,49 @@
+RackPlan 2D — Licence propriétaire
+Copyright (c) 2026 RSL — Rayonnages Services Lorraine. Tous droits réservés.
+
+Ce logiciel et son code source sont la propriété exclusive de RSL (Rayonnages
+Services Lorraine), Heillecourt, France. Ils ne sont pas des logiciels libres
+et ne sont placés sous aucune licence open source.
+
+CE QUI EST INTERDIT SANS ACCORD ÉCRIT PRÉALABLE DE RSL
+
+  - copier, reproduire ou héberger tout ou partie de ce code ;
+  - le modifier, le traduire, l'adapter ou en dériver une autre oeuvre ;
+  - le distribuer, le revendre, le louer, le prêter ou le sous-licencier ;
+  - contourner, désactiver ou altérer les mécanismes de contrôle de licence
+    et les mentions d'identification du titulaire portées sur les documents
+    exportés par le logiciel ;
+  - l'utiliser à des fins commerciales.
+
+La mise à disposition publique de ce dépôt sur GitHub ne vaut pas renonciation
+à ces droits. Elle répond à une contrainte technique d'hébergement (GitHub
+Pages) et n'accorde aucune licence d'utilisation, expresse ou implicite, en
+dehors des droits que les conditions d'utilisation de GitHub confèrent
+nécessairement à ses propres utilisateurs.
+
+DROIT D'USAGE
+
+Le droit d'utiliser ce logiciel s'acquiert exclusivement auprès de RSL, par la
+remise d'une clé de licence nominative. Ce droit est personnel au titulaire
+désigné, non cessible et non transférable. Il est limité à la version du
+logiciel couverte par la licence et aux origines d'accès expressément
+autorisées. RSL peut suspendre ou révoquer une clé en cas de manquement aux
+présentes conditions.
+
+GARANTIE ET RESPONSABILITÉ
+
+Le logiciel est fourni en l'état. Les plans, métrés et nomenclatures qu'il
+produit sont des aides à l'étude : il appartient à l'utilisateur de les
+vérifier avant toute commande, fabrication ou installation. RSL ne saurait
+être tenue responsable des dommages résultant de leur usage.
+
+CONTACT
+
+RSL — Rayonnages Services Lorraine
+s.degardin@rsl.eu
+
+---
+Ce texte est un modèle. Faites-le relire par un conseil juridique avant la
+première vente, en particulier les clauses d'incessibilité et de limitation de
+responsabilité, dont la portée dépend du type de contrat retenu (licence
+perpétuelle ou abonnement) et de la qualité de l'acquéreur.

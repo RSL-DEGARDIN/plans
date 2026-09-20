@@ -1053,7 +1053,8 @@ function downloadBom(){
   lines.push(['Récapitulatif','','Linéaire total de lisses (m)',' ','',
     (rows.reduce((s,r)=>s+r.ml,0)).toFixed(2).replace('.',',')].join(sep));
   lines.push('');
-  lines.push(['Licence', RKP.lic ? RKP.lic.licence : 'DEMO', RKP.lic ? RKP.lic.nomExport : 'version de demonstration', '', '', ''].join(sep));
+  lines.push(['Licence', RKP.lic ? RKP.lic.licence : 'DEMO', RKP.lic ? RKP.lic.nomExport : 'version de demonstration',
+   RKP.lic ? (RKP.lic.utilisateur || '') : '', '', ''].join(sep));
   const blob = new Blob(['\ufeff'+lines.join('\r\n')], {type:'text/csv;charset=utf-8'});
   const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
   a.download = 'nomenclature-racks.csv'; a.click(); URL.revokeObjectURL(a.href);
@@ -1253,7 +1254,7 @@ function printPlan(){
         ${rows.map(r=>`<tr><td>${r.ref}</td><td>${r.designation}</td><td class="n">${r.qte}</td></tr>`).join('')}</table></div>
     </div>
     <div class="p-sub" style="margin-top:12px;border-top:1px solid #ddd;padding-top:6px">
-      RackPlan 2D — licence ${RKP.lic ? RKP.lic.licence : 'DÉMONSTRATION'}${RKP.lic ? ' — ' + RKP.lic.nomExport : ''}
+      RackPlan 2D — licence ${RKP.lic ? RKP.lic.licence : 'DÉMONSTRATION'}${RKP.lic ? ' — ' + RKP.lic.nomExport : ''}${RKP.lic && RKP.lic.utilisateur ? ' — ' + RKP.lic.utilisateur : ''}
     </div>`;
   document.body.classList.add('printing');
   setTimeout(()=>{ window.print(); document.body.classList.remove('printing'); }, 260);
@@ -1565,41 +1566,29 @@ const RKP = {
   version: 1,
   demoMaxBays: 12,
   revalidateMs: 15 * 60 * 1000,
-  key: '', lic: null, demo: true, lastOk: 0
+  key: '', email: '', lic: null, demo: true, lastOk: 0
 };
 
 const RKP_MOTIFS = {
   KO_STATUT : 'Cette licence est suspendue ou révoquée.',
   KO_VERSION: 'Cette licence ne couvre pas cette version de RackPlan.',
   KO_ORIGINE: "Cette licence n'est pas autorisée depuis cette adresse.",
-  KO_POSTES : 'Nombre de postes atteint pour cette licence. Contactez RSL pour ajouter un poste,'
-            + ' ou libérez un poste inutilisé.',
-  INCONNUE  : 'Clé inconnue.',
-  VIDE      : 'Saisissez une clé de licence.',
+  INCONNUE  : "E-mail et clé ne correspondent à aucun accès ouvert.",
+  VIDE      : 'Saisissez votre e-mail et votre clé de licence.',
   RESEAU    : 'Serveur de licences injoignable. Réessayez.'
 };
-
-function rkpDevice(){
-  let d = rkpGet('rkp.device');
-  if(!d){
-    d = (crypto && crypto.randomUUID) ? crypto.randomUUID()
-      : 'dev-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 10);
-    rkpSet('rkp.device', d);
-  }
-  return d;
-}
 
 function rkpSet(k, v){ try { localStorage.setItem(k, v); } catch(e){} }
 function rkpGet(k){ try { return localStorage.getItem(k) || ''; } catch(e){ return ''; } }
 
-async function rkpValidate(key){
-  if(!key) return { ok:false, motif:'VIDE' };
+async function rkpValidate(key, email){
+  if(!key || !email) return { ok:false, motif:'VIDE' };
   try{
     const r = await fetch(RKP.api, {
       method : 'POST',
       headers: { 'Content-Type':'application/x-www-form-urlencoded;charset=UTF-8' },
-      body   : new URLSearchParams({ key:key, v:String(RKP.version),
-                 device:rkpDevice(), action:'validate' }).toString()
+      body   : new URLSearchParams({ key:key, email:email,
+                 v:String(RKP.version), action:'validate' }).toString()
     });
     let d = null;
     try { d = JSON.parse(await r.text()); } catch(e){}
@@ -1660,8 +1649,13 @@ function rkpGate(){
                 border-radius:14px;padding:26px 24px;box-shadow:0 24px 64px rgba(0,0,0,.55)">
       <h3 style="font-size:1.05rem;font-weight:700;margin-bottom:6px">Activer RackPlan 2D</h3>
       <p style="font-size:.8rem;color:var(--txt-dim);line-height:1.55;margin-bottom:16px">
-        Saisissez la clé de licence qui vous a été remise. Sans clé, l'application reste
+        Saisissez votre e-mail professionnel et la clé de licence de votre société.
+        Les deux doivent correspondre à un accès ouvert. Sans cela, l'application reste
         utilisable en démonstration&nbsp;: ${RKP.demoMaxBays} travées maximum, exports désactivés.</p>
+      <input id="rkpMail" type="email" autocomplete="email" spellcheck="false"
+             placeholder="prenom.nom@societe.fr"
+             style="width:100%;background:#0e1622;border:1px solid var(--line);border-radius:8px;
+                    padding:10px 12px;margin-bottom:8px">
       <input id="rkpKey" type="text" autocomplete="off" spellcheck="false"
              placeholder="RKP-XXXX-XXXX-XXXX"
              style="width:100%;background:#0e1622;border:1px solid var(--line);border-radius:8px;
@@ -1673,7 +1667,7 @@ function rkpGate(){
         <button id="rkpGo" class="btn primary" style="flex:1;justify-content:center">Activer</button>
       </div>
       <p style="font-size:.7rem;color:var(--txt-mute);margin-top:14px;line-height:1.5">
-        Version ${RKP.version} · La clé est nominative. Les exports portent le nom du titulaire.<br>
+        Version ${RKP.version} · Les exports portent le nom de votre société et votre e-mail.<br>
         <button id="rkpForget" type="button" style="background:none;border:0;padding:4px 0;
           color:var(--txt-dim);font-size:.7rem;text-decoration:underline;cursor:pointer">
           Oublier la licence enregistrée sur ce poste</button></p>
@@ -1683,7 +1677,8 @@ function rkpGate(){
   g.querySelector('#rkpDemo').onclick = ()=>{ rkpClose(); toast('Mode démonstration'); };
   g.querySelector('#rkpGo').onclick = rkpSubmit;
   g.querySelector('#rkpForget').onclick = rkpForget;
-  g.querySelector('#rkpKey').addEventListener('keydown', e=>{ if(e.key === 'Enter') rkpSubmit(); });
+  ['#rkpKey', '#rkpMail'].forEach(sel=>
+    g.querySelector(sel).addEventListener('keydown', e=>{ if(e.key === 'Enter') rkpSubmit(); }));
   return g;
 }
 function rkpOpen(){
@@ -1691,27 +1686,31 @@ function rkpOpen(){
   g.style.display = 'flex';
   const i = g.querySelector('#rkpKey');
   i.value = RKP.key || rkpGet('rkp.key');
-  setTimeout(()=>i.focus(), 40);
+  const m = g.querySelector('#rkpMail');
+  m.value = RKP.email || rkpGet('rkp.email');
+  setTimeout(()=>(m.value ? i : m).focus(), 40);
 }
 function rkpClose(){ const g = document.getElementById('rkpGate'); if(g) g.style.display = 'none'; }
 function rkpMsg(t){ const m = document.getElementById('rkpMsg'); if(m) m.textContent = t || ''; }
 
 function rkpForget(){
-  try { localStorage.removeItem('rkp.key'); } catch(e){}
-  RKP.key = ''; RKP.lic = null; RKP.demo = true; RKP.lastOk = 0;
+  try { localStorage.removeItem('rkp.key'); localStorage.removeItem('rkp.email'); } catch(e){}
+  RKP.key = ''; RKP.email = ''; RKP.lic = null; RKP.demo = true; RKP.lastOk = 0;
   const i = document.getElementById('rkpKey'); if(i) i.value = '';
-  rkpBadge(); rkpMsg('Licence oubliée sur ce poste. Mode démonstration actif.');
+  const m = document.getElementById('rkpMail'); if(m) m.value = '';
+  rkpBadge(); rkpMsg('Accès oublié sur ce poste. Mode démonstration actif.');
 }
 
 async function rkpSubmit(){
   const btn = document.getElementById('rkpGo');
   const key = document.getElementById('rkpKey').value.trim().toUpperCase();
+  const mail = document.getElementById('rkpMail').value.trim().toLowerCase();
   btn.disabled = true; rkpMsg('Vérification…');
-  const d = await rkpValidate(key);
+  const d = await rkpValidate(key, mail);
   btn.disabled = false;
-  if(!d.ok){ rkpMsg(RKP_MOTIFS[d.motif] || 'Licence refusée.'); return; }
-  RKP.key = key; RKP.lic = d; RKP.demo = false; RKP.lastOk = Date.now();
-  rkpSet('rkp.key', key);
+  if(!d.ok){ rkpMsg(RKP_MOTIFS[d.motif] || 'Accès refusé.'); return; }
+  RKP.key = key; RKP.email = mail; RKP.lic = d; RKP.demo = false; RKP.lastOk = Date.now();
+  rkpSet('rkp.key', key); rkpSet('rkp.email', mail);
   rkpBadge(); rkpClose();
   toast('Licence active — ' + (d.revendeur || key));
 }
@@ -1755,7 +1754,7 @@ async function rkpAllowExport(){
     return false;
   }
   if(Date.now() - RKP.lastOk > RKP.revalidateMs){
-    const d = await rkpValidate(RKP.key);
+    const d = await rkpValidate(RKP.key, RKP.email);
     if(!d.ok){
       RKP.demo = true; RKP.lic = null; rkpBadge();
       toast(RKP_MOTIFS[d.motif] || 'Licence refusée');
@@ -1785,11 +1784,11 @@ document.getElementById('bPrint').onclick = rkpPrintClick;
 /* ---------- démarrage ---------- */
 (async function rkpBoot(){
   rkpBadge();
-  const k = rkpGet('rkp.key');
-  if(k){
-    const d = await rkpValidate(k);
+  const k = rkpGet('rkp.key'), m = rkpGet('rkp.email');
+  if(k && m){
+    const d = await rkpValidate(k, m);
     if(d.ok){
-      RKP.key = k; RKP.lic = d; RKP.demo = false; RKP.lastOk = Date.now();
+      RKP.key = k; RKP.email = m; RKP.lic = d; RKP.demo = false; RKP.lastOk = Date.now();
       rkpBadge();
       return;
     }

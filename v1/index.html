@@ -3,9 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>RackPlan 2D — Plan d'implantation de racks</title>
-<meta name="description" content="RackPlan 2D — logiciel de plan d'implantation de racks à palettes : dessin à l'échelle, cotation, métré et nomenclature.">
-<meta name="robots" content="noindex">
+<title>RackPlan 2D — Prototype plan d'entrepôt</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230b1017'/%3E%3Crect x='7' y='6' width='4' height='20' fill='%233b82f6'/%3E%3Crect x='21' y='6' width='4' height='20' fill='%233b82f6'/%3E%3Crect x='11' y='6' width='10' height='3' fill='%23f97316'/%3E%3Crect x='11' y='23' width='10' height='3' fill='%23f97316'/%3E%3C/svg%3E">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/konva@9.3.16/konva.min.js"></script>
@@ -28,11 +26,11 @@ header{grid-column:1/-1;display:flex;align-items:center;gap:var(--s4);padding:0 
 .brand{display:flex;align-items:center;gap:10px;font-weight:700;letter-spacing:-0.01em}
 .brand svg{color:var(--accent)}
 .brand small{display:block;font-weight:400;font-size:var(--text-xs);color:var(--txt-mute);letter-spacing:0}
-.toolbar{display:flex;gap:6px;margin-left:auto;flex-wrap:nowrap;align-items:center;overflow-x:auto;scrollbar-width:none}
+.toolbar{display:flex;gap:3px;margin-right:auto;flex-wrap:nowrap;align-items:center;overflow-x:auto;scrollbar-width:none}
 .toolbar::-webkit-scrollbar{display:none}
-.toolbar .btn{white-space:nowrap;flex:0 0 auto}
-@media (max-width:1500px){.toolbar .btn kbd{display:none}}
-@media (max-width:1450px){.toolbar .btn{padding:6px 9px;font-size:12px}}
+.toolbar .btn{flex:0 0 auto;width:32px;height:32px;padding:0;justify-content:center;border-radius:6px}
+.toolbar .btn svg{flex:0 0 auto}
+.tsep{width:1px;height:20px;background:var(--line);margin:0 5px;flex:0 0 auto}
 button,select,input{font-family:inherit;font-size:var(--text-sm);color:var(--txt)}
 .btn{background:var(--panel-2);border:1px solid var(--line);border-radius:var(--r);padding:7px 12px;cursor:pointer;
   display:inline-flex;align-items:center;gap:6px;transition:background .15s,border-color .15s,transform .1s}
@@ -178,31 +176,56 @@ pre{background:#0a0f16;border:1px solid var(--line);border-radius:8px;padding:10
     <div>RackPlan 2D</div>
   </div>
   <div class="toolbar">
-    <button class="btn ghost" id="bUndo" title="Annuler (Ctrl+Z)" aria-label="Annuler" disabled>
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-        stroke-linecap="round" stroke-linejoin="round"><path d="M9 14 4 9l5-5"/><path d="M4 9h9a7 7 0 0 1 0 14h-3"/></svg>
+    <button class="btn ghost" id="bUndo" title="Annuler (Ctrl+Z)" aria-label="Annuler (Ctrl+Z)" disabled>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14 4 9l5-5"/><path d="M4 9h9a7 7 0 0 1 0 14h-3"/></svg>
     </button>
-    <button class="btn ghost" id="bRedo" title="Rétablir (Ctrl+Y)" aria-label="Rétablir" disabled>
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-        stroke-linecap="round" stroke-linejoin="round"><path d="m15 14 5-5-5-5"/><path d="M20 9h-9a7 7 0 0 0 0 14h3"/></svg>
+    <button class="btn ghost" id="bRedo" title="Rétablir (Ctrl+Y)" aria-label="Rétablir (Ctrl+Y)" disabled>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 14 5-5-5-5"/><path d="M20 9h-9a7 7 0 0 0 0 14h3"/></svg>
     </button>
-    <span style="width:1px;height:22px;background:var(--line);margin:0 2px"></span>
-    <button class="btn" id="tSnap" title="Aimantation sur la grille">Magnétisme <kbd>G</kbd></button>
-    <button class="btn" id="tMeasure" title="Outil mesure libre">Mesurer <kbd>M</kbd></button>
-    <button class="btn ghost" id="bLabel" title="Ajouter une étiquette à la file sélectionnée">Étiquettes</button>
-    <button class="btn ghost on" id="tTotals" title="Cotes hors-tout des ensembles">Hors-tout</button>
-    <button class="btn ghost" id="bRot" title="Rotation 90° de la sélection">Rotation <kbd>R</kbd></button>
-    <button class="btn ghost" id="bDup">Dupliquer <kbd>D</kbd></button>
-    <button class="btn ghost danger" id="bDel">Supprimer <kbd>Suppr</kbd></button>
-    <span style="width:1px;height:22px;background:var(--line);margin:0 4px"></span>
-    <button class="btn warn" id="bReset" title="Tout effacer et repartir de zéro">RESET</button>
-    <button class="btn" id="bPrint" title="Imprimer le plan (Ctrl+P)">Imprimer</button>
-    <button class="btn" id="bBom" title="Télécharger la nomenclature CSV">Nomenclature</button>
-    <button class="btn" id="bSave" title="Enregistrer le plan dans un fichier .json sur votre ordinateur">Enregistrer</button>
-    <button class="btn" id="bLoad" title="Recharger un plan .json enregistré précédemment">Ouvrir</button>
+    <span class="tsep"></span>
+    <button class="btn" id="tSnap" title="Magnétisme sur la grille (G)" aria-label="Magnétisme sur la grille (G)">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3H3v9a9 9 0 0 0 18 0V3h-4v9a5 5 0 0 1-10 0z"/><path d="M3 9h4"/><path d="M17 9h4"/></svg>
+    </button>
+    <button class="btn" id="tMeasure" title="Outil mesure libre (M)" aria-label="Outil mesure libre (M)">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 15 6 6L21 9l-6-6z"/><path d="m7 11 2 2"/><path d="m10 8 2 2"/><path d="m13 5 2 2"/></svg>
+    </button>
+    <button class="btn ghost" id="bLabel" title="Ajouter une étiquette à la file sélectionnée" aria-label="Ajouter une étiquette à la file sélectionnée">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.6 13.1 13 20.7a2 2 0 0 1-2.8 0l-7.2-7.2A2 2 0 0 1 2.4 12V4.4A2 2 0 0 1 4.4 2.4H12a2 2 0 0 1 1.4.6l7.2 7.2a2 2 0 0 1 0 2.9z"/><path d="M7 7h.01"/></svg>
+    </button>
+    <button class="btn ghost on" id="tTotals" title="Cotes hors-tout des ensembles" aria-label="Cotes hors-tout des ensembles">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 5v14"/><path d="M21 5v14"/><path d="M6 12h12"/><path d="m8.5 9-3 3 3 3"/><path d="m15.5 9 3 3-3 3"/></svg>
+    </button>
+    <span class="tsep"></span>
+    <button class="btn ghost" id="bRot" title="Rotation 90° de la sélection (R)" aria-label="Rotation 90° de la sélection (R)">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 3v6h-6"/><path d="M21 12a9 9 0 1 1-2.6-6.4L21 8"/></svg>
+    </button>
+    <button class="btn ghost" id="bDup" title="Dupliquer la sélection (D)" aria-label="Dupliquer la sélection (D)">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+    </button>
+    <button class="btn ghost danger" id="bDel" title="Supprimer la sélection (Suppr)" aria-label="Supprimer la sélection (Suppr)">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+    </button>
+    <span class="tsep"></span>
+    <button class="btn" id="bPrint" title="Imprimer le plan (Ctrl+P)" aria-label="Imprimer le plan (Ctrl+P)">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8" rx="1"/></svg>
+    </button>
+    <button class="btn" id="bBom" title="Télécharger la nomenclature CSV" aria-label="Télécharger la nomenclature CSV">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M3 6h.01"/><path d="M3 12h.01"/><path d="M3 18h.01"/></svg>
+    </button>
+    <button class="btn" id="bSave" title="Enregistrer le plan (.json)" aria-label="Enregistrer le plan (.json)">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/></svg>
+    </button>
+    <button class="btn" id="bLoad" title="Ouvrir un plan (.json)" aria-label="Ouvrir un plan (.json)">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 20h12a2 2 0 0 0 1.9-1.4l1.8-6A1 1 0 0 0 20.8 11H8.5a2 2 0 0 0-1.9 1.4L5 18"/><path d="M2 18V5a2 2 0 0 1 2-2h4l2 3h6a2 2 0 0 1 2 2v3"/></svg>
+    </button>
     <input type="file" id="fLoad" accept=".json,application/json" hidden>
-    <span style="width:1px;height:22px;background:var(--line);margin:0 4px"></span>
-    <button class="btn danger" id="bQuit" title="Quitter l'application">Quitter</button>
+    <span class="tsep"></span>
+    <button class="btn warn" id="bReset" title="Tout effacer et repartir de zéro" aria-label="Tout effacer et repartir de zéro">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v6h6"/><path d="M3.5 12a9 9 0 1 0 2.6-6.4L3 8"/><path d="M12 9v4"/><path d="M12 16h.01"/></svg>
+    </button>
+    <button class="btn danger" id="bQuit" title="Quitter l'application" aria-label="Quitter l'application">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/></svg>
+    </button>
   </div>
 </header>
 
@@ -218,11 +241,16 @@ pre{background:#0a0f16;border:1px solid var(--line);border-radius:8px;padding:10
       </div>
       <div class="row">
         <button class="btn ghost" id="bRotAll" style="padding:5px 10px;font-size:var(--text-xs)"
-          title="Pivoter tout le plan de 90° (horizontal / vertical)">Pivoter le plan</button>
+          title="Pivoter tout le plan de 90° (horizontal / vertical)"><svg width="13" height="13" viewBox="0 0 24 24"
+          fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"
+          style="flex:0 0 auto" aria-hidden="true"><path d="M20.5 12a8.5 8.5 0 1 1-2.49-6.01"/><path d="M20.5 3.5v5h-5"/></svg>Pivoter le plan</button>
         <select id="gridSel" title="Pas de grille">
           <option value="25">25 mm</option><option value="50" selected>50 mm</option>
           <option value="100">100 mm</option><option value="500">500 mm</option>
         </select></div>
+      <div class="row"><label style="white-space:nowrap">Dim. d'allée</label>
+        <input type="number" id="whAisle" step="100" min="0" value="3000"
+          title="Largeur d'allée utilisée au moment de dupliquer une travée" aria-label="Largeur d'allée en mm"></div>
     </div>
   </section>
 
@@ -398,9 +426,10 @@ pre{background:#0a0f16;border:1px solid var(--line);border-radius:8px;padding:10
 const UPRIGHTS = [80, 85, 100, 110];
 const BEAMS = [1825, 1850, 2225, 2700, 3300, 3600];
 const DEPTH = 1100, SECTION = 50;
+const BACK = 200;               // jeu dos-à-dos entre les deux faces d'un double-face
 
 const state = {
-  warehouse:{ width:30000, depth:18000, gridSize:50 },
+  warehouse:{ width:30000, depth:18000, gridSize:50, aisle:3000 },
   bays:[], selected:[], snap:true, measureMode:false, cotes:[], showTotals:true, labels:[],
   upright:100, beam:2700, levels:2, seq:1, runSeq:1
 };
@@ -502,7 +531,7 @@ function buildItems(){
     });
     // étiquette : longueur de lisse + nombre de niveaux, seulement si lisible
     if(w*s > 70){
-      const t = new Konva.Text({ text:`${b.beam} · ${b.levels}N`, fontSize:15,
+      const t = new Konva.Text({ text:`${b.beam}\u2009·\u2009${b.levels}N`, fontSize:15,
         fontFamily:'JetBrains Mono', fontStyle:'700', fill: sel?'#bfe9ff':'#7f94b0', listening:false });
       t.scale({x:1/s,y:1/s});
       t.position({ x: w/2 - (t.width()/s)/2, y: h/2 - (t.height()/s)/2 });
@@ -885,11 +914,22 @@ function overlapping(){
     if(hit(box[i].a, box[j].a)){ bad.add(box[i].id); bad.add(box[j].id); }
   return [...bad];
 }
+/* largeur d'allée courante (mm) */
+const aisle = ()=> Math.max(0, Math.round(+state.warehouse.aisle) || 0);
+/* une travée est en double-face si une autre travée lui est adossée à 200 mm derrière */
+function isDoubleFace(b){
+  const w = bayW(b);
+  return state.bays.some(o=> o.id!==b.id
+    && (o.rotation||0)===(b.rotation||0)
+    && Math.abs(o.y - (b.y + DEPTH + BACK)) <= 60
+    && o.x < b.x + w && o.x + bayW(o) > b.x);     // recouvrement horizontal
+}
 /* premier emplacement libre sous (x,y), par pas d'allée */
 function freeZone(cand, ignore){
   const others = state.bays.filter(b=>!ignore.includes(b.id));
+  const stepY = DEPTH + Math.max(aisle(), 500);
   for(let k=0;k<40;k++){
-    const test = cand.map(c=>({...c, y:c.y + k*(DEPTH+1500)}));
+    const test = cand.map(c=>({...c, y:c.y + k*stepY}));
     const clash = test.some(t=>others.some(o=>hit(aabb(t), aabb(o))) )
       || test.some((t,i)=>test.some((u,j)=>j>i && hit(aabb(t), aabb(u))));
     if(!clash) return test;
@@ -1052,9 +1092,6 @@ function downloadBom(){
   lines.push(['Récapitulatif','','Travées SUITE',' ',bays-dep,''].join(sep));
   lines.push(['Récapitulatif','','Linéaire total de lisses (m)',' ','',
     (rows.reduce((s,r)=>s+r.ml,0)).toFixed(2).replace('.',',')].join(sep));
-  lines.push('');
-  lines.push(['Licence', RKP.lic ? RKP.lic.licence : 'DEMO', RKP.lic ? RKP.lic.nomExport : 'version de demonstration',
-   RKP.lic ? (RKP.lic.utilisateur || '') : '', '', ''].join(sep));
   const blob = new Blob(['\ufeff'+lines.join('\r\n')], {type:'text/csv;charset=utf-8'});
   const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
   a.download = 'nomenclature-racks.csv'; a.click(); URL.revokeObjectURL(a.href);
@@ -1081,7 +1118,7 @@ function renderPitch(){ /* bloc d'info retiré */ }
 function loadData(d){
   const rows = d.bays || d.elements;
   if(!Array.isArray(rows)) throw new Error('JSON invalide');
-  state.warehouse = Object.assign({width:30000,depth:18000,gridSize:50}, d.warehouse||{});
+  state.warehouse = Object.assign({width:30000,depth:18000,gridSize:50,aisle:3000}, d.warehouse||{});
   state.seq = 1; state.runSeq = 1;
   state.bays = rows.filter(r=>r.mode||r.type==='travee').map(r=>({
     id:r.id||uid(), mode:r.mode==='suite'?'suite':'depart', x:+r.x, y:+r.y,
@@ -1096,6 +1133,7 @@ function loadData(d){
   const rn = [...new Set(state.bays.map(b=>b.run))]; state.runSeq = rn.length + 1;
   document.getElementById('whW').value = state.warehouse.width;
   document.getElementById('whD').value = state.warehouse.depth;
+  document.getElementById('whAisle').value = aisle();
   document.getElementById('gridSel').value = String(state.warehouse.gridSize);
   document.getElementById('fGrid').textContent = state.warehouse.gridSize+' mm';
   state.selected = [];
@@ -1252,9 +1290,6 @@ function printPlan(){
       <div><h2>Métré</h2><table>${st.map(r=>`<tr><td>${r[0]}</td><td class="n">${r[1]}</td></tr>`).join('')}</table></div>
       <div><h2>Nomenclature</h2><table><tr><th>Référence</th><th>Désignation</th><th class="n">Qté</th></tr>
         ${rows.map(r=>`<tr><td>${r.ref}</td><td>${r.designation}</td><td class="n">${r.qte}</td></tr>`).join('')}</table></div>
-    </div>
-    <div class="p-sub" style="margin-top:12px;border-top:1px solid #ddd;padding-top:6px">
-      RackPlan 2D — licence ${RKP.lic ? RKP.lic.licence : 'DÉMONSTRATION'}${RKP.lic ? ' — ' + RKP.lic.nomExport : ''}${RKP.lic && RKP.lic.utilisateur ? ' — ' + RKP.lic.utilisateur : ''}
     </div>`;
   document.body.classList.add('printing');
   setTimeout(()=>{ window.print(); document.body.classList.remove('printing'); }, 260);
@@ -1268,19 +1303,23 @@ function rotateSel(){
 }
 function dupSel(){
   if(!state.selected.length) return toast('Rien à dupliquer');
+  const src = state.selected.map(id=>state.bays.find(x=>x.id===id)).filter(Boolean);
+  const dbl = src.some(isDoubleFace);
+  // simple-face : 1100 + allée · double-face : 1100 + 200 + 1100 + allée
+  const off = DEPTH + (dbl ? BACK + DEPTH : 0) + aisle();
   // on conserve le chaînage interne : une nouvelle file par file d'origine
   const runMap = {};
-  let copies = state.selected.map(id=>{
-    const b = state.bays.find(x=>x.id===id);
+  let copies = src.map(b=>{
     if(!runMap[b.run]) runMap[b.run] = 'R'+state.runSeq++;
-    return {...b, id:uid(), x:b.x, y:b.y + DEPTH + 3000, run:runMap[b.run]};
+    return {...b, id:uid(), x:b.x, y:b.y + off, run:runMap[b.run]};
   });
   // on décale vers le bas jusqu'à trouver une zone libre (jamais de doublon caché)
   copies = freeZone(copies, []);
   copies.forEach(c=>state.bays.push(c));
   select(copies.map(c=>c.id));
   ensureVisible(copies[0]);
-  toast(copies.length+' travée(s) dupliquée(s) sur une zone libre'
+  toast(copies.length+' travée(s) dupliquée(s) — '+(dbl?'double-face':'simple-face')
+    +', allée '+fmt(aisle())+' mm (décalage '+fmt(off)+' mm)'
     + (copies.length>1 ? ' — sélection groupée, glissez-les ensemble' : ''));
 }
 function delSel(){
@@ -1416,6 +1455,12 @@ function applyWarehouse(){
   drawGrid(); renderStats(); renderJSON(); fit();
 }
 ['whW','whD'].forEach(id=>document.getElementById(id).onchange = applyWarehouse);
+// largeur d'allée : sert au décalage vertical lors d'une duplication
+document.getElementById('whAisle').onchange = e=>{
+  state.warehouse.aisle = Math.max(0, Math.round((+e.target.value||0)/50)*50);
+  e.target.value = state.warehouse.aisle;
+  renderJSON(); toast("Allée : "+fmt(state.warehouse.aisle)+' mm');
+};
 // sélecteurs déroulants (échelle, lisse)
 function selList(id, values, key, suffix){
   const el = document.getElementById(id);
@@ -1485,7 +1530,7 @@ window.addEventListener('keyup', e=>{ if(e.code==='Space') spaceDown=false; });
 /* ---------- Démo ---------- */
 /* ---------- État initial : une seule travée DÉPART ---------- */
 function resetPlan(silent){
-  state.warehouse = { width:30000, depth:18000, gridSize:50 };
+  state.warehouse = { width:30000, depth:18000, gridSize:50, aisle:3000 };
   state.bays = []; state.selected = []; state.seq = 1; state.runSeq = 1; state.cotes = []; state.labels = []; refreshCoteList();
   state.upright = 80; state.beam = 2700; state.levels = 2;
   state.measureMode = false;
@@ -1494,6 +1539,7 @@ function resetPlan(silent){
   lDim.destroyChildren(); lDim.batchDraw(); lSnap.destroyChildren(); lSnap.batchDraw(); mA = null;
   document.getElementById('whW').value = state.warehouse.width;
   document.getElementById('whD').value = state.warehouse.depth;
+  document.getElementById('whAisle').value = state.warehouse.aisle;
   document.getElementById('gridSel').value = state.warehouse.gridSize;
   document.getElementById('fGrid').textContent = state.warehouse.gridSize+' mm';
   chipsAll(); drawGrid();
@@ -1555,251 +1601,334 @@ resetPlan(true);
 histInit();
 setInterval(histWatch, 450);
 toast('Nouveau plan : travée DÉPART 2700 mm · échelles 80 mm · + et − pour ajouter / retirer une travée SUITE');
+</script>
+<script data-pplx-inline-edit>
+(function () {
+  if (window === window.top) return;
 
-/* ====================== LICENCE RACKPLAN ======================
-   Contrôle de licence côté serveur : webhook Make → base Airtable.
-   RKP.version est propre au dossier de déploiement (v1, v2, v3…).
-   Le serveur refuse une clé dont « Version max » est inférieure.
-   ============================================================== */
-const RKP = {
-  api: 'https://hook.eu2.make.com/y6lu0d6cpwwvtgwuwcq32ab5hmsr5q7c',
-  version: 1,
-  demoMaxBays: 12,
-  revalidateMs: 15 * 60 * 1000,
-  key: '', email: '', lic: null, demo: true, lastOk: 0
-};
+  const allowedParentOrigins = ["https://www.perplexity.ai","https://perplexity.ai","https://testing.perplexity.ai","https://staging.perplexity.ai","https://*.preview.i.perplexity.ai","http://perplexity.localhost","http://localhost:1420","http://127.0.0.1:1420","http://localhost:3000","http://127.0.0.1:3000","http://localhost:5173","http://127.0.0.1:5173"];
+  const MAX_FONT_BYTES = 500 * 1024;
+  const MAX_TOTAL_FONT_BYTES = 2 * 1024 * 1024;
+  let scrollForwarding = false;
+  let scrollRaf = 0;
+  let trustedTopOrigin = null;
 
-const RKP_MOTIFS = {
-  KO_STATUT : 'Cette licence est suspendue ou révoquée.',
-  KO_VERSION: 'Cette licence ne couvre pas cette version de RackPlan.',
-  KO_ORIGINE: "Cette licence n'est pas autorisée depuis cette adresse.",
-  INCONNUE  : "E-mail et clé ne correspondent à aucun accès ouvert.",
-  VIDE      : 'Saisissez votre e-mail et votre clé de licence.',
-  RESEAU    : 'Serveur de licences injoignable. Réessayez.'
-};
-
-function rkpSet(k, v){ try { localStorage.setItem(k, v); } catch(e){} }
-function rkpGet(k){ try { return localStorage.getItem(k) || ''; } catch(e){ return ''; } }
-
-async function rkpValidate(key, email){
-  if(!key || !email) return { ok:false, motif:'VIDE' };
-  try{
-    const r = await fetch(RKP.api, {
-      method : 'POST',
-      headers: { 'Content-Type':'application/x-www-form-urlencoded;charset=UTF-8' },
-      body   : new URLSearchParams({ key:key, email:email,
-                 v:String(RKP.version), action:'validate' }).toString()
-    });
-    let d = null;
-    try { d = JSON.parse(await r.text()); } catch(e){}
-    if(d && d.ok === true) return d;
-    return { ok:false, motif:(d && d.motif) || 'INCONNUE' };
-  }catch(e){ return { ok:false, motif:'RESEAU' }; }
-}
-
-/* ---------- bandeau d'état dans l'en-tête ---------- */
-function rkpBadge(){
-  let b = document.getElementById('rkpBadge');
-  if(!b){
-    b = document.createElement('button');
-    b.id = 'rkpBadge'; b.type = 'button';
-    b.style.cssText = 'margin-left:14px;background:transparent;border:1px solid var(--line);'
-      + 'border-radius:8px;padding:5px 10px;font-size:11px;letter-spacing:.05em;cursor:pointer';
-    b.onclick = rkpOpen;
-    const brand = document.querySelector('header .brand');
-    if(brand && brand.parentNode) brand.parentNode.insertBefore(b, brand.nextSibling);
-    else document.querySelector('header').appendChild(b);
-  }
-  if(RKP.demo){
-    b.textContent = 'DÉMO — activer une licence';
-    b.style.color = '#ffb3c0'; b.style.borderColor = 'rgba(244,63,94,.55)';
-  } else {
-    b.textContent = 'Licence ' + (RKP.lic.revendeur || RKP.lic.licence);
-    b.style.color = '#bfe9ff'; b.style.borderColor = '#2f5ea8';
-  }
-  rkpLockUI();
-}
-
-/* ---------- verrouillage des fonctions sous licence ---------- */
-const RKP_LOCKED = ['bBom', 'bBom2', 'bSave', 'bLoad', 'bPrint', 'quitSave'];
-function rkpLockUI(){
-  RKP_LOCKED.forEach(id=>{
-    const el = document.getElementById(id);
-    if(!el) return;
-    if(el.dataset.rkpT === undefined) el.dataset.rkpT = el.title || '';
-    el.disabled = RKP.demo;
-    el.title = RKP.demo ? 'Réservé aux licences actives' : el.dataset.rkpT;
-  });
-}
-function rkpDenied(){
-  toast('Fonction réservée aux licences actives');
-  rkpOpen();
-}
-
-/* ---------- fenêtre d'activation ---------- */
-function rkpGate(){
-  let g = document.getElementById('rkpGate');
-  if(g) return g;
-  g = document.createElement('div');
-  g.id = 'rkpGate';
-  g.style.cssText = 'position:fixed;inset:0;z-index:9999;display:none;align-items:center;'
-    + 'justify-content:center;background:rgba(7,11,17,.82);backdrop-filter:blur(3px)';
-  g.innerHTML = `
-    <div style="width:min(440px,92vw);background:var(--panel);border:1px solid var(--line);
-                border-radius:14px;padding:26px 24px;box-shadow:0 24px 64px rgba(0,0,0,.55)">
-      <h3 style="font-size:1.05rem;font-weight:700;margin-bottom:6px">Activer RackPlan 2D</h3>
-      <p style="font-size:.8rem;color:var(--txt-dim);line-height:1.55;margin-bottom:16px">
-        Saisissez votre e-mail professionnel et la clé de licence de votre société.
-        Les deux doivent correspondre à un accès ouvert. Sans cela, l'application reste
-        utilisable en démonstration&nbsp;: ${RKP.demoMaxBays} travées maximum, exports désactivés.</p>
-      <input id="rkpMail" type="email" autocomplete="email" spellcheck="false"
-             placeholder="prenom.nom@societe.fr"
-             style="width:100%;background:#0e1622;border:1px solid var(--line);border-radius:8px;
-                    padding:10px 12px;margin-bottom:8px">
-      <input id="rkpKey" type="text" autocomplete="off" spellcheck="false"
-             placeholder="RKP-XXXX-XXXX-XXXX"
-             style="width:100%;background:#0e1622;border:1px solid var(--line);border-radius:8px;
-                    padding:10px 12px;font-family:'JetBrains Mono',monospace;letter-spacing:.06em;
-                    text-transform:uppercase">
-      <div id="rkpMsg" style="min-height:20px;font-size:.78rem;margin:10px 2px 0;color:#ffb3c0"></div>
-      <div style="display:flex;gap:8px;margin-top:14px">
-        <button id="rkpDemo" class="btn ghost" style="flex:1;justify-content:center">Continuer en démo</button>
-        <button id="rkpGo" class="btn primary" style="flex:1;justify-content:center">Activer</button>
-      </div>
-      <p style="font-size:.7rem;color:var(--txt-mute);margin-top:14px;line-height:1.5">
-        Version ${RKP.version} · Les exports portent le nom de votre société et votre e-mail.<br>
-        <button id="rkpForget" type="button" style="background:none;border:0;padding:4px 0;
-          color:var(--txt-dim);font-size:.7rem;text-decoration:underline;cursor:pointer">
-          Oublier la licence enregistrée sur ce poste</button></p>
-    </div>`;
-  document.body.appendChild(g);
-
-  g.querySelector('#rkpDemo').onclick = ()=>{
-    RKP.lic = null; RKP.demo = true; RKP.lastOk = 0;
-    rkpBadge(); rkpClose();
-    toast('Mode démonstration — accès conservé pour la prochaine ouverture');
-  };
-  g.querySelector('#rkpGo').onclick = rkpSubmit;
-  g.querySelector('#rkpForget').onclick = rkpForget;
-  ['#rkpKey', '#rkpMail'].forEach(sel=>
-    g.querySelector(sel).addEventListener('keydown', e=>{ if(e.key === 'Enter') rkpSubmit(); }));
-  return g;
-}
-function rkpOpen(){
-  const g = rkpGate();
-  g.style.display = 'flex';
-  const i = g.querySelector('#rkpKey');
-  i.value = RKP.key || rkpGet('rkp.key');
-  const m = g.querySelector('#rkpMail');
-  m.value = RKP.email || rkpGet('rkp.email');
-  setTimeout(()=>(m.value ? i : m).focus(), 40);
-}
-function rkpClose(){ const g = document.getElementById('rkpGate'); if(g) g.style.display = 'none'; }
-function rkpMsg(t){ const m = document.getElementById('rkpMsg'); if(m) m.textContent = t || ''; }
-
-function rkpForget(){
-  try { localStorage.removeItem('rkp.key'); localStorage.removeItem('rkp.email'); } catch(e){}
-  RKP.key = ''; RKP.email = ''; RKP.lic = null; RKP.demo = true; RKP.lastOk = 0;
-  const i = document.getElementById('rkpKey'); if(i) i.value = '';
-  const m = document.getElementById('rkpMail'); if(m) m.value = '';
-  rkpBadge(); rkpMsg('Accès oublié sur ce poste. Mode démonstration actif.');
-}
-
-async function rkpSubmit(){
-  const btn = document.getElementById('rkpGo');
-  const key = document.getElementById('rkpKey').value.trim().toUpperCase();
-  const mail = document.getElementById('rkpMail').value.trim().toLowerCase();
-  btn.disabled = true; rkpMsg('Vérification…');
-  const d = await rkpValidate(key, mail);
-  btn.disabled = false;
-  if(!d.ok){ rkpMsg(RKP_MOTIFS[d.motif] || 'Accès refusé.'); return; }
-  RKP.key = key; RKP.email = mail; RKP.lic = d; RKP.demo = false; RKP.lastOk = Date.now();
-  rkpSet('rkp.key', key); rkpSet('rkp.email', mail);
-  rkpBadge(); rkpClose();
-  toast('Licence active — ' + (d.revendeur || key));
-}
-
-/* ---------- plafond du mode démo ---------- */
-function rkpCap(n){
-  if(!RKP.demo) return false;
-  if(state.bays.length + (n || 1) <= RKP.demoMaxBays) return false;
-  toast('Démo limitée à ' + RKP.demoMaxBays + ' travées — activez votre licence');
-  rkpOpen();
-  return true;
-}
-const _rkpAddDepart = addDepart, _rkpAddSuite = addSuite,
-      _rkpDupSel = dupSel, _rkpLoadData = loadData;
-addDepart = function(x, y, run){
-  if(rkpCap(1)) return state.bays[state.bays.length - 1];
-  return _rkpAddDepart(x, y, run);
-};
-addSuite = function(){
-  if(rkpCap(1)) return state.bays[state.bays.length - 1];
-  return _rkpAddSuite();
-};
-dupSel = function(){ if(rkpCap(state.selected.length || 1)) return; return _rkpDupSel(); };
-loadData = function(d){
-  const r = _rkpLoadData(d);
-  if(RKP.demo && state.bays.length > RKP.demoMaxBays){
-    state.bays = state.bays.slice(0, RKP.demoMaxBays);
-    state.selected = [];
-    try { buildItems(); refreshList(); renderStats(); renderBom(); renderJSON(); } catch(e){}
-    toast('Démo : plan tronqué à ' + RKP.demoMaxBays + ' travées');
-    rkpOpen();
-  }
-  return r;
-};
-
-/* ---------- verrou sur les livrables ---------- */
-async function rkpAllowExport(){
-  if(RKP.demo){
-    toast('Export réservé aux licences actives');
-    rkpOpen();
+  // Allow entries like "https://*.preview.i.perplexity.ai" — the wildcard
+  // matches a single DNS label (no dots), so "https://*.foo" cannot stretch
+  // across multiple labels.
+  function matchesAllowedOrigin(origin) {
+    if (!origin) return false;
+    for (const entry of allowedParentOrigins) {
+      if (!entry.includes("*")) {
+        if (entry === origin) return true;
+        continue;
+      }
+      const pattern = new RegExp(
+        "^" +
+          entry.replace(/[.+?^${}()|[\]\\]/g, "\\$&").replace(/\*/g, "[^.]+") +
+          "$",
+      );
+      if (pattern.test(origin)) return true;
+    }
     return false;
   }
-  if(Date.now() - RKP.lastOk > RKP.revalidateMs){
-    const d = await rkpValidate(RKP.key, RKP.email);
-    if(!d.ok){
-      RKP.demo = true; RKP.lic = null; rkpBadge();
-      toast(RKP_MOTIFS[d.motif] || 'Licence refusée');
-      rkpOpen();
-      return false;
-    }
-    RKP.lic = d; RKP.lastOk = Date.now();
-  }
-  return true;
-}
-['bSave', 'bLoad', 'quitSave'].forEach(id=>{
-  const el = document.getElementById(id);
-  if(!el) return;
-  const prev = el.onclick;
-  el.onclick = function(e){
-    if(RKP.demo) return rkpDenied();
-    return prev ? prev.call(this, e) : undefined;
-  };
-});
-const _rkpBom = downloadBom, _rkpPrint = printPlan;
-const rkpBomClick   = async ()=>{ if(await rkpAllowExport()) _rkpBom(); };
-const rkpPrintClick = async ()=>{ if(await rkpAllowExport()) _rkpPrint(); };
-document.getElementById('bBom').onclick   = rkpBomClick;
-document.getElementById('bBom2').onclick  = rkpBomClick;
-document.getElementById('bPrint').onclick = rkpPrintClick;
 
-/* ---------- démarrage ---------- */
-(async function rkpBoot(){
-  rkpBadge();
-  const k = rkpGet('rkp.key'), m = rkpGet('rkp.email');
-  if(k && m){
-    const d = await rkpValidate(k, m);
-    if(d.ok){
-      RKP.key = k; RKP.email = m; RKP.lic = d; RKP.demo = false; RKP.lastOk = Date.now();
-      rkpBadge();
+  // Trust decision: when the sender is same-origin-visible (event.origin is a
+  // real origin like https://www.perplexity.ai) we trust event.origin directly.
+  // When event.origin is "null" (opaque broker srcdoc), we fall back to the
+  // broker's stamped `parentOrigin` to identify the top window. The fallback
+  // is claim-only — we rely on the browser's native `targetOrigin` enforcement
+  // on the response path (see postToTrustedTop) to ensure replies can't be
+  // delivered to anyone but the actual top window of that claimed origin.
+  function getTrustedParentOrigin(event) {
+    const forwardedParentOrigin =
+      typeof event.data.parentOrigin === "string" ? event.data.parentOrigin : null;
+    const parentOrigin = event.origin === "null" ? forwardedParentOrigin : event.origin;
+    return matchesAllowedOrigin(parentOrigin) ? parentOrigin : null;
+  }
+
+  // All responses go to window.top with targetOrigin = the allowlisted origin.
+  // An attacker that iframes us inside their own null-origin broker can claim
+  // any parentOrigin they like, but the browser will drop the reply whenever
+  // the real top's origin doesn't match — so the screenshot never leaves.
+  function postToTrustedTop(message) {
+    if (!trustedTopOrigin) return;
+    try {
+      window.top.postMessage(message, trustedTopOrigin);
+    } catch (_error) {}
+  }
+
+  function inlineAll(original, clone) {
+    if (original.nodeType !== 1 || clone.nodeType !== 1) return;
+
+    try {
+      const computedStyle = getComputedStyle(original);
+      // cssText on a computed style is the serialized declaration in modern
+      // Chromium/Safari — a single read beats enumerating ~400 longhand
+      // properties. Firefox returns "" here, so we fall back on empty.
+      const serialized = computedStyle.cssText;
+      if (serialized) {
+        clone.style.cssText = serialized;
+      } else {
+        const parts = new Array(computedStyle.length);
+        for (let index = 0; index < computedStyle.length; index += 1) {
+          const property = computedStyle[index];
+          parts[index] = `${property}:${computedStyle.getPropertyValue(property)};`;
+        }
+        clone.style.cssText = parts.join("");
+      }
+    } catch (_error) {}
+
+    const originalChildren = original.children;
+    const clonedChildren = clone.children;
+    for (
+      let index = 0;
+      index < originalChildren.length && index < clonedChildren.length;
+      index += 1
+    ) {
+      inlineAll(originalChildren[index], clonedChildren[index]);
+    }
+  }
+
+  function extractFontUrl(srcValue) {
+    const matches = [
+      ...srcValue.matchAll(
+        /url\(["']?([^"')]+)["']?\)(?:\s*format\(["']?([^"')]+)["']?\))?/gi,
+      ),
+    ];
+    if (matches.length === 0) return null;
+    const woff2 = matches.find((m) => m[2] && m[2].toLowerCase().includes("woff2"));
+    if (woff2) return woff2[1];
+    const woff = matches.find((m) => m[2] && m[2].toLowerCase().includes("woff"));
+    if (woff) return woff[1];
+    return matches[0][1];
+  }
+
+  // Cache resolved font URL -> data URI across captures. Fonts on a page
+  // essentially never change, and a batch run emits multiple captures back to
+  // back — without this we'd refetch + re-base64 every time.
+  const fontDataUriCache = new Map();
+  const SRC_DECLARATION_RE = /src\s*:\s*[^;}]+/i;
+
+  async function fetchAsDataUri(url) {
+    if (fontDataUriCache.has(url)) return fontDataUriCache.get(url);
+    let dataUri = null;
+    try {
+      const response = await fetch(url, { mode: "cors", credentials: "omit" });
+      if (response.ok) {
+        const blob = await response.blob();
+        if (blob.size <= MAX_FONT_BYTES) {
+          dataUri = await new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onloadend = () =>
+              resolve(typeof reader.result === "string" ? reader.result : null);
+            reader.onerror = () => resolve(null);
+            reader.readAsDataURL(blob);
+          });
+        }
+      }
+    } catch (_error) {
+      dataUri = null;
+    }
+    fontDataUriCache.set(url, dataUri);
+    return dataUri;
+  }
+
+  function collectFontFaceRuleTexts() {
+    const rules = [];
+    for (const sheet of document.styleSheets) {
+      let cssRules;
+      try {
+        cssRules = sheet.cssRules;
+      } catch (_error) {
+        continue;
+      }
+      if (!cssRules) continue;
+      for (const rule of cssRules) {
+        const cssText = rule.cssText || "";
+        if (cssText.startsWith("@font-face")) rules.push(cssText);
+      }
+    }
+    return rules;
+  }
+
+  async function buildInlinedFontCss() {
+    const ruleTexts = collectFontFaceRuleTexts();
+    if (ruleTexts.length === 0) return null;
+
+    const resolved = ruleTexts.map((cssText) => {
+      if (!SRC_DECLARATION_RE.test(cssText)) return null;
+      const srcMatch = cssText.match(/src\s*:\s*([^;}]+)[;}]/i);
+      if (!srcMatch) return null;
+      const url = extractFontUrl(srcMatch[1]);
+      if (!url) return null;
+      try {
+        return { cssText, url: new URL(url, document.baseURI).href };
+      } catch (_error) {
+        return null;
+      }
+    });
+
+    const dataUris = await Promise.all(
+      resolved.map((entry) => (entry ? fetchAsDataUri(entry.url) : Promise.resolve(null))),
+    );
+
+    const inlined = [];
+    let totalBytes = 0;
+    for (let index = 0; index < resolved.length; index += 1) {
+      const entry = resolved[index];
+      const dataUri = dataUris[index];
+      if (!entry || !dataUri) continue;
+      const approxBytes = dataUri.length * 0.75;
+      if (totalBytes + approxBytes > MAX_TOTAL_FONT_BYTES) break;
+      totalBytes += approxBytes;
+      inlined.push(entry.cssText.replace(SRC_DECLARATION_RE, `src: url("${dataUri}")`));
+    }
+    return inlined.length > 0 ? inlined.join("\n") : null;
+  }
+
+  function stripExternal(clone) {
+    const images = clone.querySelectorAll("img");
+    for (let index = 0; index < images.length; index += 1) {
+      const src = images[index].getAttribute("src");
+      if (src && !src.startsWith("data:")) images[index].removeAttribute("src");
+    }
+
+    const elements = clone.querySelectorAll("*");
+    for (let index = 0; index < elements.length; index += 1) {
+      const style = elements[index].style.cssText;
+      if (style && style.includes("url(")) {
+        elements[index].style.cssText = style.replace(
+          /url\(["']?(?!data:)[^)"']*["']?\)/gi,
+          "none",
+        );
+      }
+    }
+  }
+
+  function emitScroll() {
+    scrollRaf = 0;
+    if (!scrollForwarding) return;
+    postToTrustedTop({
+      type: "INLINE_EDIT_SCROLL",
+      scrollX: window.scrollX,
+      scrollY: window.scrollY,
+    });
+  }
+
+  window.addEventListener(
+    "scroll",
+    function () {
+      if (!scrollForwarding || scrollRaf) return;
+      scrollRaf = requestAnimationFrame(emitScroll);
+    },
+    { passive: true, capture: true },
+  );
+
+  async function handleCaptureRequest(event) {
+    const requestId = event.data.requestId;
+    const scrollX = window.scrollX;
+    const scrollY = window.scrollY;
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+
+    function postResult(dataUrl) {
+      postToTrustedTop({
+        type: "INLINE_EDIT_SCREENSHOT_RESULT",
+        requestId,
+        dataUrl,
+        scrollX,
+        scrollY,
+      });
+    }
+
+    try {
+      // Wait for any pending web fonts to resolve so both inline metrics and
+      // the @font-face inlining below see the same loaded faces.
+      if (document.fonts && document.fonts.ready) {
+        try {
+          await document.fonts.ready;
+        } catch (_error) {}
+      }
+
+      const clone = document.documentElement.cloneNode(true);
+      inlineAll(document.documentElement, clone);
+
+      const removedNodes = clone.querySelectorAll("script,link[rel=\"stylesheet\"],style");
+      for (let index = 0; index < removedNodes.length; index += 1) {
+        removedNodes[index].remove();
+      }
+
+      stripExternal(clone);
+
+      // Re-embed web fonts as data-URI @font-face rules so the SVG rasterizer
+      // can resolve them — external font URLs aren't fetched during
+      // foreignObject rendering, which would otherwise force a fallback face
+      // and change text metrics.
+      const inlinedFontCss = await buildInlinedFontCss();
+      if (inlinedFontCss) {
+        const styleEl = document.createElement("style");
+        styleEl.textContent = inlinedFontCss;
+        const head = clone.querySelector("head");
+        if (head) head.appendChild(styleEl);
+        else clone.insertBefore(styleEl, clone.firstChild);
+      }
+
+      const html = new XMLSerializer().serializeToString(clone);
+      const svg =
+        `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">` +
+        '<foreignObject width="100%" height="100%">' +
+        `<div xmlns="http://www.w3.org/1999/xhtml" style="width:${width}px;height:${height}px;overflow:hidden">` +
+        `<div style="position:relative;left:-${scrollX}px;top:-${scrollY}px">` +
+        html +
+        "</div></div></foreignObject></svg>";
+      const svgUrl = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+      const image = new Image();
+      image.onload = function () {
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        canvas.getContext("2d").drawImage(image, 0, 0);
+        postResult(canvas.toDataURL("image/png"));
+      };
+      image.onerror = function () {
+        postResult(null);
+      };
+      image.src = svgUrl;
+    } catch (_error) {
+      postResult(null);
+    }
+  }
+
+  window.addEventListener("message", function (event) {
+    if (!event.data) return;
+    // Only accept messages from the direct parent frame. Blocks sibling /
+    // unrelated-window postMessage senders that could otherwise reach us.
+    if (event.source !== window.parent) return;
+
+    const trustedParentOrigin = getTrustedParentOrigin(event);
+    if (!trustedParentOrigin) return;
+    trustedTopOrigin = trustedParentOrigin;
+
+    if (event.data.type === "INLINE_EDIT_SCROLL_START") {
+      scrollForwarding = true;
+      emitScroll();
       return;
     }
-  }
-  rkpOpen();
+
+    if (event.data.type === "INLINE_EDIT_SCROLL_STOP") {
+      scrollForwarding = false;
+      if (scrollRaf) cancelAnimationFrame(scrollRaf);
+      scrollRaf = 0;
+      return;
+    }
+
+    if (event.data.type !== "INLINE_EDIT_CAPTURE_REQUEST") return;
+
+    handleCaptureRequest(event);
+  });
 })();
 
-</script>
-</body>
+
+</script></body>
 </html>

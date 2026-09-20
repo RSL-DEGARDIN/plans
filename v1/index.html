@@ -1613,6 +1613,23 @@ function rkpBadge(){
     b.textContent = 'Licence ' + (RKP.lic.revendeur || RKP.lic.licence);
     b.style.color = '#bfe9ff'; b.style.borderColor = '#2f5ea8';
   }
+  rkpLockUI();
+}
+
+/* ---------- verrouillage des fonctions sous licence ---------- */
+const RKP_LOCKED = ['bBom', 'bBom2', 'bSave', 'bLoad', 'bPrint', 'quitSave'];
+function rkpLockUI(){
+  RKP_LOCKED.forEach(id=>{
+    const el = document.getElementById(id);
+    if(!el) return;
+    if(el.dataset.rkpT === undefined) el.dataset.rkpT = el.title || '';
+    el.disabled = RKP.demo;
+    el.title = RKP.demo ? 'Réservé aux licences actives' : el.dataset.rkpT;
+  });
+}
+function rkpDenied(){
+  toast('Fonction réservée aux licences actives');
+  rkpOpen();
 }
 
 /* ---------- fenêtre d'activation ---------- */
@@ -1734,6 +1751,15 @@ async function rkpAllowExport(){
   }
   return true;
 }
+['bSave', 'bLoad', 'quitSave'].forEach(id=>{
+  const el = document.getElementById(id);
+  if(!el) return;
+  const prev = el.onclick;
+  el.onclick = function(e){
+    if(RKP.demo) return rkpDenied();
+    return prev ? prev.call(this, e) : undefined;
+  };
+});
 const _rkpBom = downloadBom, _rkpPrint = printPlan;
 const rkpBomClick   = async ()=>{ if(await rkpAllowExport()) _rkpBom(); };
 const rkpPrintClick = async ()=>{ if(await rkpAllowExport()) _rkpPrint(); };

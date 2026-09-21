@@ -219,7 +219,7 @@ pre{background:#0a0f16;border:1px solid var(--line);border-radius:8px;padding:10
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
         stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 3v6h-6"/></svg>
     </button>
-    <button class="btn ghost" id="bDup" title="Dupliquer la sélection" aria-label="Dupliquer la sélection">
+    <button class="btn ghost" id="bDup" title="Dupliquer la sélection (*)" aria-label="Dupliquer la sélection (*)">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
         stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
     </button>
@@ -403,7 +403,7 @@ pre{background:#0a0f16;border:1px solid var(--line);border-radius:8px;padding:10
   <button class="hintbtn" id="hintBtn" aria-expanded="false" aria-controls="hint"
     title="Afficher les raccourcis" aria-label="Afficher les raccourcis">?</button>
   <div class="hint" id="hint" hidden>
-    <kbd>+</kbd> travée DÉPART · <kbd>−</kbd> travée SUITE chaînée · <kbd>R</kbd> rotation 90°<br>
+    <kbd>D</kbd> travée DÉPART · <kbd>+</kbd> / <kbd>−</kbd> travée SUITE chaînée · <kbd>R</kbd> rotation 90° · <kbd>*</kbd> dupliquer la sélection<br>
     <b>Travée DÉPART sélectionnée</b> : <kbd>+</kbd> ajoute une travée SUITE à la file, <kbd>−</kbd> la retire<br>
     <b>Glisser</b> pour déplacer (une travée = un bloc) · <b>Maj+clic</b> sélection multiple<br>
     <b>Molette</b> zoom · <b>clic droit / espace</b> panoramique · <b>glisser dans le vide</b> sélection multiple · cotes en mm en direct<br>
@@ -412,7 +412,7 @@ pre{background:#0a0f16;border:1px solid var(--line);border-radius:8px;padding:10
     <b>Ctrl+Z / Ctrl+Y</b> annuler / rétablir · <b>Ctrl+P</b> imprimer · <b>Piv.</b> : bascule H ↔ V<br>
     <b>Étiquettes</b> : nom de rack accroché à la 1ère travée · glisser pour placer, double-clic pour renommer<br>
     <b>Cotes vertes</b> : restées sur le plan, clic sur l'étiquette pour les retirer · <b>Hors-tout</b> en violet<br>
-    <kbd>D</kbd> + DÉPART · <kbd>+</kbd> / <kbd>−</kbd> SUITE · <kbd>Suppr</kbd> supprimer · <kbd>G</kbd> magnétisme · <kbd>M</kbd> mesurer<br>
+    <kbd>D</kbd> + DÉPART · <kbd>+</kbd> / <kbd>−</kbd> SUITE · <kbd>*</kbd> dupliquer · <kbd>Suppr</kbd> supprimer · <kbd>G</kbd> magnétisme · <kbd>M</kbd> mesurer<br>
     <b>Flèches</b> déplacement fin (<kbd>Maj</kbd> × 10) · <kbd>Échap</kbd> désélectionner
   </div>
   </div>
@@ -584,11 +584,9 @@ function buildItems(){
     const p = parts(b);
     p.beams.forEach(r=> g.add(new Konva.Rect({ x:r.x, y:r.y, width:r.w, height:r.h,
       fill:C.orange, stroke:C.orangeDark, strokeWidth:1/s })));
-    p.ladders.forEach(r=>{
-      g.add(new Konva.Rect({ x:r.x, y:r.y, width:r.w, height:r.h, fill:C.blue, stroke:C.blueDark, strokeWidth:1/s }));
-      for(let i=1;i<6;i++) g.add(new Konva.Line({ points:[r.x, r.h*i/6, r.x+r.w, r.h*i/6],
-        stroke:'#0b1017', strokeWidth:12, opacity:.4 }));
-    });
+    // échelle = simple rectangle bleu (plus léger à dessiner)
+    p.ladders.forEach(r=> g.add(new Konva.Rect({ x:r.x, y:r.y, width:r.w, height:r.h,
+      fill:C.blue, stroke:C.blueDark, strokeWidth:1/s })));
     // étiquette : longueur de lisse + nombre de niveaux, seulement si lisible
     if(w*s > 70){
       const t = new Konva.Text({ text:`${b.beam} · ${b.levels}N`, fontSize:15,
@@ -1042,7 +1040,12 @@ function renderProps(){
     <h3><i class="swatch" style="background:${b.mode==='depart'?'var(--blue)':'var(--orange)'}"></i>${b.id}</h3>
     <div class="row"><label>Largeur échelle</label><select id="pU">${UPRIGHTS.map(v=>`<option ${v===b.upright?'selected':''}>${v}</option>`).join('')}</select></div>
     <div class="row"><label>Longueur lisse</label><select id="pB">${BEAMS.map(v=>`<option ${v===b.beam?'selected':''}>${v}</option>`).join('')}</select></div>
-    <div class="row"><label>Nivx de lisses</label><select id="pL">${LEVELS.map(v=>`<option ${v===b.levels?'selected':''}>${v}</option>`).join('')}</select></div>
+    <div class="row"><label>Nivx de lisses</label>
+      <div class="stepper">
+        <button type="button" id="pLMinus" title="Retirer un niveau de lisses" aria-label="Moins de niveaux">−</button>
+        <span class="sv" id="pLVal">${b.levels} niv.</span>
+        <button type="button" id="pLPlus" title="Ajouter un niveau de lisses" aria-label="Plus de niveaux">+</button>
+      </div></div>
     <div class="row"><label>Mode</label><select id="pM">
       <option value="depart" ${b.mode==='depart'?'selected':''}>DÉPART</option>
       <option value="suite" ${b.mode==='suite'?'selected':''}>SUITE</option></select></div>
@@ -1070,16 +1073,24 @@ function renderProps(){
     b.x=+document.getElementById('pX').value; b.y=+document.getElementById('pY').value;
     b.rotation=+document.getElementById('pR').value;
     b.upright=+document.getElementById('pU').value; b.beam=+document.getElementById('pB').value;
-    b.levels=+document.getElementById('pL').value; b.mode=document.getElementById('pM').value;
+    b.mode=document.getElementById('pM').value;
     buildItems(); drawDims(b,false); refreshList(); renderJSON(); renderProps();
   };
-  ['pX','pY','pR','pU','pB','pL','pM'].forEach(id=>document.getElementById(id).addEventListener('change',upd));
+  ['pX','pY','pR','pU','pB','pM'].forEach(id=>document.getElementById(id).addEventListener('change',upd));
   const rp = document.getElementById('pRPlus'), rm = document.getElementById('pRMinus');
   const bumpRot = d => {
     const f = document.getElementById('pR');
     f.value = ((Math.round(+f.value || 0) + d) % 360 + 360) % 360;
     upd();
   };
+  // niveaux de lisses : + / − bornés aux valeurs de LEVELS
+  const li = LEVELS.indexOf(b.levels);
+  const lp = document.getElementById('pLPlus'), lm = document.getElementById('pLMinus');
+  lm.disabled = li <= 0; lp.disabled = li >= LEVELS.length - 1;
+  const bumpLev = d => { const i = LEVELS.indexOf(b.levels) + d;
+    if(i < 0 || i >= LEVELS.length) return; b.levels = LEVELS[i]; upd(); };
+  lp.onclick = ()=> bumpLev(1);
+  lm.onclick = ()=> bumpLev(-1);
   rp.onclick = ()=> bumpRot(15);
   rm.onclick = ()=> bumpRot(-15);
   const sp = document.getElementById('pSPlus'), sm = document.getElementById('pSMinus');
@@ -1105,6 +1116,12 @@ function refreshList(){
 // 2 lisses par niveau (avant + arrière)
 const beamsOf = b => 2 * (b.levels || 2);
 const laddersOf = b => b.mode==='depart' ? 2 : 1;
+// Palettes 800 mm + jeu 75 mm : places par niveau selon la longueur de lisse
+const PALLETS_PER_LEVEL = {1825:2, 1850:2, 2225:2, 2250:2, 2700:3, 3300:3, 3600:4};
+const palletsPerLevel = beam => PALLETS_PER_LEVEL[beam] ?? Math.max(0, Math.floor((beam - 75) / 875));
+// niveaux de lisses + 1 niveau au sol
+const palletsOf = b => palletsPerLevel(b.beam) * ((b.levels || 2) + 1);
+const totalPallets = () => state.bays.reduce((s,b)=>s+palletsOf(b),0);
 function bom(){
   const ladders = UPRIGHTS.map(u=>({ famille:'Échelle', ref:`ECH-${u}x${DEPTH}`,
     designation:`Échelle ${u} × ${DEPTH} mm`, dim:`${u} × ${DEPTH}`,
@@ -1138,10 +1155,10 @@ function renderStats(){
 function renderBom(){
   const rows = bom(), box = document.getElementById('bom');
   if(!rows.length){ box.innerHTML = '<p class="empty">La nomenclature se remplit dès la première travée.</p>'; return; }
-  const total = rows.reduce((s,r)=>s+r.qte,0);
+  const total = totalPallets();
   box.innerHTML = rows.map(r=>`<div class="stat"><span>${r.ref}</span><b>${r.qte}</b></div>`).join('')
     + `<div class="stat" style="border-top:1px solid var(--line);margin-top:6px;padding-top:6px">
-         <span>Total articles</span><b>${total}</b></div>`;
+         <span>Palettes (sol + niveaux)</span><b>${total}</b></div>`;
 }
 function downloadBom(){
   const rows = bom();
@@ -1155,6 +1172,7 @@ function downloadBom(){
   lines.push('');
   lines.push(['Récapitulatif','','Travées DEPART',' ',dep,''].join(sep));
   lines.push(['Récapitulatif','','Travées SUITE',' ',bays-dep,''].join(sep));
+  lines.push(['Récapitulatif','','Palettes (sol + niveaux)',' ',totalPallets(),''].join(sep));
   lines.push(['Récapitulatif','','Linéaire total de lisses (m)',' ','',
     (rows.reduce((s,r)=>s+r.ml,0)).toFixed(2).replace('.',',')].join(sep));
   lines.push('');
@@ -1385,6 +1403,7 @@ function printPlan(){
     ['Files de racks', new Set(state.bays.map(b=>b.run)).size],
     ['Échelles', state.bays.reduce((a,b)=>a+laddersOf(b),0)],
     ['Lisses (tous niveaux)', state.bays.reduce((a,b)=>a+beamsOf(b),0)],
+    ['Palettes (sol + niveaux)', totalPallets()],
     ['Linéaire de lisses', (state.bays.reduce((a,b)=>a+b.beam*beamsOf(b),0)/1000).toFixed(2)+' m'],
     ['Surface entrepôt', ((state.warehouse.width*state.warehouse.depth)/1e6).toFixed(1)+' m²']
   ];
@@ -1679,7 +1698,8 @@ window.addEventListener('keydown', e=>{
   else if(e.key==='-' || e.key==='_' || e.code==='NumpadSubtract'){ e.preventDefault();
     document.getElementById('suiteMinus').click(); }
   else if(k==='r') rotateSel();
-  else if(k==='d') document.getElementById('addDepart').click();   // D = + DÉPART, en SF ou DF
+  else if(k==='d') document.getElementById('addDepart').click();   // D = + DÉPART uniquement, en SF ou DF
+  else if(e.key==='*' || e.code==='NumpadMultiply'){ e.preventDefault(); dupSel(); }   // * = dupliquer la sélection
   else if(e.key==='Delete'||e.key==='Backspace'){ e.preventDefault(); delSel(); }
   else if(k==='g') document.getElementById('tSnap').click();
   else if(k==='m') document.getElementById('tMeasure').click();

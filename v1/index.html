@@ -33,12 +33,18 @@ header{grid-column:1/-1;display:flex;align-items:center;gap:var(--s4);padding:0 
 .toolbar .btn{white-space:nowrap;flex:0 0 auto;width:32px;height:32px;padding:0;justify-content:center;border-radius:6px}
 .tsep{width:1px;height:20px;background:var(--line);margin:0 5px;flex:0 0 auto}
 @media (max-width:1500px){.toolbar .btn kbd{display:none}}
-@media (max-width:1450px){.toolbar .btn{padding:6px 9px;font-size:12px}}
+@media (max-width:1450px){.toolbar .btn{font-size:12px}}
 button,select,input{font-family:inherit;font-size:var(--text-sm);color:var(--txt)}
 .btn{background:var(--panel-2);border:1px solid var(--line);border-radius:var(--r);padding:7px 12px;cursor:pointer;
   display:inline-flex;align-items:center;gap:6px;transition:background .15s,border-color .15s,transform .1s}
 .btn:hover{background:#1d2836;border-color:#31405a}
 .btn:disabled{opacity:.34;cursor:not-allowed}
+.btn.arrow{flex:1 1 0;justify-content:center;height:34px;border:0;border-radius:0;
+  background:rgba(59,130,246,.16);color:#cfe2ff;font-weight:600;white-space:nowrap}
+.btn.arrow:hover{background:rgba(59,130,246,.30)}
+.btn.arrow:disabled:hover{background:rgba(59,130,246,.16)}
+.btn.arrow.left{clip-path:polygon(14px 0,100% 0,100% 100%,14px 100%,0 50%);padding:0 8px 0 18px}
+.btn.arrow.right{clip-path:polygon(0 0,calc(100% - 14px) 0,100% 50%,calc(100% - 14px) 100%,0 100%);padding:0 18px 0 8px}
 .btn:disabled:hover{background:var(--panel-2);border-color:var(--line)}
 .btn:active{transform:translateY(1px)}
 .btn.on{background:rgba(56,189,248,.14);border-color:var(--accent);color:#bfe9ff}
@@ -50,6 +56,10 @@ button,select,input{font-family:inherit;font-size:var(--text-sm);color:var(--txt
 .btn.primary:hover{background:rgba(59,130,246,.26)}
 .btn kbd{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--txt-mute);
   border:1px solid var(--line);border-radius:4px;padding:0 4px}
+.btn kbd.key{display:inline-flex;align-items:center;justify-content:center;
+  min-width:19px;height:19px;padding:0 4px;border-radius:4px;
+  border:1px solid rgba(207,226,255,.42);border-bottom-width:2px;
+  background:rgba(255,255,255,.07);color:#e4eeff;font:700 11px/1 'JetBrains Mono',monospace}
 aside{background:var(--panel);overflow-y:auto;padding:var(--s4);display:flex;flex-direction:column;gap:var(--s6)}
 aside.left{border-right:1px solid var(--line)}
 aside.right{border-left:1px solid var(--line)}
@@ -209,7 +219,7 @@ pre{background:#0a0f16;border:1px solid var(--line);border-radius:8px;padding:10
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
         stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 3v6h-6"/></svg>
     </button>
-    <button class="btn ghost" id="bDup" title="Dupliquer la sélection (D)" aria-label="Dupliquer la sélection (D)">
+    <button class="btn ghost" id="bDup" title="Dupliquer la sélection" aria-label="Dupliquer la sélection">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
         stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
     </button>
@@ -266,6 +276,8 @@ pre{background:#0a0f16;border:1px solid var(--line);border-radius:8px;padding:10
         <span class="u">mm</span>
       </div>
       <div class="row">
+        <div style="display:flex;align-items:center;gap:8px;flex:0 0 auto">
+        <label style="white-space:nowrap">Piv.</label>
         <button class="btn ghost" id="bRotAll" aria-label="Pivoter le plan de 90°"
           style="width:32px;height:32px;padding:0;justify-content:center;border-radius:6px;flex:0 0 auto"
           title="Pivoter tout le plan de 90° (horizontal / vertical)">
@@ -273,11 +285,12 @@ pre{background:#0a0f16;border:1px solid var(--line);border-radius:8px;padding:10
             stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path
             d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 3v6h-6"/></svg>
         </button>
+        </div>
         <div style="display:flex;align-items:center;gap:8px;flex:0 0 auto">
         <label style="white-space:nowrap">Grille</label>
         <select id="gridSel" title="Pas de grille" style="width:92px">
-          <option value="25">25 mm</option><option value="50" selected>50 mm</option>
-          <option value="100">100 mm</option><option value="500">500 mm</option>
+          <option value="25">25 mm</option><option value="50">50 mm</option>
+          <option value="100" selected>100 mm</option><option value="500">500 mm</option>
           <option value="1000">1000 mm</option>
         </select></div></div>
     </div>
@@ -300,15 +313,29 @@ pre{background:#0a0f16;border:1px solid var(--line);border-radius:8px;padding:10
   <section>
     <h2>Ajouter une travée</h2>
     <div class="card">
-      <button class="btn primary" style="width:100%;justify-content:center" id="addDepart">
-        + Travée DÉPART</button>
+      <div style="display:flex;gap:6px">
+        <button class="btn primary" id="addDepart" title="Ajouter une travée DÉPART (D)"
+          style="flex:1 1 auto;justify-content:center;white-space:nowrap;padding:7px 8px;gap:4px"
+          >+ DÉPART<kbd class="key">D</kbd></button>
+        <button class="btn on" id="fSF" style="flex:0 0 38px;justify-content:center"
+          title="Simple-face : une seule travée">SF</button>
+        <button class="btn" id="fDF" style="flex:0 0 38px;justify-content:center"
+          title="Double-face : deux travées adossées">DF</button>
+      </div>
+      <div class="dims" style="margin-top:8px">
+        <label style="flex:1 1 0;min-width:0;white-space:nowrap;font-size:var(--text-xs);
+          color:var(--txt-dim)">Espace DF</label>
+        <input type="number" id="whBack" step="50" min="0" value="200"
+          aria-label="Jeu dos-à-dos entre travées double-face">
+        <span class="u">mm</span>
+      </div>
       <div style="display:flex;gap:6px;margin-top:8px">
-        <button class="btn" id="suiteMinus" style="flex:0 0 36px;justify-content:center;padding:7px 0;font:600 16px/1 Inter,sans-serif"
-          title="Retirer la dernière travée SUITE de la file sélectionnée" aria-label="Retirer une travée SUITE">−</button>
-        <button class="btn primary" style="flex:1 1 auto;justify-content:center" id="addSuite">
-          + Travée SUITE</button>
-        <button class="btn" id="suitePlus" style="flex:0 0 36px;justify-content:center;padding:7px 0;font:600 16px/1 Inter,sans-serif"
-          title="Ajouter une travée SUITE à la file sélectionnée" aria-label="Ajouter une travée SUITE">+</button>
+        <button class="btn arrow left" id="suiteMinus"
+          title="Retirer la dernière travée SUITE de la file sélectionnée (−)"
+          aria-label="Retirer une travée SUITE (touche −)">SUITE<kbd class="key">−</kbd></button>
+        <button class="btn arrow right" id="suitePlus"
+          title="Ajouter une travée SUITE à la file sélectionnée (+)"
+          aria-label="Ajouter une travée SUITE (touche +)">SUITE<kbd class="key">+</kbd></button>
       </div>
     </div>
   </section>
@@ -379,13 +406,13 @@ pre{background:#0a0f16;border:1px solid var(--line);border-radius:8px;padding:10
     <kbd>+</kbd> travée DÉPART · <kbd>−</kbd> travée SUITE chaînée · <kbd>R</kbd> rotation 90°<br>
     <b>Travée DÉPART sélectionnée</b> : <kbd>+</kbd> ajoute une travée SUITE à la file, <kbd>−</kbd> la retire<br>
     <b>Glisser</b> pour déplacer (une travée = un bloc) · <b>Maj+clic</b> sélection multiple<br>
-    <b>Molette</b> zoom · <b>clic droit / espace</b> panoramique · cotes en mm en direct<br>
+    <b>Molette</b> zoom · <b>clic droit / espace</b> panoramique · <b>glisser dans le vide</b> sélection multiple · cotes en mm en direct<br>
     <b>Mesurer</b> : accroche aux angles d'échelle, cotes horizontales ou verticales<br>
     <b>Clic sur une cote bleue</b> : saisir la largeur d'allée — la file sélectionnée se recale<br>
-    <b>Ctrl+Z / Ctrl+Y</b> annuler / rétablir · <b>Ctrl+P</b> imprimer · <b>Pivoter le plan</b> : bascule H ↔ V<br>
+    <b>Ctrl+Z / Ctrl+Y</b> annuler / rétablir · <b>Ctrl+P</b> imprimer · <b>Piv.</b> : bascule H ↔ V<br>
     <b>Étiquettes</b> : nom de rack accroché à la 1ère travée · glisser pour placer, double-clic pour renommer<br>
     <b>Cotes vertes</b> : restées sur le plan, clic sur l'étiquette pour les retirer · <b>Hors-tout</b> en violet<br>
-    <kbd>D</kbd> dupliquer · <kbd>Suppr</kbd> supprimer · <kbd>G</kbd> magnétisme · <kbd>M</kbd> mesurer<br>
+    <kbd>D</kbd> + DÉPART · <kbd>+</kbd> / <kbd>−</kbd> SUITE · <kbd>Suppr</kbd> supprimer · <kbd>G</kbd> magnétisme · <kbd>M</kbd> mesurer<br>
     <b>Flèches</b> déplacement fin (<kbd>Maj</kbd> × 10) · <kbd>Échap</kbd> désélectionner
   </div>
   </div>
@@ -446,7 +473,7 @@ pre{background:#0a0f16;border:1px solid var(--line);border-radius:8px;padding:10
    contact avec l'angle de l'échelle (lisses affleurantes avant / arrière).
    {
      version, unit:"mm",
-     warehouse:{ width, depth, gridSize, aisle },
+     warehouse:{ width, depth, gridSize, aisle, back },
      bays:[ { id, mode, x, y, upright, beam, depth:1100, section:50, rotation, run } ]
    }
    x / y = angle avant-gauche de la travée avant rotation (pivot de rotation).
@@ -455,11 +482,13 @@ pre{background:#0a0f16;border:1px solid var(--line);border-radius:8px;padding:10
 const UPRIGHTS = [80, 85, 100, 110];
 const BEAMS = [1825, 1850, 2225, 2700, 3300, 3600];
 const DEPTH = 1100, SECTION = 50;
-const BACK = 200;                       // jeu dos-à-dos d'un ensemble double-face
+// jeu dos-à-dos d'un ensemble double-face, réglable dans « Ajouter une travée »
+const back = () => Math.max(0, Math.round(+state.warehouse.back) || 0);
 const aisle = () => Math.max(0, Math.round(+state.warehouse.aisle) || 0);
 
 const state = {
-  warehouse:{ width:30000, depth:18000, gridSize:50, aisle:3000 },
+  warehouse:{ width:30000, depth:18000, gridSize:100, aisle:3000, back:200 },
+  face:'SF',                              // SF = simple-face, DF = deux travées adossées
   bays:[], selected:[], snap:true, measureMode:false, cotes:[], showTotals:true, labels:[],
   upright:100, beam:2700, levels:2, seq:1, runSeq:1
 };
@@ -477,7 +506,8 @@ const lDim = new Konva.Layer();
 const lSnap = new Konva.Layer({ listening:false });
 const lCote = new Konva.Layer();
 const lLab = new Konva.Layer();
-stage.add(lGrid, lItems, lCote, lLab, lDim, lSnap);
+const lMarq = new Konva.Layer({ listening:false });   // rectangle de sélection
+stage.add(lGrid, lItems, lCote, lLab, lDim, lSnap, lMarq);
 
 const MM = 0.1;
 let zoom = 1;
@@ -984,6 +1014,9 @@ function selectLive(ids){
     r.stroke(ko ? '#f43f5e' : (sel ? C.accent : 'rgba(90,120,160,.35)'));
     r.strokeWidth((ko?3:sel?2.5:1)/s);
     r.dash(ko ? [40,30] : (sel ? null : [90,70]));
+    // l'étiquette suit la sélection comme le cadre ; sans ça elle garde
+    // la couleur de la sélection précédente jusqu'au prochain redessin complet
+    const t = g.findOne('Text'); if(t) t.fill(sel ? '#bfe9ff' : '#7f94b0');
   });
   lItems.batchDraw();
   drawDims(ids.length===1 ? state.bays.find(b=>b.id===ids[0]) : null, false);
@@ -1153,7 +1186,7 @@ function renderPitch(){ /* bloc d'info retiré */ }
 function loadData(d){
   const rows = d.bays || d.elements;
   if(!Array.isArray(rows)) throw new Error('JSON invalide');
-  state.warehouse = Object.assign({width:30000,depth:18000,gridSize:50,aisle:3000}, d.warehouse||{});
+  state.warehouse = Object.assign({width:30000,depth:18000,gridSize:100,aisle:3000,back:200}, d.warehouse||{});
   state.seq = 1; state.runSeq = 1;
   state.bays = rows.filter(r=>r.mode||r.type==='travee').map(r=>({
     id:r.id||uid(), mode:r.mode==='suite'?'suite':'depart', x:+r.x, y:+r.y,
@@ -1169,6 +1202,7 @@ function loadData(d){
   document.getElementById('whW').value = state.warehouse.width;
   document.getElementById('whD').value = state.warehouse.depth;
   document.getElementById('whAisle').value = state.warehouse.aisle;
+  document.getElementById('whBack').value = state.warehouse.back;
   document.getElementById('gridSel').value = String(state.warehouse.gridSize);
   document.getElementById('fGrid').textContent = state.warehouse.gridSize+' mm';
   state.selected = [];
@@ -1203,13 +1237,55 @@ stage.on('mousedown', e=>{
   const p = stage.getPointerPosition();
   const w = {x:(p.x-stage.x())/scale(), y:(p.y-stage.y())/scale()};
   if(state.measureMode){ measureClick(w); return; }
-  if(e.target === stage || e.target.getLayer() === lGrid) select([]);
+  if(e.target === stage || e.target.getLayer() === lGrid){
+    if(e.evt.button === 0 && !spaceDown) startMarq(e.evt, w);   // clic gauche : rectangle
+    else select([]);
+  }
 });
 let panning=false, panStart=null, spaceDown=false;
 stage.container().addEventListener('contextmenu', e=>e.preventDefault());
 stage.container().addEventListener('mousedown', e=>{
-  if(e.button===2 || spaceDown){ panning=true; panStart={x:e.clientX-stage.x(), y:e.clientY-stage.y()};
+  if(e.button===1) e.preventDefault();        // pas de défilement automatique du navigateur
+  if(e.button===2 || e.button===1 || spaceDown){ panning=true; panStart={x:e.clientX-stage.x(), y:e.clientY-stage.y()};
     stage.container().style.cursor='grabbing'; }});
+
+/* ---------- Rectangle de sélection : clic gauche maintenu dans le vide ----------
+   Sélectionne toute travée touchée par le rectangle. Maj : ajoute à la sélection.
+   Un simple clic dans le vide, sans glisser, vide la sélection comme avant. */
+let marq = null;
+function screenToWorld(e){
+  const r = stage.container().getBoundingClientRect();
+  return { x:(e.clientX - r.left - stage.x())/scale(), y:(e.clientY - r.top - stage.y())/scale() };
+}
+function startMarq(ev, w){
+  const s = scale();
+  marq = { x0:w.x, y0:w.y, sx:ev.clientX, sy:ev.clientY, add:ev.shiftKey,
+    rect: new Konva.Rect({ x:w.x, y:w.y, width:0, height:0,
+      fill:'rgba(56,189,248,.10)', stroke:C.accent, strokeWidth:1.5/s, dash:[6/s, 4/s] }) };
+  lMarq.add(marq.rect); lMarq.batchDraw();
+}
+window.addEventListener('mousemove', e=>{
+  if(!marq) return;
+  const w = screenToWorld(e);
+  marq.rect.setAttrs({ x:Math.min(marq.x0, w.x), y:Math.min(marq.y0, w.y),
+    width:Math.abs(w.x - marq.x0), height:Math.abs(w.y - marq.y0) });
+  lMarq.batchDraw();
+});
+window.addEventListener('mouseup', e=>{
+  if(!marq || e.button !== 0) return;
+  const m = marq; marq = null;
+  const x1 = m.rect.x(), y1 = m.rect.y(), x2 = x1 + m.rect.width(), y2 = y1 + m.rect.height();
+  m.rect.destroy(); lMarq.batchDraw();
+  if(Math.hypot(e.clientX - m.sx, e.clientY - m.sy) < 4){   // simple clic dans le vide
+    if(!m.add) select([]);
+    return;
+  }
+  const hits = state.bays.filter(b=>{ const a = aabb(b);
+    return a.x1 < x2 && a.x2 > x1 && a.y1 < y2 && a.y2 > y1; }).map(b=>b.id);
+  const ids = m.add ? [...new Set([...state.selected, ...hits])] : hits;
+  select(ids);
+  toast(ids.length ? `${ids.length} travée(s) sélectionnée(s)` : 'Aucune travée dans le rectangle');
+});
 window.addEventListener('mousemove', e=>{ if(panning){ stage.position({x:e.clientX-panStart.x,y:e.clientY-panStart.y}); stage.batchDraw(); }});
 window.addEventListener('mouseup', ()=>{ if(panning){ panning=false;
   stage.container().style.cursor = state.measureMode?'crosshair':'default'; }});
@@ -1341,13 +1417,13 @@ function rotateSel(){
 }
 // Détection double-face par la géométrie : aucune propriété ne la porte dans le modèle.
 // Une travée est en double-face si une autre travée, de même rotation, est adossée
-// à DEPTH + BACK (tolérance 60 mm) avec recouvrement horizontal.
+// à DEPTH + back() (tolérance 60 mm) avec recouvrement horizontal.
 function isDoubleFace(b){
   const tol = 60, bw = bayW(b);
   return state.bays.some(o=>{
     if(o.id === b.id || (o.rotation||0) !== (b.rotation||0)) return false;
-    const dosADos = Math.abs(o.y - (b.y + DEPTH + BACK)) <= tol
-                 || Math.abs(b.y - (o.y + DEPTH + BACK)) <= tol;
+    const dosADos = Math.abs(o.y - (b.y + DEPTH + back())) <= tol
+                 || Math.abs(b.y - (o.y + DEPTH + back())) <= tol;
     if(!dosADos) return false;
     return Math.max(b.x, o.x) < Math.min(b.x + bw, o.x + bayW(o));
   });
@@ -1363,7 +1439,7 @@ function dupSel(){
     const b = state.bays.find(x=>x.id===id);
     return b && isDoubleFace(b);
   });
-  const dy = dbl ? DEPTH + BACK + DEPTH + aisle() : DEPTH + aisle();
+  const dy = dbl ? DEPTH + back() + DEPTH + aisle() : DEPTH + aisle();
   let copies = state.selected.map(id=>{
     const b = state.bays.find(x=>x.id===id);
     if(!runMap[b.run]) runMap[b.run] = 'R'+state.runSeq++;
@@ -1383,8 +1459,44 @@ function delSel(){
   state.bays = state.bays.filter(b=>!state.selected.includes(b.id));
   select([]); toast(n+' travée(s) supprimée(s)');
 }
-function doDepart(){ const b = addDepart(); select([b.id]); refreshList(); ensureVisible(b);
-  toast(`Travée DÉPART ${b.beam} mm · échelles ${b.upright} mm (emprise ${fmt(bayW(b))} mm)`); }
+// Point de pose d'une nouvelle travée : sous la travée sélectionnée, même X,
+// décalée d'une profondeur plus l'allée. Sans sélection, on reprend la dernière
+// travée posée. Plan vide : placement automatique.
+function nextSpot(){
+  const sel = state.bays.filter(b=>state.selected.includes(b.id));
+  const pool = sel.length ? sel : (lastBay() ? [lastBay()] : []);
+  if(!pool.length) return {};
+  // référence = la plus basse de la sélection
+  let ref = pool.reduce((a, b)=> b.y > a.y ? b : a, pool[0]);
+  // si la référence est la travée avant d'un dos-à-dos, on part de celle de derrière
+  const tol = 60, rw = bayW(ref);
+  const arriere = state.bays.find(o=> o.id !== ref.id
+    && (o.rotation||0) === (ref.rotation||0)
+    && Math.abs(o.y - (ref.y + DEPTH + back())) <= tol
+    && Math.max(ref.x, o.x) < Math.min(ref.x + rw, o.x + bayW(o)));
+  if(arriere) ref = arriere;
+  return { x: ref.x, y: ref.y + DEPTH + aisle() };
+}
+function doDepart(){
+  const p = nextSpot();
+  if(state.face === 'DF'){
+    if(typeof rkpCap === 'function' && rkpCap(2)) return;
+    const b = addDepart(p.x, p.y);
+    const bb = {...b, id:uid(), run:'R'+state.runSeq++, y: b.y + DEPTH + back()};
+    state.bays.push(bb);
+    select([b.id, bb.id]); refreshList(); ensureVisible(b);
+    toast(`Ensemble double-face ${b.beam} mm · jeu dos-à-dos ${back()} mm`);
+    return;
+  }
+  const b = addDepart(p.x, p.y); select([b.id]); refreshList(); ensureVisible(b);
+  toast(`Travée DÉPART ${b.beam} mm · échelles ${b.upright} mm (emprise ${fmt(bayW(b))} mm)`);
+}
+function setFace(f){
+  state.face = f;
+  document.getElementById('fSF').classList.toggle('on', f === 'SF');
+  document.getElementById('fDF').classList.toggle('on', f === 'DF');
+  toast(f === 'DF' ? 'Travées ajoutées en double-face' : 'Travées ajoutées en simple-face');
+}
 function doSuite(){ const b = addSuite(); select([b.id]); refreshList(); ensureVisible(b);
   toast(`Travée SUITE ${b.beam} mm chaînée (file ${b.run})`); }
 
@@ -1421,8 +1533,9 @@ function removeLastSuite(ref){
   toast(`Travée SUITE ${last.id} retirée — ${suitesOf(ref.run).length} SUITE restante(s)`);
 }
 
+document.getElementById('fSF').onclick = ()=> setFace('SF');
+document.getElementById('fDF').onclick = ()=> setFace('DF');
 document.getElementById('addDepart').onclick = doDepart;
-document.getElementById('addSuite').onclick = doSuite;
 document.getElementById('suitePlus').onclick = ()=>{
   const b = selBay(); b ? addSuiteToRun(b) : doSuite(); };
 document.getElementById('suiteMinus').onclick = ()=>{
@@ -1510,6 +1623,9 @@ function applyWarehouse(){
   const ai = document.getElementById('whAisle');
   state.warehouse.aisle = Math.max(0, Math.round((+ai.value||0)/50)*50);
   ai.value = state.warehouse.aisle;
+  const bk = document.getElementById('whBack');
+  state.warehouse.back = Math.max(0, Math.round((+bk.value||0)/50)*50);
+  bk.value = state.warehouse.back;
   drawGrid(); renderStats(); renderJSON(); fit();
 }
 ['whW','whD'].forEach(id=>document.getElementById(id).onchange = applyWarehouse);
@@ -1557,12 +1673,13 @@ window.addEventListener('keydown', e=>{
   if((e.ctrlKey||e.metaKey) && k==='p'){ e.preventDefault(); return printPlan(); }
   if(e.ctrlKey||e.metaKey) return;
   if(e.code==='Space'){ spaceDown=true; e.preventDefault(); }
+  // + et − du clavier = boutons SUITE (+) et SUITE (−) : même logique, même état désactivé
   if(e.key==='+' || e.key==='=' || e.code==='NumpadAdd'){ e.preventDefault();
-    const d = selDepart(); d ? addSuiteToRun(d) : doDepart(); }
+    document.getElementById('suitePlus').click(); }
   else if(e.key==='-' || e.key==='_' || e.code==='NumpadSubtract'){ e.preventDefault();
-    const d = selDepart(); d ? removeLastSuite(d) : doSuite(); }
+    document.getElementById('suiteMinus').click(); }
   else if(k==='r') rotateSel();
-  else if(k==='d') dupSel();
+  else if(k==='d') document.getElementById('addDepart').click();   // D = + DÉPART, en SF ou DF
   else if(e.key==='Delete'||e.key==='Backspace'){ e.preventDefault(); delSel(); }
   else if(k==='g') document.getElementById('tSnap').click();
   else if(k==='m') document.getElementById('tMeasure').click();
@@ -1582,7 +1699,7 @@ window.addEventListener('keyup', e=>{ if(e.code==='Space') spaceDown=false; });
 /* ---------- Démo ---------- */
 /* ---------- État initial : une seule travée DÉPART ---------- */
 function resetPlan(silent){
-  state.warehouse = { width:30000, depth:18000, gridSize:50, aisle:3000 };
+  state.warehouse = { width:30000, depth:18000, gridSize:100, aisle:3000, back:200 };
   state.bays = []; state.selected = []; state.seq = 1; state.runSeq = 1; state.cotes = []; state.labels = []; refreshCoteList();
   state.upright = 80; state.beam = 2700; state.levels = 2;
   state.measureMode = false;
@@ -1592,6 +1709,7 @@ function resetPlan(silent){
   document.getElementById('whW').value = state.warehouse.width;
   document.getElementById('whD').value = state.warehouse.depth;
   document.getElementById('whAisle').value = state.warehouse.aisle;
+  document.getElementById('whBack').value = state.warehouse.back;
   document.getElementById('gridSel').value = state.warehouse.gridSize;
   document.getElementById('fGrid').textContent = state.warehouse.gridSize+' mm';
   chipsAll(); drawGrid();

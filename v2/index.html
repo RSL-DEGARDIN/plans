@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>RackPlan 2D — Plan d'implantation de racks</title>
-<meta name="description" content="RackPlan 2D — logiciel de plan d'implantation de racks à palettes : dessin à l'échelle, cotation, métré et nomenclature.">
+<title>RackPlan 2D/3D — Plan d'implantation de racks</title>
+<meta name="description" content="RackPlan 2D/3D — logiciel de plan d'implantation de racks à palettes : dessin à l'échelle, cotation, métré et nomenclature.">
 <meta name="robots" content="noindex">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230b1017'/%3E%3Crect x='7' y='6' width='4' height='20' fill='%233b82f6'/%3E%3Crect x='21' y='6' width='4' height='20' fill='%233b82f6'/%3E%3Crect x='11' y='6' width='10' height='3' fill='%23f97316'/%3E%3Crect x='11' y='23' width='10' height='3' fill='%23f97316'/%3E%3C/svg%3E">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -52,6 +52,7 @@ button,select,input{font-family:inherit;font-size:var(--text-sm);color:var(--txt
 .btn:disabled:hover{background:var(--panel-2);border-color:var(--line)}
 .btn:active{transform:translateY(1px)}
 .btn.on{background:rgba(56,189,248,.14);border-color:var(--accent);color:#bfe9ff}
+#tGalva.on{background:#002a5b;border-color:#002a5b;color:#fff}
 .btn.ghost{background:transparent}
 .btn.danger:hover{border-color:var(--danger);color:#ffc6d1}
 .btn.warn{border-color:rgba(244,63,94,.55);color:#ffb3c0;letter-spacing:.06em}
@@ -223,13 +224,13 @@ body.share .sharetag{display:block}
 <div class="app">
 <header>
   <div class="brand">
-    <svg width="26" height="26" viewBox="0 0 32 32" aria-label="RackPlan 2D">
+    <svg width="26" height="26" viewBox="0 0 32 32" aria-label="RackPlan 2D/3D">
       <rect x="6" y="5" width="4" height="22" rx="1" fill="currentColor"/>
       <rect x="22" y="5" width="4" height="22" rx="1" fill="currentColor"/>
       <rect x="10" y="5" width="12" height="3" rx="1" fill="#f97316"/>
       <rect x="10" y="24" width="12" height="3" rx="1" fill="#f97316"/>
     </svg>
-    <div>RackPlan 2D</div>
+    <div>RackPlan 2D/3D</div>
   </div>
   <div class="toolbar">
     <button class="btn ghost" id="bUndo" title="Annuler (Ctrl+Z)" aria-label="Annuler" disabled>
@@ -253,6 +254,10 @@ body.share .sharetag{display:block}
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
         stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7l11 11-7 7L3 10z"/><circle cx="7.5" cy="7.5" r="1.4"/></svg>
     </button>
+    <button class="btn ghost" id="bText" title="Ajouter une annotation texte libre sur le plan 2D" aria-label="Ajouter une annotation texte">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+        stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 5h14"/><path d="M12 5v14"/></svg>
+    </button>
     <button class="btn ghost" id="tPal" title="Vue des palettes (masque les repères de travée)" aria-label="Vue des palettes">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
         stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="11" rx="1"/><path d="M3 18h18"/><path d="M4 18v3"/><path d="M12 18v3"/><path d="M20 18v3"/></svg>
@@ -261,9 +266,13 @@ body.share .sharetag{display:block}
       <svg width="16" height="16" viewBox="0 0 24 24"><path d="M5 20 7 10h10l2 10a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1z"
         fill="#f5c518" stroke="#92650a" stroke-width="1.5" stroke-linejoin="round"/></svg>
     </button>
-    <button class="btn ghost" id="tDeck" title="Plateaux fil grillé par défaut pour les nouvelles travées" aria-label="Plateaux fil grillé par défaut">
+    <button class="btn ghost" id="tDeck" title="Plateau fil sur toutes les travées du plan" aria-label="Plateau fil partout">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
         stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="12" rx="1"/><path d="M3 10h18"/><path d="M3 14h18"/><path d="M9 6v12"/><path d="M15 6v12"/></svg>
+    </button>
+    <button class="btn ghost" id="tGalva" title="Échelles bleu RAL 5002 sur toutes les travées du plan (sinon galva)" aria-label="Échelles bleu RAL 5002 partout">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="#002a5b" stroke="#001733"
+        stroke-width="1.5" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="3"/></svg>
     </button>
     <button class="btn ghost on" id="tTotals" title="Cotes hors-tout des ensembles" aria-label="Cotes hors-tout des ensembles">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -295,15 +304,15 @@ body.share .sharetag{display:block}
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
         stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M3 6h.01"/><path d="M3 12h.01"/><path d="M3 18h.01"/></svg>
     </button>
-    <button class="btn" id="bSave" title="Enregistrer le plan dans un fichier .json" aria-label="Enregistrer le plan dans un fichier .json">
+    <button class="btn" id="bSave" title="Enregistrer le plan dans un fichier .rsl" aria-label="Enregistrer le plan dans un fichier .rsl">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
         stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/></svg>
     </button>
-    <button class="btn" id="bLoad" title="Ouvrir un plan .json enregistré" aria-label="Ouvrir un plan .json enregistré">
+    <button class="btn" id="bLoad" title="Ouvrir un plan .rsl enregistré" aria-label="Ouvrir un plan .rsl enregistré">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
         stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 19V5a2 2 0 0 1 2-2h4.5a2 2 0 0 1 1.6.8l1.1 1.4a2 2 0 0 0 1.6.8H18a2 2 0 0 1 2 2v1.5"/><path d="M2 19h15.2a2 2 0 0 0 1.9-1.4l2-6.1A1.5 1.5 0 0 0 19.7 9.5H8.6a2 2 0 0 0-1.9 1.4L4 19"/></svg>
     </button>
-    <input type="file" id="fLoad" accept=".json,application/json" hidden>
+    <input type="file" id="fLoad" accept=".rsl" hidden>
     <span class="tsep"></span>
     <button class="btn warn" id="bReset" title="Tout effacer et repartir de zéro" aria-label="Tout effacer et repartir de zéro">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -315,7 +324,7 @@ body.share .sharetag{display:block}
     </button>
   </div>
   <input type="text" id="dossier" maxlength="60" placeholder="Nom du dossier" spellcheck="false"
-    title="Nom du dossier — imprimé en tête du PDF et repris dans le nom du fichier .json" aria-label="Nom du dossier">
+    title="Nom du dossier — imprimé en tête du PDF et repris dans le nom du fichier .rsl" aria-label="Nom du dossier">
 </header>
 
 <aside class="left">
@@ -370,6 +379,7 @@ body.share .sharetag{display:block}
           <span class="sv" id="levVal">2 niv.</span>
           <button type="button" id="levPlus" aria-label="Plus de niveaux">+</button>
         </div></div>
+      <div class="row" title="Pour les travées créées ensuite"><label>Plancher fil</label><input type="checkbox" id="dDeck"></div>
     </div>
   </section>
 
@@ -435,7 +445,7 @@ body.share .sharetag{display:block}
 
 <div class="modal" id="quitDlg" hidden>
   <div class="dialog">
-    <h3>Quitter RackPlan 2D ?</h3>
+    <h3>Quitter RackPlan 2D/3D ?</h3>
     <p>Voulez-vous enregistrer le plan avant de quitter ? Les modifications non enregistrées seront perdues définitivement.</p>
     <div class="acts">
       <button class="btn" id="quitCancel">Annuler</button>
@@ -543,7 +553,7 @@ body.share .sharetag{display:block}
 
 <script>
 /* ==========================================================================
-   RackPlan 2D — modèle de données (unités : millimètres)
+   RackPlan 2D/3D — modèle de données (unités : millimètres)
    --------------------------------------------------------------------------
    L'objet dessiné est la TRAVÉE, jamais la lisse ou l'échelle seule.
      mode "depart" : 2 échelles + 2 lisses   emprise = 2*upright + beam
@@ -574,7 +584,7 @@ if(SHARE) document.body.classList.add('share');   // mise en page client avant t
 const state = {
   warehouse:{ width:30000, depth:18000, gridSize:100, aisle:3000, back:200 },
   face:'SF',                              // SF = simple-face, DF = deux travées adossées
-  bays:[], selected:[], snap:true, measureMode:false, cotes:[], showTotals:true, showPal:false, sabots:true, deck:false, labels:[], pallet:800, name:'',
+  bays:[], selected:[], snap:true, measureMode:false, cotes:[], showTotals:true, showPal:false, sabots:true, deck:false, galva:true, labels:[], texts:[], pallet:800, name:'',
   upright:100, beam:2700, levels:2, seq:1, runSeq:1,
   rackH:3500                              // hauteur des échelles des nouvelles travées
 };
@@ -582,7 +592,7 @@ const LEVELS = [1,2,3,4,5,6];
 // palettes : largeur de face 800 (Europe) ou 1000 (industrielle), profondeur 1200
 const PALLETS = [800, 1000], PAL_D = 1200, JEU_PAL = 75;   // jeu latéral du configurateur
 const palsOf = b => Math.max(0, Math.floor((b.beam - JEU_PAL)/((b.pallet||800) + JEU_PAL)));
-const RACK_HEIGHTS = Array.from({length:21}, (_,i)=>2000 + i*500);   // 2000 → 12000 mm
+const RACK_HEIGHTS = Array.from({length:9}, (_,i)=>2000 + i*500);    // 2000 → 6000 mm
 // hauteurs des niveaux de lisses (dessus de lisse) : H / (N + 1), le sol étant le niveau 0
 const levelsY = b => { const n = b.levels || 2;
   return Array.from({length:n}, (_,i)=> Math.round(b.height*(i+1)/(n+1))); };
@@ -595,7 +605,7 @@ const ladderHeights = b => { const n = laddersOf(b), nx = nextInRun(b), out = Ar
   if(nx) out[n-1] = Math.max(b.height, nx.height); return out; };
 
 const C = { blue:'#3b82f6', blueDark:'#1d4ed8', orange:'#f97316', orangeDark:'#b4520c',
-  accent:'#38bdf8', grid:'#18222f', gridMajor:'#22303f', floor:'#0d131b', wall:'#2b3a4f', lbl:'#556982' };
+  accent:'#38bdf8', grid:'#18222f', gridMajor:'#22303f', floor:'#0d131b', wall:'#2b3a4f', lbl:'#556982', txt:'#e6edf7' };
 
 /* ---------- Konva ---------- */
 const host = document.getElementById('stage');
@@ -606,15 +616,17 @@ const lDim = new Konva.Layer();
 const lSnap = new Konva.Layer({ listening:false });
 const lCote = new Konva.Layer();
 const lLab = new Konva.Layer();
+const lTxt = new Konva.Layer();
 const lMarq = new Konva.Layer({ listening:false });   // rectangle de sélection
-stage.add(lGrid, lItems, lCote, lLab, lDim, lSnap, lMarq);
+stage.add(lGrid, lItems, lCote, lLab, lTxt, lDim, lSnap, lMarq);
 
 const MM = 0.1;
 let zoom = 1;
 const scale = () => MM * zoom;
 function applyScale(){ stage.scale({x:scale(), y:scale()});
   document.getElementById('fZoom').textContent = Math.round(zoom*100)+' %';
-  if(typeof drawCotes === 'function' && state.bays.length){ drawCotes(); drawLabels(); } }
+  if(typeof drawCotes === 'function' && state.bays.length){ drawCotes(); drawLabels(); }
+  drawTexts(); }
 
 /* ---------- Géométrie de la travée ---------- */
 const uid = () => 'TRV-' + String(state.seq++).padStart(3,'0');
@@ -776,6 +788,7 @@ function buildItems(){
   lItems.batchDraw();
   drawCotes();
   drawLabels();
+  drawTexts();
 }
 
 /* ---------- Cotation ---------- */
@@ -984,17 +997,19 @@ function nextLabelName(){
   for(const c of LETTERS){ const n = 'Rack '+c; if(!used.has(n)) return n; }
   return 'Rack '+(state.labels.length+1);
 }
+let selLabel = null;   // id de l'étiquette cliquée (sélection indépendante des travées, pour Suppr)
 function drawLabels(){
   lLab.destroyChildren();
   const s = scale();
   state.labels.forEach(l=>{
     const b = firstBay(l.run); if(!b) return;
     const a = aabb(b);
+    const sel = l.id === selLabel;
     const g = new Konva.Group({ x:a.x1 + l.dx, y:a.y1 + l.dy, draggable:true, id:'lab-'+l.id });
     const t = new Konva.Text({ text:l.text, fontSize:15/s, fontStyle:'700',
       fontFamily:'Inter, sans-serif', fill:'#0b1220', padding:6/s });
     const bg = new Konva.Rect({ width:t.width(), height:t.height(), fill:'#fbbf24',
-      cornerRadius:5/s, stroke:'#facc15', strokeWidth:1/s,
+      cornerRadius:5/s, stroke:sel?C.accent:'#facc15', strokeWidth:(sel?2.5:1)/s,
       shadowColor:'#000', shadowBlur:8/s, shadowOpacity:.45 });
     g.add(bg, t);
     // trait de rattachement à l'angle de la première travée
@@ -1005,11 +1020,47 @@ function drawLabels(){
     g.on('dragend', ()=>{ const f = firstBay(l.run); if(!f) return; const aa = aabb(f);
       l.dx = Math.round(g.x() - aa.x1); l.dy = Math.round(g.y() - aa.y1);
       drawLabels(); renderJSON(); });
-    g.on('dblclick dbltap', e=>{ e.cancelBubble = true; openLblDlg(l); });
-    g.on('click tap', e=>{ e.cancelBubble = true; });
+    g.on('dblclick dbltap', e=>{ e.cancelBubble = true; editLabelInline(l, g); });
+    // selectLive (pas select) : ne détruit pas les nœuds d'étiquette, sinon le double-clic
+    // qui suit rate son second clic (nœud recréé = hit-test caduc, cf. markLabelSel ci-dessus)
+    g.on('click tap', e=>{ e.cancelBubble = true; selectLive([]); selLabel = l.id; markLabelSel(); });
     lLab.add(g);
   });
   lLab.batchDraw();
+}
+// met à jour juste le contour de sélection (sans détruire/recréer les nœuds) : un double-clic
+// enchaîne deux clics très rapprochés, et un drawLabels() complet entre les deux casse la
+// détection du double-clic côté Konva (nouveaux nœuds = hit-test caduc)
+function markLabelSel(){
+  const s = scale();
+  lLab.getChildren().forEach(g=>{
+    if(g.getClassName()!=='Group') return;   // ignore les traits de rattachement
+    const bg = g.getChildren()[0], sel = g.id()==='lab-'+selLabel;
+    bg.stroke(sel?C.accent:'#facc15'); bg.strokeWidth((sel?2.5:1)/s);
+  });
+  lLab.batchDraw();
+}
+// édition directe dans l'étiquette (input HTML superposé au canvas), sans popup
+function editLabelInline(l, g){
+  const r = g.getClientRect(), box = stage.container().getBoundingClientRect();
+  const inp = document.createElement('input');
+  inp.type = 'text'; inp.value = l.text; inp.maxLength = 30;
+  Object.assign(inp.style, { position:'fixed', left:(box.left+r.x)+'px', top:(box.top+r.y)+'px',
+    width:Math.max(r.width,70)+'px', height:r.height+'px', font:'700 14px Inter, sans-serif',
+    padding:'0 6px', boxSizing:'border-box', border:'2px solid #0f3b66', borderRadius:'5px',
+    background:'#fbbf24', color:'#0b1220', zIndex:1000, outline:'none' });
+  document.body.appendChild(inp); inp.focus(); inp.select();
+  let done = false;
+  const finish = commit=>{
+    if(done) return; done = true; inp.remove();
+    if(commit){ const v = inp.value.trim(); if(v && v!==l.text){ l.text = v; renderJSON(); toast('Étiquette renommée : '+v); } }
+    drawLabels();
+  };
+  inp.addEventListener('keydown', e=>{
+    if(e.key==='Enter'){ e.preventDefault(); finish(true); }
+    else if(e.key==='Escape'){ e.preventDefault(); finish(false); }
+  });
+  inp.addEventListener('blur', ()=>finish(true));
 }
 let lblEdit = null;
 function openLblDlg(l){
@@ -1039,6 +1090,91 @@ function addLabel(){
     ? 'Étiquette « '+created[0].text+' » ajoutée — glissez-la, double-clic pour la renommer'
     : created.length+' étiquettes ajoutées — double-clic sur une étiquette pour la renommer');
   if(created.length===1) openLblDlg(created[0]);
+}
+
+/* ---------- Annotations texte libres (plan 2D + PDF, pas de fond ni de cadre) ---------- */
+let selTxt = null;   // id de l'annotation sélectionnée (cadre rouge + ✎/✕) ; exclu du PDF à l'impression
+function drawTexts(){
+  lTxt.destroyChildren();
+  const s = scale();
+  state.texts.forEach(tx=>{
+    const sel = tx.id === selTxt;
+    const g = new Konva.Group({ x:tx.x, y:tx.y, rotation:tx.rotation||0, draggable:true, id:'txt-'+tx.id });
+    const t = new Konva.Text({ text:tx.text, fontSize:18/s, fontStyle:'600',
+      fontFamily:'Inter, sans-serif', fill:C.txt, name:'txtLabel' });
+    g.add(t);
+    if(sel){
+      const pad = 6/s;
+      g.add(new Konva.Rect({ x:-pad, y:-pad, width:t.width()+pad*2, height:t.height()+pad*2,
+        stroke:'#dc2626', strokeWidth:2/s, cornerRadius:3/s, listening:false }));
+      // boutons ✎ (modifier) et ✕ (supprimer), au-dessus à droite — seulement sur la sélection,
+      // exclus du PDF (cf. printPlan, qui désélectionne avant la capture du plan)
+      const bs = 20/s, by = -pad - bs - 4/s, bx2 = t.width()+pad - bs, bx1 = bx2 - bs - 4/s;
+      const mkBtn = (x, label, fn)=>{
+        const b = new Konva.Group({ x, y:by });
+        b.add(new Konva.Circle({ radius:bs/2, x:bs/2, y:bs/2, fill:'#dc2626' }));
+        b.add(new Konva.Text({ text:label, width:bs, height:bs, align:'center', verticalAlign:'middle',
+          fontSize:11/s, fontStyle:'700', fill:'#fff', listening:false }));
+        b.on('click tap', e=>{ e.cancelBubble = true; fn(); });
+        return b;
+      };
+      g.add(mkBtn(bx1, '✎', ()=>editTextInline(tx, g)));
+      g.add(mkBtn(bx2, '✕', ()=>delText(tx.id)));
+    }
+    g.on('mouseenter', ()=>{ stage.container().style.cursor='move'; });
+    g.on('mouseleave', ()=>{ stage.container().style.cursor = state.measureMode?'crosshair':'default'; });
+    g.on('dragend', ()=>{ tx.x = Math.round(g.x()); tx.y = Math.round(g.y()); drawTexts(); renderJSON(); });
+    g.on('click tap', e=>{
+      e.cancelBubble = true;
+      if(selTxt === tx.id) editTextInline(tx, g);
+      else { selectLive([]); selTxt = tx.id; drawTexts(); }
+    });
+    lTxt.add(g);
+  });
+  lTxt.batchDraw();
+}
+// édition directe dans l'annotation (input HTML superposé), même principe que editLabelInline
+function editTextInline(tx, g){
+  // rect du seul texte (pas du groupe) : le groupe sélectionné porte aussi le cadre rouge et les
+  // boutons ✎/✕ au-dessus, qui gonfleraient la zone de saisie si on prenait g.getClientRect()
+  const r = g.findOne('.txtLabel').getClientRect(), box = stage.container().getBoundingClientRect();
+  const inp = document.createElement('input');
+  inp.type = 'text'; inp.value = tx.text; inp.maxLength = 200;
+  Object.assign(inp.style, { position:'fixed', left:(box.left+r.x)+'px', top:(box.top+r.y)+'px',
+    width:Math.max(r.width,80)+'px', height:r.height+'px', font:'600 16px Inter, sans-serif',
+    padding:'0 2px', boxSizing:'border-box', border:'2px solid #dc2626', borderRadius:'3px',
+    background:'#fff', color:'#0b1220', zIndex:1000, outline:'none' });
+  document.body.appendChild(inp); inp.focus(); inp.select();
+  let done = false;
+  const finish = commit=>{
+    if(done) return; done = true; inp.remove();
+    if(commit){
+      const v = inp.value.trim();
+      if(v) tx.text = v;
+      else { state.texts = state.texts.filter(x=>x.id!==tx.id); if(selTxt===tx.id) selTxt = null; }
+    }
+    drawTexts(); renderJSON();
+  };
+  inp.addEventListener('keydown', e=>{
+    if(e.key==='Enter'){ e.preventDefault(); finish(true); }
+    else if(e.key==='Escape'){ e.preventDefault(); finish(false); }
+  });
+  inp.addEventListener('blur', ()=>finish(true));
+}
+function delText(id){
+  const t = state.texts.find(x=>x.id===id);
+  state.texts = state.texts.filter(x=>x.id!==id);
+  if(selTxt===id) selTxt = null;
+  drawTexts(); renderJSON(); toast('Annotation supprimée'+(t?' : '+t.text:''));
+}
+function addText(){
+  if(state.measureMode) return toast("Désactivez l'outil Mesurer avant d'ajouter une annotation");
+  const cx = (stage.width()/2 - stage.x())/scale(), cy = (stage.height()/2 - stage.y())/scale();
+  const tx = { id:'TXT-'+String(state.texts.length+1).padStart(3,'0'), x:Math.round(cx), y:Math.round(cy), text:'Texte', rotation:0 };
+  state.texts.push(tx);
+  selectLive([]); selTxt = tx.id; drawTexts(); renderJSON();
+  const g = lTxt.findOne('#txt-'+tx.id);
+  if(g) editTextInline(tx, g);
 }
 
 function refreshCoteList(){
@@ -1082,14 +1218,25 @@ function addDepart(x, y, run){
   state.bays.push(b); return b;
 }
 // SUITE : chaînée sur la dernière travée de la file (contact d'angle garanti)
-function addSuite(){
-  const prev = lastBay();
+function addSuite(prev){
+  prev = prev || lastBay();
   if(!prev){ const b = addDepart(); toast('Aucune travée : une travée DÉPART a été créée'); return b; }
   const r = (prev.rotation||0)*Math.PI/180, adv = bayW(prev);
   const b = { id:uid(), mode:'suite', x:Math.round(prev.x + adv*Math.cos(r)), y:Math.round(prev.y + adv*Math.sin(r)),
     upright:prev.upright, beam:state.beam, levels:state.levels, height:state.rackH, pallet:state.pallet, depth:DEPTH, section:SECTION,
     rotation:prev.rotation||0, run:prev.run, deck:state.deck };
   state.bays.push(b); return b;
+}
+// dernière travée de la file opposée dos-à-dos (pour prolonger les deux files d'un ensemble double-face)
+function mirrorLastBay(ref){
+  const tol = 60, rw = bayW(ref);
+  const partner = state.bays.find(o => o.run !== ref.run
+    && (o.rotation||0) === (ref.rotation||0)
+    && (Math.abs(o.y - (ref.y + DEPTH + back())) <= tol || Math.abs(ref.y - (o.y + DEPTH + back())) <= tol)
+    && Math.max(ref.x, o.x) < Math.min(ref.x + rw, o.x + bayW(o)));
+  if(!partner) return null;
+  const run = state.bays.filter(b=>b.run===partner.run);
+  return run[run.length-1];
 }
 function lastBay(){
   if(!state.selected.length) return state.bays[state.bays.length-1];
@@ -1098,6 +1245,7 @@ function lastBay(){
   const run = state.bays.filter(b=>b.run===sel.run);
   return run[run.length-1];
 }
+function lastOfRun(run){ const r = state.bays.filter(b=>b.run===run); return r[r.length-1]; }
 // aimantation de chaînage après un déplacement : recolle l'angle sur la travée voisine
 let dragRef = null;
 /* deux travées se recouvrent-elles ? (tolérance 1 mm) */
@@ -1138,9 +1286,14 @@ function magnetChain(b){
 }
 
 /* ---------- Sélection / panneaux ---------- */
+// select()/selectLive() sont aussi appelés pendant l'initialisation du plan, avant que
+// la const View3D (déclarée plus bas dans le fichier) n'existe encore : garde anti-TDZ.
+function refresh3D(){ try{ View3D.refresh(); }catch(e){} }
 /* sélection sans reconstruction des nœuds : indispensable pendant un mousedown/drag,
    sinon le groupe en cours de glissement est détruit et la travée ne bouge plus */
 function selectLive(ids){
+  if(selLabel){ selLabel = null; markLabelSel(); }
+  if(selTxt){ selTxt = null; drawTexts(); }
   state.selected = ids;
   const bad = overlapping(), s = scale();
   lItems.getChildren().forEach(g=>{
@@ -1155,13 +1308,15 @@ function selectLive(ids){
   lItems.batchDraw();
   drawDims(ids.length===1 ? state.bays.find(b=>b.id===ids[0]) : null, false);
   document.getElementById('fSel').textContent = ids.length;
-  renderProps(); refreshList();
+  renderProps(); refreshList(); refresh3D();
 }
 function select(ids){
+  if(selLabel){ selLabel = null; markLabelSel(); }
+  if(selTxt){ selTxt = null; drawTexts(); }
   state.selected = ids; buildItems();
   drawDims(ids.length===1 ? state.bays.find(b=>b.id===ids[0]) : null, false);
   document.getElementById('fSel').textContent = ids.length;
-  renderProps(); refreshList();
+  renderProps(); refreshList(); refresh3D();
 }
 function renderProps(){
   updateSuiteBtns();
@@ -1262,7 +1417,7 @@ function bom(){
   const cnt = {};
   state.bays.forEach(b=>ladderHeights(b).forEach(h=>{ const k = b.upright+'x'+h; cnt[k] = (cnt[k]||0) + 1; }));
   const ladders = UPRIGHTS.flatMap(u=>RACK_HEIGHTS.filter(h=>cnt[u+'x'+h]).map(h=>({ famille:'Échelle',
-    ref:`ECH-${u}x${DEPTH}-H${h}`, designation:`Échelle ${u} × ${DEPTH} mm, H ${h} mm`, dim:`${u} × ${DEPTH} × ${h}`,
+    ref:`ECH-${u}x${DEPTH}-H${h}`, designation:`Échelle ${u} P.${DEPTH} H.${h} mm`, dim:`${u} × ${DEPTH} × ${h}`,
     qte: cnt[u+'x'+h], ml:0 })));
   const beams = BEAMS.map(l=>{
     const qte = state.bays.filter(b=>b.beam===l).reduce((s,b)=>s+beamsOf(b),0);
@@ -1275,7 +1430,7 @@ function bom(){
   }).filter(r=>r.qte) : [];
   const decks = [900,1100].map(w=>{
     const qte = state.bays.reduce((s,b)=>s+(deckOf(b) && deckOf(b)[1]===w ? decksOf(b) : 0), 0);
-    return { famille:'Plancher', ref:`PLF-${w}`, designation:`Plancher fil grillé ${w} mm`, dim:`${w}`, qte, ml:0 };
+    return { famille:'Plancher', ref:`PLF-${w}`, designation:`Plancher fil ${w} mm`, dim:`${w}`, qte, ml:0 };
   }).filter(r=>r.qte);
   return [...ladders, ...beams, ...sabots, ...decks];
 }
@@ -1290,14 +1445,14 @@ function renderStats(){
   document.getElementById('stats').innerHTML = `
     <div class="stat"><span>Travées</span><b>${state.bays.length}</b></div>
     <div class="stat"><span>↳ DÉPART / SUITE</span><b>${dep} / ${sui}</b></div>
-    <div class="stat"><span>Files de racks</span><b>${runs}</b></div>
+    <div class="stat"><span>Meubles</span><b>${runs}</b></div>
     ${byLev.map(([n,c])=>`<div class="stat"><span>↳ travées à ${n} niveau${n>1?'x':''}</span><b>${c}</b></div>`).join('')}
     <div class="stat"><span>Échelles</span><b>${ladders}</b></div>
     <div class="stat"><span>Lisses (tous niveaux)</span><b>${beams}</b></div>
     <div class="stat"><span>Linéaire de lisses</span><b>${(ml/1000).toFixed(2)} m</b></div>
     <div class="stat"><span>Emplacements palettes</span><b>${state.bays.reduce((a,b)=>a+palsOf(b)*((b.levels||2)+1),0)}</b></div>
     <div class="stat"><span>Sabots de protection</span><b>${state.sabots ? state.bays.reduce((a,b)=>a+sabotsOf(b),0) : 0}</b></div>
-    <div class="stat"><span>Plateaux fil grillé</span><b>${state.bays.reduce((a,b)=>a+decksOf(b),0)}</b></div>
+    <div class="stat"><span>Plateaux fil</span><b>${state.bays.reduce((a,b)=>a+decksOf(b),0)}</b></div>
     <div class="stat"><span>Surface au sol</span><b>${((state.warehouse.width*state.warehouse.depth)/1e6).toFixed(1)} m²</b></div>`;
   renderBom();
 }
@@ -1329,9 +1484,10 @@ function downloadBom(){
   toast('Nomenclature exportée ('+rows.length+' références)');
 }
 function toJSON(){
-  return { version:3, unit:'mm', name:state.name, sabots:state.sabots, deck:state.deck, warehouse:{...state.warehouse},
+  return { version:3, unit:'mm', name:state.name, sabots:state.sabots, deck:state.deck, galva:state.galva, warehouse:{...state.warehouse},
     cotes: state.cotes.map(c=>({...c})),
     labels: state.labels.map(l=>({...l})),
+    texts: state.texts.map(t=>({...t})),
     bays: state.bays.map(b=>({ id:b.id, mode:b.mode, x:Math.round(b.x), y:Math.round(b.y),
       upright:b.upright, beam:b.beam, levels:b.levels, height:b.height, pallet:b.pallet, depth:b.depth, section:b.section,
       rotation:Math.round(b.rotation||0), run:b.run, deck:b.deck===true })) };
@@ -1365,8 +1521,13 @@ function loadData(d){
   state.name = String(d.name||'').slice(0,60); document.getElementById('dossier').value = state.name;
   state.sabots = d.sabots !== false; document.getElementById('tSab').classList.toggle('on', state.sabots);
   state.deck = d.deck === true; document.getElementById('tDeck').classList.toggle('on', state.deck);
+  document.getElementById('dDeck').checked = state.deck;
+  state.galva = d.galva !== false; document.getElementById('tGalva').classList.toggle('on', !state.galva);
   state.labels = Array.isArray(d.labels) ? d.labels.map((l,i)=>({ id:safeId(l.id, 'ETQ-'+String(i+1).padStart(3,'0')),
     run:safeId(l.run,'R1'), text:String(l.text||('Rack '+LETTERS[i%26])), dx:+l.dx||0, dy:+l.dy||-1500 })) : [];
+  state.texts = Array.isArray(d.texts) ? d.texts.map((t,i)=>({ id:safeId(t.id, 'TXT-'+String(i+1).padStart(3,'0')),
+    x:+t.x||0, y:+t.y||0, text:String(t.text||'Texte').slice(0,200), rotation:+t.rotation||0 })) : [];
+  selTxt = null;
   state.seq = state.bays.length + 1;
   const rn = [...new Set(state.bays.map(b=>b.run))]; state.runSeq = rn.length + 1;
   document.getElementById('whW').value = state.warehouse.width;
@@ -1375,7 +1536,7 @@ function loadData(d){
   document.getElementById('whBack').value = state.warehouse.back;
   document.getElementById('gridSel').value = String(state.warehouse.gridSize);
   document.getElementById('fGrid').textContent = state.warehouse.gridSize+' mm';
-  state.selected = [];
+  state.selected = []; selLabel = null;
   drawGrid(); buildItems(); drawDims(null); refreshList(); renderProps(); fit();
 }
 
@@ -1528,7 +1689,8 @@ function rotatePlan(){
 function printPlan(){
   if(!state.bays.length) return notice('Le plan est vide — ajoutez une travée avant d\'imprimer');
   const sel = state.selected.slice();
-  state.selected = []; buildItems(); drawDims(null);
+  const selTB = selTxt;   // le cadre rouge + ✎/✕ ne doivent pas apparaître dans le PDF
+  state.selected = []; selTxt = null; buildItems(); drawDims(null);
   const box = { x1:0, y1:0, x2:state.warehouse.width, y2:state.warehouse.depth };
   const zBak = zoom, pBak = stage.position(), wBak = stage.width(), hBak = stage.height();
   const px = 1600 / (box.x2 - box.x1);
@@ -1537,14 +1699,14 @@ function printPlan(){
   stage.width((box.x2-box.x1)*scale() + M*2); stage.height((box.y2-box.y1)*scale() + M*2);
   stage.position({ x:M, y:M });
   // thème clair, lisible à l'encre
-  const bak = { floor:C.floor, grid:C.grid, gridMajor:C.gridMajor, wall:C.wall, lbl:C.lbl };
-  C.floor = '#ffffff'; C.grid = '#e6ebf2'; C.gridMajor = '#c3cedd'; C.wall = '#94a3b8'; C.lbl = '#475569';
+  const bak = { floor:C.floor, grid:C.grid, gridMajor:C.gridMajor, wall:C.wall, lbl:C.lbl, txt:C.txt };
+  C.floor = '#ffffff'; C.grid = '#e6ebf2'; C.gridMajor = '#c3cedd'; C.wall = '#94a3b8'; C.lbl = '#475569'; C.txt = '#0b1220';
   lGrid.visible(true); drawGrid(); buildItems();
   const url = stage.toDataURL({ pixelRatio:1.5, mimeType:'image/png' });
   // restauration de la vue à l'écran
   Object.assign(C, bak);
   stage.width(wBak); stage.height(hBak); zoom = zBak; applyScale(); stage.position(pBak);
-  state.selected = sel; drawGrid(); buildItems();
+  state.selected = sel; selTxt = selTB; drawGrid(); buildItems();
   drawDims(sel.length===1 ? state.bays.find(b=>b.id===sel[0]) : null);
 
   const img3d = View3D.snapshot(2000, 1150);   // page 2 : vue 3D recadrée
@@ -1554,13 +1716,13 @@ function printPlan(){
   const st = [
     ['Travées', state.bays.length],
     ['dont DÉPART / SUITE', dep+' / '+(state.bays.length-dep)],
-    ['Files de racks', new Set(state.bays.map(b=>b.run)).size],
+    ['Meubles', new Set(state.bays.map(b=>b.run)).size],
     ['Échelles', state.bays.reduce((a,b)=>a+laddersOf(b),0)],
     ['Lisses (tous niveaux)', state.bays.reduce((a,b)=>a+beamsOf(b),0)],
     ['Linéaire de lisses', (state.bays.reduce((a,b)=>a+b.beam*beamsOf(b),0)/1000).toFixed(2)+' m'],
     ['Emplacements palettes', state.bays.reduce((a,b)=>a+palsOf(b)*((b.levels||2)+1),0)],
     ['Sabots de protection', state.sabots ? state.bays.reduce((a,b)=>a+sabotsOf(b),0) : 0],
-    ['Plateaux fil grillé', state.bays.reduce((a,b)=>a+decksOf(b),0)],
+    ['Plateaux fil', state.bays.reduce((a,b)=>a+decksOf(b),0)],
     ['Surface entrepôt', ((state.warehouse.width*state.warehouse.depth)/1e6).toFixed(1)+' m²']
   ];
   const d = new Date();
@@ -1568,29 +1730,41 @@ function printPlan(){
   const esc = t => String(t).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
   // titulaire de la licence (société, utilisateur) — jamais la clé
   const holder = RKP.lic ? [RKP.lic.nomExport || RKP.lic.revendeur, RKP.lic.utilisateur].filter(Boolean).join(' — ') : '';
-  const lic = `<div class="p-sub p-foot">RackPlan 2D — ${holder ? 'licence ' + esc(holder) : 'version de démonstration'}</div>`;
+  const lic = `<div class="p-sub p-foot">RackPlan 2D/3D — ${holder ? 'licence ' + esc(holder) : 'version de démonstration'}</div>`;
   const nm = esc(state.name.trim());
+  // en-tête revendeur (logo/raison sociale/adresse saisis localement dans "En-tête PDF")
+  const brandLogo = RKP.brand.logo
+    ? `<img src="${RKP.brand.logo}" alt="logo" style="height:32px;max-height:32px;width:auto;object-fit:contain;border:none;border-radius:0;margin:0;display:inline-block">`
+    : '';
+  const brandTxt = [esc(RKP.brand.nom), esc(RKP.brand.adresse)].filter(Boolean).join(' · ');
+  const brandRight = (brandTxt ? brandTxt + '<br>' : '') + edit;
   const wrap = document.getElementById('printArea');
   wrap.innerHTML = `
     <div class="p-head">
-      <div><h1>${nm ? nm : "Plan d'entrepôt — implantation racks"}</h1>
-        <div class="p-sub">${nm ? "Plan d'entrepôt — implantation racks · " : ''}Entrepôt ${fmt(state.warehouse.width)} × ${fmt(state.warehouse.depth)} mm · grille ${state.warehouse.gridSize} mm · cotes en mm</div></div>
-      <div class="p-sub">${edit}</div>
+      <div style="display:flex;align-items:center;gap:10px">
+        ${brandLogo}
+        <div><h1>${nm ? nm : "Plan d'entrepôt — implantation racks"}</h1>
+          <div class="p-sub">${nm ? "Plan d'entrepôt — implantation racks" : ''}</div></div>
+      </div>
+      <div class="p-sub" style="text-align:right">${brandRight}</div>
     </div>
     <div class="p-body">
       <div class="p-side">
         <h2>Récapitulatif</h2><table>${st.map(r=>`<tr><td>${r[0]}</td><td class="n">${r[1]}</td></tr>`).join('')}</table>
         <h2>Nomenclature</h2><table><tr><th>Désignation</th><th class="n">Qté</th></tr>
-          ${rows.map(r=>`<tr><td>${r.designation}</td><td class="n">${r.qte}</td></tr>`).join('')}</table>
+          ${rows.map(r=>`<tr><td>${r.designation.replace(/\s*\(section \d+ mm\)/,'')}</td><td class="n">${r.qte}</td></tr>`).join('')}</table>
       </div>
       <div class="p-plan"><img src="${url}" alt="Plan"></div>
     </div>
     ${lic}
     ${img3d ? `<div class="p-page2">
       <div class="p-head">
-        <div><h1>${nm ? nm + ' — vue 3D' : 'Vue 3D — élévation des racks'}</h1>
-          <div class="p-sub">Échelles H ${hs} mm · ${state.bays.length} travée${state.bays.length>1?'s':''} · lisses à H / (N + 1) · cotes en mm</div></div>
-        <div class="p-sub">${edit}</div>
+        <div style="display:flex;align-items:center;gap:10px">
+          ${brandLogo}
+          <div><h1>${nm ? nm + ' — vue 3D' : 'Vue 3D — élévation des racks'}</h1>
+            <div class="p-sub">Échelles H ${hs} mm · ${state.bays.length} travée${state.bays.length>1?'s':''} · lisses à H / (N + 1) · cotes en mm</div></div>
+        </div>
+        <div class="p-sub" style="text-align:right">${brandRight}</div>
       </div>
       <img class="p-3d" src="${img3d}" alt="Vue 3D">
       ${lic}
@@ -1602,6 +1776,8 @@ function printPlan(){
 }
 
 function rotateSel(){
+  if(selTxt){ const tx=state.texts.find(t=>t.id===selTxt); tx.rotation=((tx.rotation||0)+90)%360;
+    drawTexts(); renderJSON(); return toast('Annotation pivotée +90°'); }
   if(!state.selected.length) return toast('Sélectionnez une travée à pivoter');
   state.selected.forEach(id=>{ const b=state.bays.find(x=>x.id===id); b.rotation=((b.rotation||0)+90)%360; });
   buildItems(); if(state.selected.length===1) drawDims(state.bays.find(b=>b.id===state.selected[0]),false);
@@ -1689,8 +1865,14 @@ function setFace(f){
   document.getElementById('fDF').classList.toggle('on', f === 'DF');
   toast(f === 'DF' ? 'Travées ajoutées en double-face' : 'Travées ajoutées en simple-face');
 }
-function doSuite(){ const b = addSuite(); select([b.id]); refreshList(); ensureVisible(b);
-  toast(`Travée SUITE ${b.beam} mm chaînée (file ${b.run})`); }
+function doSuite(){
+  const primary = lastBay();
+  const mirror = (state.face === 'DF' && primary) ? mirrorLastBay(primary) : null;
+  const b = addSuite(primary);
+  const bb = mirror ? addSuite(mirror) : null;
+  select(bb ? [b.id, bb.id] : [b.id]); refreshList(); ensureVisible(b);
+  toast(bb ? `Travées SUITE ajoutées en double-face (files ${b.run} / ${bb.run})` : `Travée SUITE ${b.beam} mm chaînée (file ${b.run})`);
+}
 
 /* ---------- + / − contextuels sur une travée DÉPART sélectionnée ---------- */
 // nombre de travées SUITE de la file
@@ -1708,10 +1890,15 @@ function updateSuiteBtns(){
   if(m) m.disabled = !b || !suitesOf(b.run).length;
 }
 // « + » : allonge la file d'une travée SUITE, la sélection ne bouge pas
+// en mode DF, la file opposée dos-à-dos est allongée en même temps (quelle que soit la sélection)
 function addSuiteToRun(ref){
-  const b = addSuite();                 // chaînée sur la dernière travée de la file
+  const primary = lastOfRun(ref.run);
+  const mirror = (state.face === 'DF') ? mirrorLastBay(primary) : null;
+  const b = addSuite(primary);          // chaînée sur la dernière travée de la file
+  const bb = mirror ? addSuite(mirror) : null;
   select([ref.id]); refreshList(); renderJSON(); ensureVisible(b);
-  toast(`Travée SUITE ajoutée à la file ${ref.run} — ${suitesOf(ref.run).length} SUITE`);
+  toast(bb ? `Travées SUITE ajoutées en double-face à la file ${ref.run} (+ ${bb.run})`
+            : `Travée SUITE ajoutée à la file ${ref.run} — ${suitesOf(ref.run).length} SUITE`);
   return b;
 }
 // « − » : retire la dernière travée SUITE ; ne touche jamais à la travée DÉPART
@@ -1749,9 +1936,22 @@ document.getElementById('tSab').onclick = e=>{
   toast(state.sabots ? 'Sabots de protection affichés' : 'Sabots de protection masqués');
 };
 document.getElementById('tDeck').onclick = e=>{
+  // « Plancher fil partout » : applique le plateau fil grillé à toutes les travées existantes.
+  // Un second clic (dévalidation) ne retire pas les plateaux déjà posés : il décoche juste
+  // le sélecteur « Plancher fil » du bloc Données (défaut pour les prochaines travées).
   state.deck = !state.deck;
+  if(state.deck) state.bays.forEach(b=>{ b.deck = true; });
   e.currentTarget.classList.toggle('on', state.deck);
-  toast(state.deck ? 'Les nouvelles travées auront un plateau fil grillé' : 'Les nouvelles travées n\'auront pas de plateau fil grillé');
+  document.getElementById('dDeck').checked = state.deck;
+  if(state.deck){ buildItems(); View3D.refresh(); renderJSON(); renderStats(); renderProps(); }
+  toast(state.deck ? 'Plateau fil ajouté à toutes les travées' : 'Les nouvelles travées n\'auront pas de plateau fil');
+};
+document.getElementById('tGalva').onclick = e=>{
+  // Échelles bleu RAL 5002 sur tout le plan ; bouton non validé = échelles galva (défaut)
+  state.galva = !state.galva;
+  e.currentTarget.classList.toggle('on', !state.galva);
+  refresh3D(); renderJSON();
+  toast(state.galva ? 'Échelles galva' : 'Échelles bleu RAL 5002');
 };
 document.getElementById('tTotals').onclick = e=>{
   state.showTotals = !state.showTotals;
@@ -1764,6 +1964,7 @@ document.getElementById('bRotAll').onclick = rotatePlan;
 document.getElementById('bUndo').onclick = undo;
 document.getElementById('bRedo').onclick = redo;
 document.getElementById('bLabel').onclick = addLabel;
+document.getElementById('bText').onclick = addText;
 document.getElementById('lblNo').onclick = closeLblDlg;
 document.getElementById('lblYes').onclick = ()=>{
   const v = document.getElementById('lblVal').value.trim();
@@ -1771,7 +1972,7 @@ document.getElementById('lblYes').onclick = ()=>{
   closeLblDlg(); drawLabels(); renderJSON(); toast(v ? 'Étiquette renommée : '+v : 'Étiquette inchangée');
 };
 document.getElementById('lblDel').onclick = ()=>{
-  if(lblEdit) state.labels = state.labels.filter(o=>o.id!==lblEdit.id);
+  if(lblEdit){ state.labels = state.labels.filter(o=>o.id!==lblEdit.id); if(selLabel===lblEdit.id) selLabel=null; }
   closeLblDlg(); drawLabels(); renderJSON(); toast('Étiquette supprimée');
 };
 document.getElementById('lblDlg').onclick = e=>{ if(e.target.id==='lblDlg') closeLblDlg(); };
@@ -1809,25 +2010,65 @@ document.getElementById('zIn').onclick = ()=>zoomAt(1.25);
 document.getElementById('zOut').onclick = ()=>zoomAt(0.8);
 document.getElementById('zFit').onclick = fit;
 document.getElementById('dossier').oninput = e=>{ state.name = e.target.value; };
-// « Dossier Dupont-20261007-2255.json », sans caractères interdits dans un nom de fichier
+// « Dossier Dupont-20261007-2255.rsl », sans caractères interdits dans un nom de fichier
 function jsonFileName(){
   const d = new Date(), pad = n=>String(n).padStart(2,'0');
   const base = state.name.replace(/[\\/:*?"<>|]+/g,'-').trim() || 'plan-entrepot';
-  return base+'-'+d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate())+'-'+pad(d.getHours())+pad(d.getMinutes())+'.json';
+  return base+'-'+d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate())+'-'+pad(d.getHours())+pad(d.getMinutes())+'.rsl';
 }
-document.getElementById('bSave').onclick = ()=>{
-  const blob = new Blob([JSON.stringify(toJSON(),null,2)],{type:'application/json'});
+// File System Access (Chrome/Edge) : une fois un fichier .rsl ouvert ou enregistré une première
+// fois, « Enregistrer » réécrit directement ce même fichier sans redemander où le mettre.
+// Navigateurs sans cette API (Firefox, Safari) : repli sur le téléchargement / <input type=file> classique.
+let rslHandle = null;
+const rslFSOk = () => !!(window.showSaveFilePicker && window.showOpenFilePicker);
+async function rslWritable(h){
+  try{ if((await h.queryPermission({mode:'readwrite'})) === 'granted') return true;
+    return (await h.requestPermission({mode:'readwrite'})) === 'granted'; }
+  catch(e){ return false; }
+}
+async function doSave(){
+  const json = JSON.stringify(toJSON(), null, 2);
+  if(rslFSOk()){
+    try{
+      let h = rslHandle;
+      if(!h || !(await rslWritable(h)))
+        h = await window.showSaveFilePicker({ suggestedName: jsonFileName(),
+          types: [{ description:'Plan RSL', accept:{ 'application/json':['.rsl'] } }] });
+      const w = await h.createWritable(); await w.write(json); await w.close();
+      rslHandle = h;
+      toast('Plan enregistré : '+h.name);
+      return true;
+    }catch(err){ if(err.name !== 'AbortError') notice('Enregistrement impossible : '+err.message); return false; }
+  }
+  const blob = new Blob([json],{type:'application/json'});
   const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
   a.download = jsonFileName();
   a.click(); URL.revokeObjectURL(a.href);
-  toast('Plan enregistré : '+a.download); };
+  toast('Plan enregistré : '+a.download);
+  return true;
+}
+document.getElementById('bSave').onclick = doSave;
 document.getElementById('bBom').onclick = downloadBom;
 document.getElementById('bBom2').onclick = downloadBom;
-document.getElementById('bLoad').onclick = ()=>document.getElementById('fLoad').click();
+async function doOpen(){
+  if(rslFSOk()){
+    try{
+      const [h] = await window.showOpenFilePicker({ types: [{ description:'Plan RSL',
+        accept:{ 'application/json':['.rsl'] } }] });
+      const text = await (await h.getFile()).text();
+      loadData(JSON.parse(text));
+      rslHandle = h;
+      toast('Plan rechargé : '+state.bays.length+' travée(s), '+state.cotes.length+' cote(s), '+state.labels.length+' étiquette(s)');
+    }catch(err){ if(err.name !== 'AbortError') notice('Fichier illisible : '+err.message); }
+    return;
+  }
+  document.getElementById('fLoad').click();
+}
+document.getElementById('bLoad').onclick = doOpen;
 document.getElementById('fLoad').onchange = e=>{
   const f = e.target.files[0]; if(!f) return;
   const r = new FileReader();
-  r.onload = ()=>{ try{ loadData(JSON.parse(r.result)); toast('Plan rechargé : '+state.bays.length+' travée(s), '+state.cotes.length+' cote(s), '+state.labels.length+' étiquette(s)'); }
+  r.onload = ()=>{ try{ rslHandle = null; loadData(JSON.parse(r.result)); toast('Plan rechargé : '+state.bays.length+' travée(s), '+state.cotes.length+' cote(s), '+state.labels.length+' étiquette(s)'); }
     catch(err){ notice('Fichier illisible : '+err.message); } };
   r.readAsText(f); e.target.value=''; };
 function applyWarehouse(){
@@ -1878,6 +2119,13 @@ const paintEch = selList('echSel', UPRIGHTS, 'upright', '');
 const paintLis = selList('lisSel', BEAMS, 'beam', '');
 const paintLev = stepList('levMinus','levPlus','levVal', LEVELS, 'levels', v=>v+' niv.');
 const paintPal = selList('palSel', PALLETS, 'pallet', '×1200');
+// Plancher fil : défaut pour les nouvelles travées (coché/décoché indépendant des travées déjà posées)
+document.getElementById('dDeck').checked = state.deck;
+document.getElementById('dDeck').onchange = e=>{
+  state.deck = e.target.checked;
+  document.getElementById('tDeck').classList.toggle('on', state.deck);
+  toast(state.deck ? 'Les nouvelles travées auront un plateau fil' : 'Les nouvelles travées n\'auront pas de plateau fil');
+};
 // hauteur des échelles : une seule valeur pour tout le plan
 (function(){
   const el = document.getElementById('hautSel');
@@ -1907,11 +2155,25 @@ window.addEventListener('keydown', e=>{
     document.getElementById('suiteMinus').click(); }
   else if(k==='r') rotateSel();
   else if(k==='d') document.getElementById('addDepart').click();   // D = + DÉPART, en SF ou DF
-  else if(e.key==='Delete'||e.key==='Backspace'){ e.preventDefault(); delSel(); }
+  else if(e.key==='Delete'||e.key==='Backspace'){ e.preventDefault();
+    if(selLabel){ const t=state.labels.find(l=>l.id===selLabel)?.text;
+      state.labels = state.labels.filter(l=>l.id!==selLabel); selLabel=null;
+      drawLabels(); renderJSON(); toast('Étiquette supprimée'+(t?' : '+t:'')); }
+    else if(selTxt) delText(selTxt);
+    else delSel(); }
   else if(k==='g') document.getElementById('tSnap').click();
   else if(k==='m') document.getElementById('tMeasure').click();
   else if(k==='v') View3D.toggle();
   else if(k==='escape') select([]);
+  // Tab en vue 3D : passe à la travée suivante/précédente (Maj+Tab) dans l'ordre du plan, au lieu de
+  // déplacer le focus clavier dans les menus — peu utile une fois dans la vue 3D.
+  else if(k==='tab' && document.body.classList.contains('v3d') && state.bays.length){
+    e.preventDefault();
+    const ids = state.bays.map(b=>b.id);
+    const i = state.selected.length ? ids.indexOf(state.selected[state.selected.length-1]) : -1;
+    const next = e.shiftKey ? (i<=0 ? ids.length-1 : i-1) : (i>=ids.length-1 ? 0 : i+1);
+    select([ids[next]]);
+  }
   else if(e.key.startsWith('Arrow') && state.selected.length){
     e.preventDefault();
     const st = e.shiftKey ? state.warehouse.gridSize*10 : state.warehouse.gridSize;
@@ -1927,8 +2189,10 @@ window.addEventListener('keyup', e=>{ if(e.code==='Space') spaceDown=false; });
 /* ---------- Démo ---------- */
 /* ---------- État initial : une seule travée DÉPART ---------- */
 function resetPlan(silent){
+  rslHandle = null;   // nouveau plan : « Enregistrer » redemandera un fichier, pas d'écrasement de l'ancien
   state.warehouse = { width:30000, depth:18000, gridSize:100, aisle:3000, back:200 };
-  state.bays = []; state.selected = []; state.seq = 1; state.runSeq = 1; state.cotes = []; state.labels = []; refreshCoteList();
+  state.bays = []; state.selected = []; state.seq = 1; state.runSeq = 1; state.cotes = []; state.labels = []; selLabel = null;
+  state.texts = []; selTxt = null; refreshCoteList();
   state.name = ''; document.getElementById('dossier').value = '';
   state.upright = 80; state.beam = 2700; state.levels = 2; state.pallet = 800;
   state.rackH = 3500; document.getElementById('hautSel').value = '3500';
@@ -1974,14 +2238,9 @@ function resetPlan(silent){
       document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;background:#0b1017;color:#8fa0b8;font-family:Inter,sans-serif;font-size:1rem;">Vous pouvez fermer cet onglet.</div>';
     }, 200);
   }
-  function saveAndQuit(){
-    // Déclenche le téléchargement JSON
-    const blob = new Blob([JSON.stringify(toJSON(),null,2)],{type:'application/json'});
-    const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
-    a.download = jsonFileName();
-    a.click(); URL.revokeObjectURL(a.href);
-    toast('Plan enregistré — fermeture…');
-    setTimeout(doQuit, 800);
+  async function saveAndQuit(){
+    if(await doSave()) setTimeout(doQuit, 800);
+    else toast('Fermeture annulée — le plan n\'a pas été enregistré');
   }
   document.getElementById('bQuit').onclick = ()=>{
     modal.hidden = false;
@@ -2037,6 +2296,7 @@ const View3D = (function(){
     const meshTex=new THREE.CanvasTexture(mc); meshTex.wrapS=meshTex.wrapT=THREE.RepeatWrapping;
     V.mat = {
       galva:new THREE.MeshStandardMaterial({color:0xb9c1c8,metalness:0.55,roughness:0.38}),
+      blue:new THREE.MeshStandardMaterial({color:0x002a5b,metalness:0.15,roughness:0.45}),   // RAL 5002, un peu plus foncé
       orange:new THREE.MeshStandardMaterial({color:0xe25303,metalness:0.2,roughness:0.45}),
       sabot:new THREE.MeshStandardMaterial({color:0xf5c518,metalness:0.1,roughness:0.5}),
       wiremesh:new THREE.MeshStandardMaterial({map:meshTex,transparent:true,alphaTest:0.4,side:THREE.DoubleSide,metalness:0.4,roughness:0.5}),
@@ -2049,7 +2309,7 @@ const View3D = (function(){
     // orbite maison du configurateur + déplacement (clic droit / Maj / 2 doigts)
     const cv=r.domElement, pts=new Map(); let pinch0=0, mid0=null, panMode=false;
     cv.addEventListener('contextmenu',e=>e.preventDefault());
-    cv.addEventListener('pointerdown',e=>{ cv.setPointerCapture(e.pointerId); pts.set(e.pointerId,{x:e.clientX,y:e.clientY});
+    cv.addEventListener('pointerdown',e=>{ cv.setPointerCapture(e.pointerId); pts.set(e.pointerId,{x:e.clientX,y:e.clientY,x0:e.clientX,y0:e.clientY});
       if(pts.size===1) panMode = e.button===1 || e.button===2 || e.shiftKey;
       if(pts.size===2){ const [a,b]=[...pts.values()]; pinch0=Math.hypot(a.x-b.x,a.y-b.y); mid0={x:(a.x+b.x)/2,y:(a.y+b.y)/2}; }
       setView(null); });
@@ -2062,7 +2322,10 @@ const View3D = (function(){
       if(pts.size===2){ const [a,b]=[...pts.values()]; const d=Math.hypot(a.x-b.x,a.y-b.y); if(pinch0) V.orb.dist*=pinch0/d; pinch0=d;
         const m={x:(a.x+b.x)/2,y:(a.y+b.y)/2}; if(mid0) pan(m.x-mid0.x, m.y-mid0.y); mid0=m; }
       V.orb.dist=Math.max(1.5,Math.min(V.maxD,V.orb.dist)); render(); });
-    const up=e=>{ pts.delete(e.pointerId); pinch0=0; mid0=null; };
+    const up=e=>{ const p=pts.get(e.pointerId);
+      // clic (quasi) sans glisser, bouton gauche, un seul doigt/pointeur : sélectionne la travée visée
+      if(p && pts.size===1 && !panMode && Math.hypot(e.clientX-p.x0,e.clientY-p.y0)<6) pickBay(e.clientX,e.clientY);
+      pts.delete(e.pointerId); pinch0=0; mid0=null; };
     cv.addEventListener('pointerup',up); cv.addEventListener('pointercancel',up);
     cv.addEventListener('wheel',e=>{ e.preventDefault(); V.orb.dist=Math.max(1.5,Math.min(V.maxD,V.orb.dist*(1+Math.sign(e.deltaY)*0.1))); render(); },{passive:false});
     new ResizeObserver(resize).observe(V.el);
@@ -2092,6 +2355,16 @@ const View3D = (function(){
     V.scene.add(V.floor, V.grid); V.floorSize=size;
   }
 
+  // sélectionne la travée cliquée en vue 3D (clic sur une de ses pièces -> remonte au groupe taggé bayId)
+  const ray = new THREE.Raycaster();
+  function pickBay(clientX,clientY){
+    if(!V.group) return;
+    const rect = V.r.domElement.getBoundingClientRect();
+    ray.setFromCamera(new THREE.Vector2(((clientX-rect.left)/rect.width)*2-1, -((clientY-rect.top)/rect.height)*2+1), V.cam);
+    const hit = ray.intersectObjects(V.group.children, true)[0]; if(!hit) return;
+    let o = hit.object; while(o && o.userData.bayId===undefined) o = o.parent;
+    if(o) select([o.userData.bayId]);
+  }
   function setView(v){ viewMode=v; document.querySelectorAll('#viewer3d .vtools [data-v]').forEach(b=>b.classList.toggle('on',b.dataset.v===v)); }
   function render(){
     if(!V.r) return; const o=V.orb;
@@ -2112,22 +2385,52 @@ const View3D = (function(){
     const m=new THREE.Mesh(geo(t,len,t*0.8),mat);
     m.position.copy(a).addScaledVector(dir,0.5); m.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),dir.normalize()); m.castShadow=true; g.add(m);
   }
-  function label(g,text,x,y,z,size=0.28,bg="rgba(15,59,102,.92)",fg="#fff"){
+  // depthTest=false (défaut) : étiquette toujours visible, par-dessus tout (repères généraux).
+  // depthTest=true : masquée normalement par un rack placé devant (cotes de travée au sol).
+  function label(g,text,x,y,z,size=0.28,bg="rgba(15,59,102,.92)",fg="#fff",depthTest=false){
     const c=document.createElement("canvas"); const ctx=c.getContext("2d"); const fs=64;
     ctx.font=`600 ${fs}px Inter, Arial`; const w=ctx.measureText(text).width+36; c.width=w; c.height=fs+28;
     ctx.font=`600 ${fs}px Inter, Arial`; ctx.fillStyle=bg;
     const rr=18; ctx.beginPath(); ctx.moveTo(rr,0);ctx.arcTo(w,0,w,c.height,rr);ctx.arcTo(w,c.height,0,c.height,rr);ctx.arcTo(0,c.height,0,0,rr);ctx.arcTo(0,0,w,0,rr);ctx.fill();
     ctx.fillStyle=fg; ctx.textBaseline="middle"; ctx.fillText(text,18,c.height/2+2);
     const tex=new THREE.CanvasTexture(c); tex.anisotropy=4;
-    const s=new THREE.Sprite(new THREE.SpriteMaterial({map:tex,depthTest:false,transparent:true}));
-    s.scale.set(size*c.width/c.height,size,1); s.position.set(x,y,z); s.renderOrder=10; g.add(s);
+    const s=new THREE.Sprite(new THREE.SpriteMaterial({map:tex,depthTest,transparent:true}));
+    s.scale.set(size*c.width/c.height,size,1); s.position.set(x,y,z); s.renderOrder=depthTest?0:10; g.add(s);
   }
-  function cote(g,a,b,txt,off,red=false){
+  // étiquette de cote "à plat" : texte seul (pas de pastille), posée dans le plan horizontal et alignée
+  // sur la ligne de cote — jamais orientée vers la caméra, donc ne tourne pas quand on tourne la vue.
+  function coteText(g,text,mid,dir,color,depthTest){
+    const c=document.createElement("canvas"); const ctx=c.getContext("2d"); const fs=64;
+    ctx.font=`600 ${fs}px Inter, Arial`; const w=Math.ceil(ctx.measureText(text).width)+28; c.width=w; c.height=fs+16;
+    ctx.font=`600 ${fs}px Inter, Arial`; ctx.fillStyle=color; ctx.textBaseline="middle"; ctx.textAlign="center";
+    ctx.fillText(text,w/2,c.height/2+2);
+    const tex=new THREE.CanvasTexture(c); tex.anisotropy=4;
+    const size=0.26;
+    const m=new THREE.Mesh(new THREE.PlaneGeometry(size*c.width/c.height,size),
+      new THREE.MeshBasicMaterial({map:tex,transparent:true,depthTest,side:THREE.DoubleSide}));
+    const xAxis=dir.clone().normalize(), zAxis=new THREE.Vector3(0,1,0);
+    const yAxis=new THREE.Vector3().crossVectors(zAxis,xAxis).normalize();
+    m.quaternion.setFromRotationMatrix(new THREE.Matrix4().makeBasis(xAxis,yAxis,zAxis));
+    m.position.copy(mid); m.renderOrder=depthTest?0:10; g.add(m);
+  }
+  function cote(g,a,b,txt,off,red=false,depthTest=false){
     const mat = red ? V.mat.cotRed : V.mat.cot;
     const pts=[a.clone().add(off),b.clone().add(off)];
     g.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),mat));
     [a,b].forEach(p=>g.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([p,p.clone().add(off.clone().multiplyScalar(1.15))]),mat)));
-    const m=pts[0].clone().add(pts[1]).multiplyScalar(0.5); label(g,txt,m.x,m.y,m.z,0.28,red?"rgba(198,40,40,.95)":undefined);
+    const m=pts[0].clone().add(pts[1]).multiplyScalar(0.5);
+    if(red) label(g,txt,m.x,m.y,m.z,0.28,"rgba(198,40,40,.95)",undefined,depthTest);
+    else coteText(g,txt,m,pts[1].clone().sub(pts[0]),'#2563eb',depthTest);
+  }
+  // cage de sélection : arêtes en volume (boîtes), pas des lignes GL — reste épaisse et visible à tout zoom
+  function selCage(g,w,h,d,cx,cy,cz,mat,t){
+    const hw=w/2, hh=h/2, hd=d/2;
+    [[t,h,t,hw,0,hd],[t,h,t,-hw,0,hd],[t,h,t,hw,0,-hd],[t,h,t,-hw,0,-hd],
+     [w,t,t,0,hh,hd],[w,t,t,0,-hh,hd],[w,t,t,0,hh,-hd],[w,t,t,0,-hh,-hd],
+     [t,t,d,hw,hh,0],[t,t,d,-hw,hh,0],[t,t,d,hw,-hh,0],[t,t,d,-hw,-hh,0]]
+    .forEach(([ew,eh,ed,ox,oy,oz])=>{
+      const m=new THREE.Mesh(new THREE.BoxGeometry(ew,eh,ed),mat); m.position.set(cx+ox,cy+oy,cz+oz); g.add(m);
+    });
   }
   function dispose(o){ o.traverse(n=>{ if(n.geometry) n.geometry.dispose(); if(n.material && n.material.map){n.material.map.dispose();n.material.dispose();} }); }
 
@@ -2147,25 +2450,29 @@ const View3D = (function(){
     const meshCache=new Map();
     const meshMatFor=(wmm,dmm)=>{ const key=wmm+'x'+dmm; let m=meshCache.get(key);
       if(!m){ m=M.wiremesh.clone(); m.map=M.wiremesh.map.clone(); m.map.repeat.set(wmm/100,dmm/100); m.map.needsUpdate=true; meshCache.set(key,m); } return m; };
+    // repère de sélection : cage épaisse (boîtes, pas des lignes GL fines) + halo au sol
+    const selMat = new THREE.MeshBasicMaterial({color:0x22e3ff});
+    const selFloorMat = new THREE.MeshBasicMaterial({color:0x38bdf8, transparent:true, opacity:0.22, depthWrite:false});
+    const echMat = state.galva!==false ? M.galva : M.blue;   // couleur des échelles pour tout le plan
 
     state.bays.forEach(b=>{
       // une travée = son repère local du plan : x le long des lisses, z en profondeur (y du plan)
-      const bg=new THREE.Group(); bg.position.set(b.x*k,0,b.y*k); bg.rotation.y=-(b.rotation||0)*Math.PI/180; g.add(bg);
+      const bg=new THREE.Group(); bg.userData.bayId=b.id; bg.position.set(b.x*k,0,b.y*k); bg.rotation.y=-(b.rotation||0)*Math.PI/180; g.add(bg);
       const D=b.depth*k, u=b.upright*k, L=b.beam*k, p=parts(b), zFront=ud/2, zBack=D-ud/2, lh=ladderHeights(b);
       p.ladders.forEach((l,i)=>{
         const x=l.x*k+u/2, H=lh[i]*k;
-        box(bg,u,H,ud,x,H/2,zFront,M.galva); box(bg,u,H,ud,x,H/2,zBack,M.galva);
-        box(bg,0.15,0.006,0.12,x,0.003,zFront,M.galva,false); box(bg,0.15,0.006,0.12,x,0.003,zBack,M.galva,false);
+        box(bg,u,H,ud,x,H/2,zFront,echMat); box(bg,u,H,ud,x,H/2,zBack,echMat);
+        box(bg,0.15,0.006,0.12,x,0.003,zFront,echMat,false); box(bg,0.15,0.006,0.12,x,0.003,zBack,echMat,false);
         // sabot de protection : uniquement en façade (côté allée), fine plaque debout devant le poteau
         if(state.sabots){ const sw=u+0.04, sh=0.4, sd=0.05, front=frontByRun[b.run];
           box(bg,sw,sh,sd,x,sh/2,front?-ud:D+ud,M.sabot); }
         // treillis
         const dz=D-ud, n=Math.max(2,Math.round((H-0.3)/Math.max(0.55,dz*0.9)));
         const y0=0.15, y1=H-0.12, st=(y1-y0)/n;
-        bar(bg,v3(x,y0,zFront),v3(x,y0,zBack),0.03,M.galva);
-        bar(bg,v3(x,y1,zFront),v3(x,y1,zBack),0.03,M.galva);
+        bar(bg,v3(x,y0,zFront),v3(x,y0,zBack),0.03,echMat);
+        bar(bg,v3(x,y1,zFront),v3(x,y1,zBack),0.03,echMat);
         for(let j=0;j<n;j++){ const a=j%2?zFront:zBack, c=j%2?zBack:zFront;
-          bar(bg,v3(x,y0+j*st,a),v3(x,y0+(j+1)*st,c),0.025,M.galva); }
+          bar(bg,v3(x,y0+j*st,a),v3(x,y0+(j+1)*st,c),0.025,echMat); }
       });
       // lisses avant / arrière
       const xs=p.beams[0].x*k, xc=xs+L/2, sH=SEC*k, ys=levelsY(b).map(v=>v*k);
@@ -2187,6 +2494,13 @@ const View3D = (function(){
           const lb=box(bg,pw-0.02,bh,pd-0.02,px,py+0.144+bh/2,pz,M.box[Math.floor(rnd()*4)]);
           const ed=new THREE.LineSegments(edges(lb.geometry),M.edge); ed.position.copy(lb.position); bg.add(ed);
         }});
+      }
+      // cadre de sélection : reprend la travée sélectionnée dans la vue 2D
+      if(state.selected.includes(b.id)){
+        const H=Math.max(...lh)*k;
+        selCage(bg, L+0.05, H+0.05, D+0.05, xc, H/2, D/2, selMat, 0.035);
+        const selFloor=new THREE.Mesh(new THREE.PlaneGeometry(L+0.04,D+0.04), selFloorMat);
+        selFloor.rotation.x=-Math.PI/2; selFloor.position.set(xc,0.003,D/2); bg.add(selFloor);
       }
     });
     if(showCot) cotes(g, frontByRun);
@@ -2218,8 +2532,9 @@ const View3D = (function(){
       const front=frontByRun[run];
       const zf=front?0:D*k, s=front?-1:1, h0=items[0].b.height, H=Math.max(...items.map(i=>i.b.height))*k;
       const cg=new THREE.Group(); cg.position.set(f.x*k,0,f.y*k); cg.rotation.y=-r; g.add(cg);
+      // cote de travée au sol : masquée normalement si un rack placé devant la cache (inutile de la voir au travers)
       items.forEach((it,i)=>{ const bx=(it.x0+parts(it.b).beams[0].x)*k;
-        cote(cg,v3(bx,0.02,zf),v3(bx+it.b.beam*k,0.02,zf),`T${i+1} · L ${it.b.beam}`,v3(0,0,0.45*s)); });
+        cote(cg,v3(bx,0.02,zf),v3(bx+it.b.beam*k,0.02,zf),`T${i+1} · L ${it.b.beam}`,v3(0,0,0.45*s),false,true); });
       cote(cg,v3(x0*k-0.02,0,zf),v3(x0*k-0.02,h0*k,zf),`H ${h0}`,v3(-0.55,0,0.35*s),true);
       // hauteur différente dans la file : repère au-dessus de la travée (comme H intermédiaire du configurateur)
       items.forEach(it=>{ if(it.b.height!==h0) label(cg,`H ${it.b.height}`,(it.x0+bayW(it.b)/2)*k,it.b.height*k+0.15,zf,0.22); });
@@ -2301,7 +2616,9 @@ const RKP = {
   version: 1,
   demoMaxBays: 12,
   revalidateMs: 15 * 60 * 1000,
-  key: '', email: '', lic: null, demo: true, lastOk: 0
+  key: '', email: '', lic: null, demo: true, lastOk: 0,
+  // en-tête PDF du revendeur : saisie locale uniquement, jamais envoyée à Airtable
+  brand: { nom: rkpGet('rkp.brand.nom'), adresse: rkpGet('rkp.brand.adresse'), logo: rkpGet('rkp.brand.logo') }
 };
 
 const RKP_MOTIFS = {
@@ -2353,6 +2670,101 @@ function rkpBadge(){
     b.style.color = '#bfe9ff'; b.style.borderColor = '#2f5ea8';
   }
   rkpLockUI();
+  rkpBrandBtn();
+}
+
+/* ---------- en-tête PDF (nom, adresse, logo du revendeur) ----------
+   100% local (localStorage) : aucune lecture/écriture Airtable, donc
+   aucun coût supplémentaire sur le quota de la licence. */
+function rkpBrandBtn(){
+  let b = document.getElementById('rkpBrandBtn');
+  if(b) return;
+  b = document.createElement('button');
+  b.id = 'rkpBrandBtn'; b.type = 'button'; b.textContent = 'En-tête PDF';
+  b.style.cssText = 'margin-left:8px;background:transparent;border:1px solid var(--line);'
+    + 'border-radius:8px;padding:5px 10px;font-size:11px;letter-spacing:.05em;cursor:pointer;color:var(--txt-dim)';
+  b.onclick = rkpBrandOpen;
+  const badge = document.getElementById('rkpBadge');
+  if(badge && badge.parentNode) badge.parentNode.insertBefore(b, badge.nextSibling);
+}
+let rkpBrandTmpLogo = '';
+function rkpBrandDlg(){
+  let g = document.getElementById('rkpBrandGate');
+  if(g) return g;
+  g = document.createElement('div');
+  g.id = 'rkpBrandGate';
+  g.style.cssText = 'position:fixed;inset:0;z-index:9999;display:none;align-items:center;'
+    + 'justify-content:center;background:rgba(7,11,17,.82);backdrop-filter:blur(3px)';
+  g.innerHTML = `
+    <div style="width:min(440px,92vw);background:var(--panel);border:1px solid var(--line);
+                border-radius:14px;padding:26px 24px;box-shadow:0 24px 64px rgba(0,0,0,.55)">
+      <h3 style="font-size:1.05rem;font-weight:700;margin-bottom:6px">En-tête des PDF</h3>
+      <p style="font-size:.8rem;color:var(--txt-dim);line-height:1.55;margin-bottom:16px">
+        Votre société, votre adresse et votre logo apparaîtront en haut des plans et
+        nomenclatures imprimés. Ces informations restent sur ce poste.</p>
+      <input id="brandNom" type="text" spellcheck="false" placeholder="Raison sociale"
+             style="width:100%;background:#0e1622;border:1px solid var(--line);border-radius:8px;
+                    padding:10px 12px;margin-bottom:8px">
+      <textarea id="brandAdresse" rows="2" spellcheck="false" placeholder="Adresse"
+             style="width:100%;background:#0e1622;border:1px solid var(--line);border-radius:8px;
+                    padding:10px 12px;margin-bottom:8px;resize:vertical;font-family:inherit"></textarea>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+        <img id="brandLogoPrev" style="height:34px;max-width:140px;object-fit:contain;display:none;background:#fff;border-radius:4px;padding:2px">
+        <input id="brandLogoFile" type="file" accept="image/*" style="flex:1;font-size:.78rem;color:var(--txt-dim)">
+        <button id="brandLogoClr" type="button" class="btn ghost" style="padding:6px 10px;font-size:.75rem">Retirer</button>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:14px">
+        <button id="brandCancel" class="btn ghost" style="flex:1;justify-content:center">Annuler</button>
+        <button id="brandSave" class="btn primary" style="flex:1;justify-content:center">Enregistrer</button>
+      </div>
+    </div>`;
+  document.body.appendChild(g);
+
+  g.querySelector('#brandLogoFile').onchange = e=>{
+    const f = e.target.files[0]; if(!f) return;
+    const img = new Image(), reader = new FileReader();
+    reader.onload = ()=>{
+      img.onload = ()=>{
+        const maxH = 120, scale = Math.min(1, maxH / img.height);        // shortcut: logo redimensionné côté client (max 120px de haut), pas de contrôle de poids fichier au-delà — upgrader si un logo très lourd sature le localStorage (~5 Mo)
+        const c = document.createElement('canvas');
+        c.width = Math.round(img.width * scale) || 1; c.height = Math.round(img.height * scale) || 1;
+        c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+        rkpBrandTmpLogo = c.toDataURL('image/png');
+        const p = g.querySelector('#brandLogoPrev'); p.src = rkpBrandTmpLogo; p.style.display = 'block';
+      };
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(f);
+  };
+  g.querySelector('#brandLogoClr').onclick = ()=>{
+    rkpBrandTmpLogo = '';
+    const p = g.querySelector('#brandLogoPrev'); p.src = ''; p.style.display = 'none';
+    g.querySelector('#brandLogoFile').value = '';
+  };
+  g.querySelector('#brandCancel').onclick = rkpBrandClose;
+  g.querySelector('#brandSave').onclick = rkpBrandSubmit;
+  g.onclick = e=>{ if(e.target === g) rkpBrandClose(); };
+  return g;
+}
+function rkpBrandOpen(){
+  const g = rkpBrandDlg();
+  g.style.display = 'flex';
+  g.querySelector('#brandNom').value = RKP.brand.nom || '';
+  g.querySelector('#brandAdresse').value = RKP.brand.adresse || '';
+  rkpBrandTmpLogo = RKP.brand.logo || '';
+  const p = g.querySelector('#brandLogoPrev');
+  if(rkpBrandTmpLogo){ p.src = rkpBrandTmpLogo; p.style.display = 'block'; } else { p.style.display = 'none'; }
+}
+function rkpBrandClose(){ const g = document.getElementById('rkpBrandGate'); if(g) g.style.display = 'none'; }
+function rkpBrandSubmit(){
+  RKP.brand.nom = document.getElementById('brandNom').value.trim().slice(0, 80);
+  RKP.brand.adresse = document.getElementById('brandAdresse').value.trim().slice(0, 200);
+  RKP.brand.logo = rkpBrandTmpLogo;
+  rkpSet('rkp.brand.nom', RKP.brand.nom);
+  rkpSet('rkp.brand.adresse', RKP.brand.adresse);
+  rkpSet('rkp.brand.logo', RKP.brand.logo);
+  rkpBrandClose();
+  toast('En-tête PDF enregistré');
 }
 
 /* ---------- verrouillage des fonctions sous licence ---------- */
@@ -2382,7 +2794,7 @@ function rkpGate(){
   g.innerHTML = `
     <div style="width:min(440px,92vw);background:var(--panel);border:1px solid var(--line);
                 border-radius:14px;padding:26px 24px;box-shadow:0 24px 64px rgba(0,0,0,.55)">
-      <h3 style="font-size:1.05rem;font-weight:700;margin-bottom:6px">Activer RackPlan 2D</h3>
+      <h3 style="font-size:1.05rem;font-weight:700;margin-bottom:6px">Activer RackPlan 2D/3D</h3>
       <p style="font-size:.8rem;color:var(--txt-dim);line-height:1.55;margin-bottom:16px">
         Saisissez votre e-mail professionnel et la clé de licence de votre société.
         Les deux doivent correspondre à un accès ouvert. Sans cela, l'application reste
@@ -2468,9 +2880,9 @@ addDepart = function(x, y, run){
   if(rkpCap(1)) return state.bays[state.bays.length - 1];
   return _rkpAddDepart(x, y, run);
 };
-addSuite = function(){
+addSuite = function(prev){
   if(rkpCap(1)) return state.bays[state.bays.length - 1];
-  return _rkpAddSuite();
+  return _rkpAddSuite(prev);
 };
 dupSel = function(){ if(rkpCap(state.selected.length || 1)) return; return _rkpDupSel(); };
 loadData = function(d){

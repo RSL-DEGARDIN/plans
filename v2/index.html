@@ -14,22 +14,30 @@
 :root{
   --bg:#0b1017; --panel:#111823; --panel-2:#161f2c; --line:#243044;
   --txt:#e6edf7; --txt-dim:#8fa0b8; --txt-mute:#61728a;
+  --surface:#0e151f; --surface2:#0e1622; --surface3:#131d2b; --canvas:#080c12;
+  --overlay:rgba(11,16,23,.86); --overlay-txt:#e6edf7; --accent-txt:#bfe9ff;
   --blue:#3b82f6; --orange:#f97316; --accent:#38bdf8; --danger:#f43f5e;
   --text-xs:0.75rem; --text-sm:0.875rem; --text-base:1rem; --text-lg:1.25rem;
   --s1:4px;--s2:8px;--s3:12px;--s4:16px;--s6:24px; --r:8px;
+}
+body[data-theme="light"]{
+  --bg:#eef1f5; --panel:#ffffff; --panel-2:#f5f7fa; --line:#d8dee8;
+  --txt:#1b2330; --txt-dim:#5b6b82; --txt-mute:#8696ac;
+  --surface:#eef1f5; --surface2:#e6eaf0; --surface3:#dde3eb; --canvas:#e9eef4;
+  --overlay:rgba(255,255,255,.9); --overlay-txt:#1b2330; --accent-txt:#0b6fb8;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%}
 body{background:var(--bg);color:var(--txt);font-family:Inter,system-ui,sans-serif;font-variant-numeric:tabular-nums;font-size:var(--text-sm);
   -webkit-font-smoothing:antialiased;overflow:hidden}
 .mono{font-family:Inter,system-ui,sans-serif;font-variant-numeric:tabular-nums}
-.app{display:grid;grid-template-columns:284px 1fr 268px;grid-template-rows:56px 1fr 32px;height:100vh}
+.app{display:grid;grid-template-columns:439px 1fr;grid-template-rows:56px 1fr 32px;height:100vh}
 header{grid-column:1/-1;display:flex;align-items:center;gap:var(--s4);padding:0 var(--s4);
   background:var(--panel);border-bottom:1px solid var(--line)}
 .brand{display:flex;align-items:center;gap:10px;font-weight:700;letter-spacing:-0.01em}
 .brand svg{color:var(--accent)}
 .brand small{display:block;font-weight:400;font-size:var(--text-xs);color:var(--txt-mute);letter-spacing:0}
-#dossier{flex:0 1 200px;min-width:110px;text-align:left;background:#0e151f;border:1px solid var(--line);border-radius:6px;
+#dossier{flex:0 1 200px;min-width:110px;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:6px;
   padding:7px 10px;color:var(--txt);font:500 13px Inter,system-ui,sans-serif}
 #dossier::placeholder{color:var(--txt-mute)}
 .toolbar{display:flex;gap:3px;margin-right:auto;flex-wrap:nowrap;align-items:center;overflow-x:auto;scrollbar-width:none}
@@ -51,7 +59,7 @@ button,select,input{font-family:inherit;font-size:var(--text-sm);color:var(--txt
 .btn.arrow.right{clip-path:polygon(0 0,calc(100% - 14px) 0,100% 50%,calc(100% - 14px) 100%,0 100%);padding:0 18px 0 8px}
 .btn:disabled:hover{background:var(--panel-2);border-color:var(--line)}
 .btn:active{transform:translateY(1px)}
-.btn.on{background:rgba(56,189,248,.14);border-color:var(--accent);color:#bfe9ff}
+.btn.on{background:rgba(56,189,248,.14);border-color:var(--accent);color:var(--accent-txt)}
 #tGalva.on{background:#002a5b;border-color:#002a5b;color:#fff}
 .btn.ghost{background:transparent}
 .btn.danger:hover{border-color:var(--danger);color:#ffc6d1}
@@ -69,16 +77,17 @@ aside{background:var(--panel);overflow-y:auto;padding:var(--s4);display:flex;fle
 aside.left{border-right:1px solid var(--line)}
 aside.right{border-left:1px solid var(--line)}
 h2{font-size:var(--text-xs);text-transform:uppercase;letter-spacing:.09em;color:var(--txt-mute);font-weight:600;margin-bottom:var(--s3)}
+.left h2{color:var(--danger);font-weight:700}
 .swatch{width:10px;height:10px;border-radius:3px;display:inline-block}
 .card{background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:var(--s3)}
 .card + .card{margin-top:var(--s2)}
 .card h3{font-size:var(--text-sm);font-weight:600;display:flex;align-items:center;gap:8px;margin-bottom:2px}
 .card p{font-size:var(--text-xs);color:var(--txt-dim);line-height:1.55}
 .chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:9px}
-.stepper{display:flex;align-items:stretch;gap:0;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#0e1622}
-.stepper button{width:26px;flex:0 0 26px;border:0;background:#131d2b;color:var(--txt);font:600 15px/1 Inter,sans-serif;cursor:pointer;transition:background .15s,color .15s}
+.stepper{display:flex;align-items:stretch;gap:0;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--surface2)}
+.stepper button{width:26px;flex:0 0 26px;border:0;background:var(--surface3);color:var(--txt);font:600 15px/1 Inter,sans-serif;cursor:pointer;transition:background .15s,color .15s}
 .stepper button:hover{background:#1b2a3d;color:var(--accent)}
-.stepper button:disabled{opacity:.32;cursor:not-allowed;background:#131d2b;color:var(--txt)}
+.stepper button:disabled{opacity:.32;cursor:not-allowed;background:var(--surface3);color:var(--txt)}
 .stepper .sv{min-width:46px;padding:6px 6px;text-align:center;font:600 12px/1.4 Inter,system-ui,sans-serif;color:var(--accent);
   border-left:1px solid var(--line);border-right:1px solid var(--line);display:flex;align-items:center;justify-content:center;white-space:nowrap}
 .row .stepper{flex:0 0 auto}
@@ -90,31 +99,31 @@ h2{font-size:var(--text-xs);text-transform:uppercase;letter-spacing:.09em;color:
 .row label{min-width:0}
 .stepper input.sv{background:transparent;color:var(--accent);border-radius:0;width:46px;min-width:46px;text-align:center;border-top:0;border-bottom:0}
 .stepper input.sv::-webkit-outer-spin-button,.stepper input.sv::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
-.chip{background:#0e151f;border:1px solid var(--line);border-radius:999px;padding:4px 10px;font-size:var(--text-xs);
+.chip{background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:4px 10px;font-size:var(--text-xs);
   cursor:pointer;font-family:Inter,system-ui,sans-serif;color:var(--txt-dim)}
-.chip:hover{border-color:var(--accent);color:#bfe9ff}
-.chip.sel{background:rgba(56,189,248,.14);border-color:var(--accent);color:#bfe9ff}
+.chip:hover{border-color:var(--accent);color:var(--accent-txt)}
+.chip.sel{background:rgba(56,189,248,.14);border-color:var(--accent);color:var(--accent-txt)}
 .row{display:flex;align-items:center;justify-content:space-between;gap:var(--s2);padding:5px 0}
 .row label{font-size:var(--text-xs);color:var(--txt-dim)}
 .val{font-size:var(--text-sm)}
-input[type=number],select{background:#0e151f;border:1px solid var(--line);border-radius:6px;padding:5px 8px;width:100px;
+input[type=number],select{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:5px 8px;width:100px;
   text-align:right;font-family:Inter,system-ui,sans-serif;font-variant-numeric:tabular-nums}
 select{text-align:left;width:112px}
 input:focus,select:focus{outline:2px solid rgba(56,189,248,.5)}
 input.plainnum{background:transparent;border:0;border-radius:4px;padding:1px 2px;width:5.6ch;text-align:right;
   color:var(--accent);font-family:Inter,system-ui,sans-serif;font-variant-numeric:tabular-nums}
 input.plainnum::-webkit-outer-spin-button,input.plainnum::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
-input.plainnum:hover{background:#0e151f}
-input.plainnum:focus{outline:1px solid rgba(56,189,248,.55);background:#0e151f}
-main{position:relative;background:#080c12;overflow:hidden}
+input.plainnum:hover{background:var(--surface)}
+input.plainnum:focus{outline:1px solid rgba(56,189,248,.55);background:var(--surface)}
+main{position:relative;background:var(--canvas);overflow:hidden}
 #stage{position:absolute;inset:0;font-variant-numeric:normal}   /* textes du plan mesurés et dessinés pareil */
 .hintwrap{position:absolute;left:16px;bottom:16px;display:flex;align-items:flex-end;gap:8px}
 .hintbtn{width:32px;height:32px;flex:0 0 32px;border-radius:50%;border:1px solid var(--line);cursor:pointer;
-  background:rgba(11,16,23,.86);color:var(--txt-dim);backdrop-filter:blur(6px);font:600 14px/1 Inter,sans-serif;
+  background:var(--overlay);color:var(--txt-dim);backdrop-filter:blur(6px);font:600 14px/1 Inter,sans-serif;
   display:flex;align-items:center;justify-content:center;transition:color .15s,border-color .15s,background .15s}
 .hintbtn:hover{color:var(--accent);border-color:var(--accent)}
 .hintbtn.on{color:var(--accent);border-color:var(--accent);background:rgba(56,189,248,.14)}
-.hint{background:rgba(11,16,23,.86);border:1px solid var(--line);
+.hint{background:var(--overlay);border:1px solid var(--line);
   border-radius:var(--r);padding:8px 12px;font-size:var(--text-xs);color:var(--txt-dim);backdrop-filter:blur(6px);
   pointer-events:none;max-width:340px;line-height:1.65}
 .hint[hidden]{display:none}
@@ -127,9 +136,9 @@ main{position:relative;background:#080c12;overflow:hidden}
 .dialog p{font-size:var(--text-xs);color:var(--txt-dim);line-height:1.6}
 .dialog .acts{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
 .hint b{color:var(--txt)}
-.hint kbd{font-family:Inter,system-ui,sans-serif;background:#0e151f;border:1px solid var(--line);
-  border-radius:4px;padding:0 4px;color:#bfe9ff}
-.zoombar{position:absolute;right:16px;bottom:16px;display:flex;gap:var(--s1);background:rgba(11,16,23,.86);
+.hint kbd{font-family:Inter,system-ui,sans-serif;background:var(--surface);border:1px solid var(--line);
+  border-radius:4px;padding:0 4px;color:var(--accent-txt)}
+.zoombar{position:absolute;right:16px;bottom:16px;display:flex;gap:var(--s1);background:var(--overlay);
   border:1px solid var(--line);border-radius:var(--r);padding:5px;backdrop-filter:blur(6px)}
 .zoombar .btn{padding:5px 9px}
 footer{grid-column:1/-1;display:flex;align-items:center;gap:var(--s4);padding:0 var(--s4);background:var(--panel);
@@ -143,11 +152,53 @@ footer b{color:var(--txt-dim);font-weight:500}
 .item:hover{background:var(--panel-2)}
 .item.sel{background:rgba(56,189,248,.12);border-color:rgba(56,189,248,.45)}
 .item .tag{font-family:Inter,system-ui,sans-serif;font-size:10px;padding:1px 5px;border-radius:4px;
-  background:#0e151f;border:1px solid var(--line);color:var(--txt-mute)}
+  background:var(--surface);border:1px solid var(--line);color:var(--txt-mute)}
 .item span.n{margin-left:auto;color:var(--txt-mute);font-family:Inter,system-ui,sans-serif}
 .stat{display:flex;justify-content:space-between;font-size:var(--text-xs);padding:3px 0;color:var(--txt-dim)}
 .stat b{color:var(--txt);font-weight:500;font-family:Inter,system-ui,sans-serif}
-pre{background:#0a0f16;border:1px solid var(--line);border-radius:8px;padding:10px;font-family:Inter,system-ui,sans-serif;
+/* ---------- Formulaire « Meuble » (remplace Données / Ajouter une travée / Propriétés) ---------- */
+.mhead{display:flex;flex-wrap:wrap;gap:6px;align-items:flex-end;margin-bottom:10px}
+.mhead>label{flex:1 1 90px;min-width:0}
+.mhead>label.narrow{flex:0 1 84px}
+.mhead>label input,.mhead>label select{width:100%;text-align:left}
+.mhead .x{flex:0 0 auto;margin-left:auto}
+#props,#propsNew{color:#000;--panel-2:#ffffff;--line:#d8dee8;--txt:#000;--txt-dim:#000;--txt-mute:#000}
+#props input[type=number],#props input[type=text],#props select,
+#propsNew input[type=number],#propsNew input[type=text],#propsNew select{background:#f2f5f9}
+#props .trow,#props .svgbox,#propsNew .trow,#propsNew .svgbox{background:#f7f9fb}
+#props .stepper,#propsNew .stepper{background:#fff}
+#props .stepper button,#propsNew .stepper button{background:#eaeef3}
+#props .stepper .sv,#propsNew .stepper .sv{color:#000}
+#props input.plainnum:hover,#props input.plainnum:focus,
+#propsNew input.plainnum:hover,#propsNew input.plainnum:focus{background:#f2f5f9}
+#props .fftoggle,#propsNew .fftoggle{display:flex;gap:6px}
+#props .fftoggle .btn,#propsNew .fftoggle .btn{flex:1 1 0;justify-content:center;padding:6px 8px}
+#props .btn.on,#propsNew .btn.on{color:#000}
+.mhead input[type=text]{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:5px 8px}
+#mName{color:var(--danger);font-weight:700}
+.mhead label .stepper{display:inline-flex;width:auto}
+.mhead label.mrot{text-align:right}
+.fieldcap{font-size:var(--text-xs);color:var(--txt-dim);margin:2px 0 4px}
+.mhead label.mface{display:flex;align-items:center;gap:4px;flex:0 0 auto;min-width:0;
+  cursor:pointer;user-select:none;padding-bottom:5px}
+.mhead label.mface input{appearance:none;-webkit-appearance:none;width:18px;height:18px;border-radius:50%;
+  border:2px solid var(--line);background:var(--surface);position:relative;margin:0;cursor:pointer;flex:0 0 auto}
+.mhead label.mface input:checked{border-color:var(--accent)}
+.mhead label.mface input:checked::after{content:'';position:absolute;left:50%;top:50%;width:8px;height:8px;
+  border-radius:50%;background:var(--accent);transform:translate(-50%,-50%)}
+.trow{border:1px solid var(--line);border-radius:8px;padding:7px 8px;margin-bottom:6px;background:var(--surface)}
+.trow .tline{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.trow .tline+.tline{margin-top:5px}
+.trow select,.trow input[type=text]{width:auto;flex:1 1 72px;min-width:0;text-align:left;font-size:12px;padding:5px 6px}
+.trow .tline:first-child select{flex-basis:58px}
+.trow .tn{font:700 11px Inter,sans-serif;color:var(--txt-mute);flex:0 0 16px}
+.trow label.chk{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--txt-dim);flex:0 0 auto;white-space:nowrap}
+.trow label.chk input{width:auto}
+.svgbox{background:var(--canvas);border:1px solid var(--line);border-radius:8px;overflow:hidden;padding:4px;height:258px}
+.svgbox svg{display:block;min-width:260px}
+.popup-tabs h3{margin-top:14px}
+.popup-tabs h3:first-child{margin-top:0}
+pre{background:var(--canvas);border:1px solid var(--line);border-radius:8px;padding:10px;font-family:Inter,system-ui,sans-serif;
   font-size:11px;color:#a8c3e0;max-height:196px;overflow:auto;line-height:1.5}
 .toast{position:fixed;left:50%;bottom:56px;transform:translate(-50%,20px);opacity:0;background:var(--panel-2);
   border:1px solid var(--accent);color:#d8f2ff;padding:9px 16px;border-radius:999px;font-size:var(--text-sm);
@@ -160,11 +211,11 @@ pre{background:#0a0f16;border:1px solid var(--line);border-radius:8px;padding:10
 .notice.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
 /* ---------- Vue 3D (rendu repris du configurateur EPSIRACK) ---------- */
 .vswitch{position:absolute;top:12px;right:16px;z-index:6;display:flex;gap:3px;padding:4px;
-  background:rgba(11,16,23,.86);border:1px solid var(--line);border-radius:var(--r);backdrop-filter:blur(6px)}
+  background:var(--overlay);border:1px solid var(--line);border-radius:var(--r);backdrop-filter:blur(6px)}
 .vswitch button{border:0;background:transparent;color:var(--txt-dim);font:600 12px/1 Inter,sans-serif;
   padding:7px 12px;border-radius:5px;cursor:pointer}
 .vswitch button:hover{color:var(--accent)}
-.vswitch button.on{background:rgba(56,189,248,.16);color:#bfe9ff}
+.vswitch button.on{background:rgba(56,189,248,.16);color:var(--accent-txt)}
 #viewer3d{--brand:#0f3b66;--ink:#15202e;--muted:#5d6b7c;--accent:#e25303;
   position:absolute;inset:0;z-index:3;overflow:hidden;background:linear-gradient(#e9eef4,#d5dde6);touch-action:none}
 #viewer3d[hidden]{display:none}
@@ -182,7 +233,7 @@ pre{background:#0a0f16;border:1px solid var(--line);border-radius:8px;padding:10
   font-size:13.5px;background:#fde8e6;color:#b3261e}
 body.v3d .hintwrap,body.v3d .zoombar{display:none}
 .sharetag{display:none;position:absolute;top:12px;right:16px;z-index:6;padding:7px 12px;border-radius:var(--r);
-  background:rgba(11,16,23,.86);color:#e6edf7;font:600 12.5px/1.2 Inter,sans-serif;backdrop-filter:blur(6px)}
+  background:var(--overlay);color:var(--overlay-txt);font:600 12.5px/1.2 Inter,sans-serif;backdrop-filter:blur(6px)}
 body.share .app{grid-template-columns:1fr;grid-template-rows:1fr}
 body.share header,body.share aside,body.share footer,body.share .vswitch,body.share .toast{display:none!important}
 body.share .sharetag{display:block}
@@ -206,7 +257,8 @@ body.share .sharetag{display:block}
   #printArea .p-body{display:grid;grid-template-columns:64mm 1fr;gap:6mm;align-items:start}
   #printArea .p-side h2:first-child{margin-top:0}
   #printArea .p-side table{font-size:7.5pt}
-  #printArea .p-plan img{max-height:172mm}
+  #printArea .p-plan-full{text-align:center}
+  #printArea .p-plan-full img{max-height:184mm;width:auto;max-width:100%}
   #printArea .p-foot{margin-top:4mm;border-top:1px solid #ddd;padding-top:2mm}
   #printArea table{width:100%;border-collapse:collapse;font-size:8.5pt}
   #printArea th{text-align:left;border-bottom:1px solid #111;padding:3px 4px;font-size:8pt}
@@ -214,9 +266,14 @@ body.share .sharetag{display:block}
   #printArea td.n,#printArea th.n{text-align:right;font-variant-numeric:tabular-nums}
   #printArea .p-page2{break-before:page;page-break-before:always}
   #printArea img.p-3d{width:100%;max-height:178mm;object-fit:contain}
+  #printArea .p-elev-page{break-before:page;page-break-before:always}
+  #printArea .p-elev-grid{display:flex;flex-wrap:wrap;gap:6mm;margin-top:4mm}
+  #printArea .p-elev-cell{width:84mm;text-align:center}
+  #printArea .p-elev-cell img{width:100%;max-height:95mm;object-fit:contain;border:1px solid #ccc;border-radius:4px}
+  #printArea .p-elev-cap{font-size:8.5pt;color:#555;margin-top:2mm}
 }
 ::-webkit-scrollbar{width:9px;height:9px}
-::-webkit-scrollbar-thumb{background:#243044;border-radius:9px}
+::-webkit-scrollbar-thumb{background:var(--line);border-radius:9px}
 ::-webkit-scrollbar-track{background:transparent}
 </style>
 </head>
@@ -250,7 +307,7 @@ body.share .sharetag{display:block}
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
         stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 15 15 3l6 6L9 21z"/><path d="m7 11 2 2"/><path d="m11 7 2 2"/></svg>
     </button>
-    <button class="btn ghost" id="bLabel" title="Ajouter une étiquette à la file sélectionnée" aria-label="Ajouter une étiquette à la file sélectionnée">
+    <button class="btn ghost" id="bLabel" title="Afficher / masquer les noms des meubles" aria-label="Afficher / masquer les noms des meubles">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
         stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7l11 11-7 7L3 10z"/><circle cx="7.5" cy="7.5" r="1.4"/></svg>
     </button>
@@ -304,6 +361,15 @@ body.share .sharetag{display:block}
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
         stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M3 6h.01"/><path d="M3 12h.01"/><path d="M3 18h.01"/></svg>
     </button>
+    <button class="btn" id="bInfo" title="Nomenclature, cotes et récapitulatif du plan" aria-label="Nomenclature, cotes et récapitulatif du plan">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+        stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+    </button>
+    <button class="btn" id="bTheme" title="Basculer mode sombre / blanc" aria-label="Basculer mode sombre / blanc"></button>
+    <button class="btn" id="bSketchUp" title="Exporter vers SketchUp (script .rb)" aria-label="Exporter vers SketchUp (script .rb)">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+        stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M3.27 6.96 12 12.01l8.73-5.05"/><path d="M12 22.08V12"/></svg>
+    </button>
     <button class="btn" id="bSave" title="Enregistrer le plan dans un fichier .rsl" aria-label="Enregistrer le plan dans un fichier .rsl">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
         stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/></svg>
@@ -329,25 +395,39 @@ body.share .sharetag{display:block}
 
 <aside class="left">
   <section>
-    <h2>Entrepôt</h2>
-    <div class="card">
-      <div class="dims">
-        <input type="number" id="whW" step="500" value="30000" aria-label="Largeur de l'entrepôt en mm">
-        <span class="x">×</span>
-        <input type="number" id="whD" step="500" value="18000" aria-label="Profondeur de l'entrepôt en mm">
-        <span class="u">mm</span>
+    <h2 style="display:flex;align-items:center;gap:6px">
+      <button type="button" class="btn ghost" id="whToggle" title="Replier / déplier" aria-label="Replier / déplier le bloc Entrepôt"
+        style="padding:3px;border-radius:5px;flex:0 0 auto">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+          stroke-linecap="round" stroke-linejoin="round" style="transition:transform .15s"><path d="M6 9l6 6 6-6"/></svg>
+      </button>
+      <span style="flex:1 1 auto">Entrepôt</span>
+    </h2>
+    <div class="card" id="whCard">
+      <div class="row" style="align-items:flex-end;justify-content:flex-start;gap:20px">
+        <div class="dims" style="flex:0 1 auto">
+          <input type="number" id="whW" step="500" value="30000" aria-label="Largeur de l'entrepôt en mm">
+          <span class="x">×</span>
+          <input type="number" id="whD" step="500" value="18000" aria-label="Profondeur de l'entrepôt en mm">
+          <span class="u">mm</span>
+        </div>
+        <div>
+          <div style="font-size:10px;color:var(--txt-dim);text-align:left;margin-bottom:2px">Allée</div>
+          <div class="dims" style="gap:6px">
+            <input type="number" id="whAisle" step="100" min="0" value="3000" style="width:64px"
+              aria-label="Largeur d'allée en mm">
+            <span class="u">mm</span>
+          </div>
+        </div>
       </div>
-      <div class="dims" style="margin-top:6px">
-        <label style="flex:1 1 0;min-width:0;white-space:nowrap;font-size:var(--text-xs);
-          color:var(--txt-dim)">Dim. d'allée :</label>
-        <span class="x" style="visibility:hidden">×</span>
-        <input type="number" id="whAisle" step="100" min="0" value="3000"
-          aria-label="Largeur d'allée en mm">
-        <span class="u">mm</span>
-      </div>
-      <div class="row">
+      <div class="row" style="margin-top:8px">
         <div style="display:flex;align-items:center;gap:8px;flex:0 0 auto">
-        <label style="white-space:nowrap">Piv.</label>
+          <label style="white-space:nowrap">Palette</label>
+          <select id="whPal" title="Dimensions de palette — identique pour tout l'entrepôt">
+            <option value="800">800×1200</option>
+            <option value="1000">1000×1200</option>
+          </select>
+        </div>
         <button class="btn ghost" id="bRotAll" aria-label="Pivoter le plan de 90°"
           style="width:32px;height:32px;padding:0;justify-content:center;border-radius:6px;flex:0 0 auto"
           title="Pivoter tout le plan de 90° (horizontal / vertical)">
@@ -355,22 +435,24 @@ body.share .sharetag{display:block}
             stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path
             d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 3v6h-6"/></svg>
         </button>
-        </div>
         <div style="display:flex;align-items:center;gap:8px;flex:0 0 auto">
-        <label style="white-space:nowrap">Grille</label>
-        <select id="gridSel" title="Pas de grille" style="width:92px">
-          <option value="25">25 mm</option><option value="50">50 mm</option>
-          <option value="100" selected>100 mm</option><option value="500">500 mm</option>
-          <option value="1000">1000 mm</option>
-        </select></div></div>
+          <input type="checkbox" id="gridOn" checked title="Afficher la grille" aria-label="Afficher la grille">
+          <select id="gridSel" title="Pas de grille" style="width:92px">
+            <option value="25">25 mm</option><option value="50">50 mm</option>
+            <option value="100" selected>100 mm</option><option value="500">500 mm</option>
+            <option value="1000">1000 mm</option>
+          </select>
+        </div>
+      </div>
     </div>
   </section>
 
+  <div hidden>
   <section>
     <h2>Données</h2>
     <div class="card">
       <div class="row"><label>Largeur échelle</label><select id="echSel"></select></div>
-      <div class="row"><label title="Pour les travées créées ensuite — pas des niveaux = H / (N + 1)">Hauteur échelles</label><select id="hautSel"></select></div>
+      <div class="row"><label title="Pour les travées créées ensuite — pas des niveaux = H / (N + 1)">Hauteur travée</label><select id="hautSel"></select></div>
       <div class="row"><label>Longueur lisse</label><select id="lisSel"></select></div>
       <div class="row"><label>Palette</label><select id="palSel" style="width:132px"></select></div>
       <div class="row"><label>Nivx de lisses</label>
@@ -411,6 +493,41 @@ body.share .sharetag{display:block}
           aria-label="Ajouter une travée SUITE (touche +)">SUITE<kbd class="key">+</kbd></button>
       </div>
     </div>
+  </section>
+  </div>
+
+  <section>
+    <h2 style="display:flex;align-items:center;gap:6px">
+      <button type="button" class="btn ghost" id="mNewToggle" title="Replier / déplier" aria-label="Replier / déplier le bloc Nouveau"
+        style="padding:3px;border-radius:5px;flex:0 0 auto">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+          stroke-linecap="round" stroke-linejoin="round" style="transition:transform .15s"><path d="M6 9l6 6 6-6"/></svg>
+      </button>
+      <span style="flex:1 1 auto">Nouveau</span>
+      <button type="button" class="btn ghost" id="mNewBtn" title="Créer un nouveau meuble" aria-label="Créer un nouveau meuble"
+        style="padding:3px;border-radius:5px;flex:0 0 auto">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+      </button>
+    </h2>
+    <div id="propsNew"></div>
+  </section>
+
+  <section id="selSection" hidden>
+    <h2 style="display:flex;align-items:center;gap:6px">
+      <span style="flex:1 1 auto">Meuble sélectionné</span>
+      <button type="button" class="btn ghost" id="mDupMeuble" title="Dupliquer le meuble sélectionné" aria-label="Dupliquer le meuble sélectionné"
+        style="padding:3px;border-radius:5px;flex:0 0 auto">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+          stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/></svg>
+      </button>
+      <button type="button" class="btn ghost danger" id="mDelAll" title="Supprimer le meuble sélectionné" aria-label="Supprimer le meuble sélectionné"
+        style="padding:3px;border-radius:5px;flex:0 0 auto">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M10 4h4"/><path d="M6 7l1 12.2A2 2 0 0 0 9 21h6a2 2 0 0 0 2-1.8L18 7"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+      </button>
+    </h2>
+    <div id="props"></div>
   </section>
 
   <section>
@@ -455,17 +572,24 @@ body.share .sharetag{display:block}
   </div>
 </div>
 
-<div class="modal" id="lblDlg" hidden>
-  <div class="dialog">
-    <h3>Nom de l'étiquette</h3>
-    <p>Ce nom suit la première travée de la file. Vous pouvez déplacer l'étiquette en la glissant sur le plan.</p>
-    <input id="lblVal" type="text" maxlength="28"
-      style="width:100%;margin-top:12px;background:var(--panel-2);border:1px solid var(--line);border-radius:var(--r);padding:9px 11px;font-family:Inter,system-ui,sans-serif">
-    <div class="acts">
-      <button class="btn danger" id="lblDel">Supprimer</button>
-      <button class="btn" id="lblNo">Annuler</button>
-      <button class="btn primary" id="lblYes">Valider</button>
+<div class="modal" id="infoDlg" hidden>
+  <div class="dialog" style="max-width:420px;max-height:84vh;overflow-y:auto">
+    <h3>Nomenclature et informations du plan</h3>
+    <div class="popup-tabs">
+      <h3>Nomenclature</h3>
+      <div class="card" id="bom"></div>
+      <button class="btn" style="width:100%;justify-content:center;margin-top:8px" id="bBom2">Télécharger la nomenclature (CSV)</button>
+      <h3>Récapitulatif</h3>
+      <div class="card" id="stats"></div>
+      <h3>Cotes placées</h3>
+      <div class="card">
+        <div id="coteList"></div>
+        <button class="btn" style="width:100%;justify-content:center;margin-top:10px" id="bCoteClr">Effacer les cotes</button>
+      </div>
+      <h3>Structure JSON</h3>
+      <pre id="json"></pre>
     </div>
+    <div class="acts"><button class="btn primary" id="infoClose">Fermer</button></div>
   </div>
 </div>
 
@@ -512,33 +636,6 @@ body.share .sharetag{display:block}
   </div>
 </main>
 
-<aside class="right">
-  <section>
-    <h2>Propriétés</h2>
-    <div id="props"></div>
-  </section>
-  <section>
-    <h2>Nomenclature</h2>
-    <div class="card" id="bom"></div>
-    <button class="btn" style="width:100%;justify-content:center;margin-top:8px" id="bBom2">Télécharger la nomenclature (CSV)</button>
-  </section>
-  <section>
-    <h2>Cotes placées</h2>
-    <div class="card">
-      <div id="coteList"></div>
-      <button class="btn" style="width:100%;justify-content:center;margin-top:10px" id="bCoteClr">Effacer les cotes</button>
-    </div>
-  </section>
-
-  <section>
-    <h2>Récapitulatif</h2>
-    <div class="card" id="stats"></div>
-  </section>
-  <section>
-    <h2>Structure JSON</h2>
-    <pre id="json"></pre>
-  </section>
-</aside>
 
 <footer>
   <span>Curseur <b class="mono" id="fCur">—</b></span><span class="sep"></span>
@@ -584,7 +681,7 @@ if(SHARE) document.body.classList.add('share');   // mise en page client avant t
 const state = {
   warehouse:{ width:30000, depth:18000, gridSize:100, aisle:3000, back:200 },
   face:'SF',                              // SF = simple-face, DF = deux travées adossées
-  bays:[], selected:[], snap:true, measureMode:false, cotes:[], showTotals:true, showPal:false, sabots:true, deck:false, galva:true, labels:[], texts:[], pallet:800, name:'',
+  bays:[], selected:[], snap:true, measureMode:false, cotes:[], showTotals:true, showPal:false, sabots:true, deck:false, galva:true, gridVisible:true, labelsVisible:true, labels:[], texts:[], pallet:800, name:'',
   upright:100, beam:2700, levels:2, seq:1, runSeq:1,
   rackH:3500                              // hauteur des échelles des nouvelles travées
 };
@@ -593,19 +690,58 @@ const LEVELS = [1,2,3,4,5,6];
 const PALLETS = [800, 1000], PAL_D = 1200, JEU_PAL = 75;   // jeu latéral du configurateur
 const palsOf = b => Math.max(0, Math.floor((b.beam - JEU_PAL)/((b.pallet||800) + JEU_PAL)));
 const RACK_HEIGHTS = Array.from({length:9}, (_,i)=>2000 + i*500);    // 2000 → 6000 mm
-// hauteurs des niveaux de lisses (dessus de lisse) : H / (N + 1), le sol étant le niveau 0
-const levelsY = b => { const n = b.levels || 2;
+// hauteurs des niveaux de lisses (dessus de lisse) : H / (N + 1), le sol étant le niveau 0 —
+// ou, si b.customLevels est défini (formulaire Meuble), ces hauteurs exactes, non réparties.
+const levelsY = b => {
+  if(b.customLevels && b.customLevels.length) return b.customLevels.slice().sort((x,y)=>x-y);
+  const n = b.levels || 2;
   return Array.from({length:n}, (_,i)=> Math.round(b.height*(i+1)/(n+1))); };
 // travée SUITE accrochée à droite de b (même file, angle en contact)
 const nextInRun = b => { const r=(b.rotation||0)*Math.PI/180, w=bayW(b), x=b.x+w*Math.cos(r), y=b.y+w*Math.sin(r);
   return state.bays.find(o=>o!==b && o.run===b.run && o.mode==='suite' && Math.abs(o.x-x)<2 && Math.abs(o.y-y)<2); };
-// hauteur de chaque échelle de la travée (ordre de parts().ladders) :
+// hauteur « automatique » de chaque échelle de la travée (ordre de parts().ladders) :
 // l'échelle de droite, partagée avec la SUITE suivante, prend la plus haute des deux
-const ladderHeights = b => { const n = laddersOf(b), nx = nextInRun(b), out = Array(n).fill(b.height);
+const ladderDefaultHeights = b => { const n = laddersOf(b), nx = nextInRun(b), out = Array(n).fill(b.height);
   if(nx) out[n-1] = Math.max(b.height, nx.height); return out; };
+// hauteur réelle de chaque échelle : la valeur automatique, sauf si l'utilisateur a fixé une
+// hauteur précise pour cette échelle (b.ladderH[i], ex. échelles de rive plus hautes que les
+// intermédiaires) — dans ce cas la valeur imposée gagne, y compris sur l'échelle partagée.
+const ladderHeights = b => { const out = ladderDefaultHeights(b);
+  if(b.ladderH) out.forEach((_,i)=>{ if(b.ladderH[i]!=null) out[i] = b.ladderH[i]; });
+  return out; };
 
 const C = { blue:'#3b82f6', blueDark:'#1d4ed8', orange:'#f97316', orangeDark:'#b4520c',
   accent:'#38bdf8', grid:'#18222f', gridMajor:'#22303f', floor:'#0d131b', wall:'#2b3a4f', lbl:'#556982', txt:'#e6edf7' };
+// mode sombre/blanc (test) : variantes des couleurs du plan 2D (fond canvas en CSS, voir --canvas)
+const C_DARK = {...C};
+const C_LIGHT = { grid:'#c7cfd9', gridMajor:'#a9b4c2', floor:'#ffffff', wall:'#aab4c2', lbl:'#5b6b82', txt:'#1b2330' };
+const ICON_MOON = '<path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"/>';
+const ICON_SUN = '<circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.9 4.9 1.4 1.4"/><path d="m17.7 17.7 1.4 1.4"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.3 17.7-1.4 1.4"/><path d="m19.1 4.9-1.4 1.4"/>';
+function applyTheme(light, redraw){
+  document.body.dataset.theme = light ? 'light' : 'dark';
+  Object.assign(C, light ? C_LIGHT : C_DARK);
+  const btn = document.getElementById('bTheme');
+  btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${light ? ICON_MOON : ICON_SUN}</svg>`;
+  try{ localStorage.setItem('rkpTheme', light ? 'light' : 'dark'); }catch(e){}
+  if(redraw){ drawGrid(); buildItems(); drawDims(state.selected.length===1?state.bays.find(b=>b.id===state.selected[0]):null,false); }
+}
+document.getElementById('bTheme').onclick = ()=>applyTheme(document.body.dataset.theme!=='light', true);
+(function(){ let saved='dark'; try{ saved = localStorage.getItem('rkpTheme')||'dark'; }catch(e){} applyTheme(saved==='light', false); })();
+
+// replier / déplier un bloc (bouton chevron dans son <h2>) : ne garde que le titre visible
+function wireCollapse(btnId, contentId, startCollapsed){
+  const btn = document.getElementById(btnId), content = document.getElementById(contentId);
+  if(!btn || !content) return;
+  const svg = btn.querySelector('svg');
+  btn.onclick = ()=>{
+    const open = content.style.display !== 'none';
+    content.style.display = open ? 'none' : '';
+    svg.style.transform = open ? 'rotate(-90deg)' : '';
+  };
+  if(startCollapsed){ content.style.display = 'none'; svg.style.transform = 'rotate(-90deg)'; }
+}
+wireCollapse('whToggle', 'whCard', true);
+wireCollapse('mNewToggle', 'propsNew', true);
 
 /* ---------- Konva ---------- */
 const host = document.getElementById('stage');
@@ -684,11 +820,13 @@ function drawGrid(){
   const W=state.warehouse.width, D=state.warehouse.depth, g=state.warehouse.gridSize, s=scale();
   lGrid.add(new Konva.Rect({x:0,y:0,width:W,height:D,fill:C.floor,stroke:C.wall,strokeWidth:24,
     shadowColor:'#000',shadowBlur:40,shadowOpacity:.5}));
-  const px = g*s, step = px < 5 ? g*Math.ceil(5/px) : g, major = 1000;
-  for(let x=0;x<=W;x+=step) lGrid.add(new Konva.Line({points:[x,0,x,D],
-    stroke:x%major===0?C.gridMajor:C.grid, strokeWidth:(x%major===0?1.5:1)/s}));
-  for(let y=0;y<=D;y+=step) lGrid.add(new Konva.Line({points:[0,y,W,y],
-    stroke:y%major===0?C.gridMajor:C.grid, strokeWidth:(y%major===0?1.5:1)/s}));
+  if(state.gridVisible){
+    const px = g*s, step = px < 5 ? g*Math.ceil(5/px) : g, major = 1000;
+    for(let x=0;x<=W;x+=step) lGrid.add(new Konva.Line({points:[x,0,x,D],
+      stroke:x%major===0?C.gridMajor:C.grid, strokeWidth:(x%major===0?1.5:1)/s}));
+    for(let y=0;y<=D;y+=step) lGrid.add(new Konva.Line({points:[0,y,W,y],
+      stroke:y%major===0?C.gridMajor:C.grid, strokeWidth:(y%major===0?1.5:1)/s}));
+  }
   const mkLbl = text=>{ const t = new Konva.Text({text, fontSize:11, fontFamily:'Inter', fill:C.lbl});
     t.scale({x:1/s, y:1/s}); return t; };
   // graduations horizontales : centrées sur leur trait
@@ -742,6 +880,14 @@ function buildItems(){
       t.scale({x:1/s,y:1/s});
       t.position({ x: w/2 - (t.width()/s)/2, y: h/2 - (t.height()/s)/2 });
       g.add(t);
+    }
+    // repère T1, T2… sous la travée, comme en vue 3D
+    if(!state.showPal){
+      const tn = new Konva.Text({ text:`T${runBaysOf(b.run).indexOf(b)+1}`, fontSize:11,
+        fontFamily:'Inter', fontStyle:'700', fill: sel?'#bfe9ff':'#7f94b0', listening:false });
+      tn.scale({x:1/s,y:1/s});
+      tn.position({ x: w/2 - (tn.width()/s)/2, y: h + 6/s });
+      g.add(tn);
     }
     g.on('dragstart', ()=>{
       if(!state.selected.includes(b.id)) selectLive([b.id]);
@@ -992,20 +1138,24 @@ function firstBay(run){
   return list.reduce((a,b)=> (b.x < a.x || (b.x===a.x && b.y < a.y)) ? b : a);
 }
 const LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-function nextLabelName(){
-  const used = new Set(state.labels.map(l=>l.text));
-  for(const c of LETTERS){ const n = 'Rack '+c; if(!used.has(n)) return n; }
-  return 'Rack '+(state.labels.length+1);
-}
 let selLabel = null;   // id de l'étiquette cliquée (sélection indépendante des travées, pour Suppr)
 function drawLabels(){
   lLab.destroyChildren();
+  if(!state.labelsVisible){ lLab.batchDraw(); return; }
   const s = scale();
-  state.labels.forEach(l=>{
+  // une étiquette par meuble (1 par paire de files en double-face) : le nom saisi,
+  // ou à défaut la lettre auto (A, B, C…) — matérialisée via setNameOfRun si on l'édite/déplace
+  const seen = new Set();
+  state.bays.forEach(bay=>{
+    if(bay.mode!=='depart' || seen.has(bay.run)) return;
+    const partner = partnerRunOf(bay);
+    seen.add(bay.run); if(partner) seen.add(partner);
+    const l = state.labels.find(x=>x.run===bay.run) || (partner && state.labels.find(x=>x.run===partner))
+      || { run:bay.run, text:runLabel(bay.run), dx:0, dy:-1500, virtual:true };
     const b = firstBay(l.run); if(!b) return;
     const a = aabb(b);
-    const sel = l.id === selLabel;
-    const g = new Konva.Group({ x:a.x1 + l.dx, y:a.y1 + l.dy, draggable:true, id:'lab-'+l.id });
+    const sel = l.id && l.id === selLabel;
+    const g = new Konva.Group({ x:a.x1 + l.dx, y:a.y1 + l.dy, draggable:true, id:'lab-'+(l.id||l.run) });
     const t = new Konva.Text({ text:l.text, fontSize:15/s, fontStyle:'700',
       fontFamily:'Inter, sans-serif', fill:'#0b1220', padding:6/s });
     const bg = new Konva.Rect({ width:t.width(), height:t.height(), fill:'#fbbf24',
@@ -1017,13 +1167,17 @@ function drawLabels(){
       stroke:'#fbbf24', strokeWidth:1/s, dash:[8/s,6/s], opacity:.45, listening:false }));
     g.on('mouseenter', ()=>{ stage.container().style.cursor='move'; });
     g.on('mouseleave', ()=>{ stage.container().style.cursor = state.measureMode?'crosshair':'default'; });
-    g.on('dragend', ()=>{ const f = firstBay(l.run); if(!f) return; const aa = aabb(f);
-      l.dx = Math.round(g.x() - aa.x1); l.dy = Math.round(g.y() - aa.y1);
-      drawLabels(); renderJSON(); });
+    g.on('dragend', ()=>{
+      const f = firstBay(l.run); if(!f) return; const aa = aabb(f);
+      const dx = Math.round(g.x() - aa.x1), dy = Math.round(g.y() - aa.y1);
+      setNameOfRun(l.run, l.text);   // matérialise l'étiquette auto en vraie entrée au premier déplacement
+      const real = state.labels.find(x=>x.run===l.run); if(real){ real.dx = dx; real.dy = dy; }
+      drawLabels(); renderJSON();
+    });
     g.on('dblclick dbltap', e=>{ e.cancelBubble = true; editLabelInline(l, g); });
     // selectLive (pas select) : ne détruit pas les nœuds d'étiquette, sinon le double-clic
     // qui suit rate son second clic (nœud recréé = hit-test caduc, cf. markLabelSel ci-dessus)
-    g.on('click tap', e=>{ e.cancelBubble = true; selectLive([]); selLabel = l.id; markLabelSel(); });
+    g.on('click tap', e=>{ e.cancelBubble = true; selectLive([]); selLabel = l.id||null; markLabelSel(); });
     lLab.add(g);
   });
   lLab.batchDraw();
@@ -1053,7 +1207,7 @@ function editLabelInline(l, g){
   let done = false;
   const finish = commit=>{
     if(done) return; done = true; inp.remove();
-    if(commit){ const v = inp.value.trim(); if(v && v!==l.text){ l.text = v; renderJSON(); toast('Étiquette renommée : '+v); } }
+    if(commit){ const v = inp.value.trim(); if(v && v!==l.text){ setNameOfRun(l.run, v); toast('Étiquette renommée : '+v); } }
     drawLabels();
   };
   inp.addEventListener('keydown', e=>{
@@ -1062,36 +1216,6 @@ function editLabelInline(l, g){
   });
   inp.addEventListener('blur', ()=>finish(true));
 }
-let lblEdit = null;
-function openLblDlg(l){
-  lblEdit = l;
-  const i = document.getElementById('lblVal');
-  i.value = l.text;
-  document.getElementById('lblDlg').hidden = false;
-  i.focus(); i.select();
-}
-function closeLblDlg(){ document.getElementById('lblDlg').hidden = true; lblEdit = null; }
-function addLabel(){
-  if(state.measureMode) return toast("Désactivez l'outil Mesurer avant d'ajouter une étiquette");
-  if(!state.bays.length) return toast('Ajoutez une travée avant de poser une étiquette');
-  const sel = state.bays.filter(b=>state.selected.includes(b.id));
-  const runs = sel.length ? [...new Set(sel.map(b=>b.run))]
-                          : [...new Set(state.bays.map(b=>b.run))];
-  const created = [];
-  runs.forEach(r=>{
-    if(state.labels.some(l=>l.run===r)) return;
-    const l = { id:'ETQ-'+String(state.labels.length+1).padStart(3,'0'), run:r,
-      text:nextLabelName(), dx:0, dy:-1500 };
-    state.labels.push(l); created.push(l);
-  });
-  drawLabels(); renderJSON();
-  if(!created.length) return notice("Ce rack a déjà une étiquette — double-clic dessus pour la renommer ou sélectionnez un autre rack");
-  toast(created.length===1
-    ? 'Étiquette « '+created[0].text+' » ajoutée — glissez-la, double-clic pour la renommer'
-    : created.length+' étiquettes ajoutées — double-clic sur une étiquette pour la renommer');
-  if(created.length===1) openLblDlg(created[0]);
-}
-
 /* ---------- Annotations texte libres (plan 2D + PDF, pas de fond ni de cadre) ---------- */
 let selTxt = null;   // id de l'annotation sélectionnée (cadre rouge + ✎/✕) ; exclu du PDF à l'impression
 function drawTexts(){
@@ -1215,7 +1339,9 @@ function addDepart(x, y, run){
   const p = (x===undefined) ? freeSpot() : {x,y};
   const b = { id:uid(), mode:'depart', x:snapV(p.x), y:snapV(p.y), upright:state.upright, beam:state.beam,
     levels:state.levels, height:state.rackH, pallet:state.pallet, depth:DEPTH, section:SECTION, rotation:0, run: run || ('R'+state.runSeq++), deck:state.deck };
-  state.bays.push(b); return b;
+  state.bays.push(b);
+  setNameOfRun(b.run, runLabel(b.run));   // valide d'emblée la lettre auto (A, B, C…) comme vrai nom, pas juste un repère
+  return b;
 }
 // SUITE : chaînée sur la dernière travée de la file (contact d'angle garanti)
 function addSuite(prev){
@@ -1318,82 +1444,434 @@ function select(ids){
   document.getElementById('fSel').textContent = ids.length;
   renderProps(); refreshList(); refresh3D();
 }
+/* ---------- Formulaire « Meuble » : remplace Données + Ajouter une travée + Propriétés.
+   Un meuble = une file (b.run), + son éventuelle file adossée (double-face). Toujours construit
+   travée par travée via addDepart()/addSuiteToRun()/removeLastSuite() : seule la façon de saisir
+   les dimensions change, pas le mécanisme de construction. ---------- */
+const runBaysOf = run => state.bays.filter(b=>b.run===run);   // ordre de chaînage = ordre de création
+function partnerRunOf(depart){
+  const tol = 60, rw = bayW(depart);
+  const o = state.bays.find(x => x.run !== depart.run && x.mode==='depart'
+    && (x.rotation||0) === (depart.rotation||0)
+    && (Math.abs(x.y - (depart.y + DEPTH + back())) <= tol || Math.abs(depart.y - (x.y + DEPTH + back())) <= tol)
+    && Math.max(depart.x, x.x) < Math.min(depart.x + rw, x.x + bayW(x)));
+  return o ? o.run : null;
+}
+function moveRun(run, dx, dy){
+  state.bays.filter(b=>b.run===run).forEach(b=>{ b.x = Math.round(b.x+dx); b.y = Math.round(b.y+dy); });
+}
+// nom par défaut du meuble (A, B, C... selon l'ordre de création) utilisé tant qu'aucun nom n'est saisi
+function runLabel(run){
+  const order = []; state.bays.forEach(b=>{ if(!order.includes(b.run)) order.push(b.run); });
+  let n = order.indexOf(run); if(n<0) return run;
+  let s = ''; do { s = String.fromCharCode(65+(n%26))+s; n = Math.floor(n/26)-1; } while(n>=0);
+  return s;
+}
+function nameOfRun(run){ const l = state.labels.find(x=>x.run===run); return l ? l.text : ''; }
+// label du meuble auquel appartient une travée (nom saisi, ou celui de la face adossée en DF, sinon la lettre par défaut)
+function meubleLabelOf(b){
+  const depart = runBaysOf(b.run).find(x=>x.mode==='depart') || runBaysOf(b.run)[0];
+  const partner = depart ? partnerRunOf(depart) : null;
+  return nameOfRun(b.run) || (partner && nameOfRun(partner)) || runLabel(b.run);
+}
+function setNameOfRun(run, text){
+  text = String(text||'').trim();
+  let l = state.labels.find(x=>x.run===run);
+  if(!text){ if(l) state.labels = state.labels.filter(x=>x!==l); drawLabels(); renderJSON(); return; }
+  if(l) l.text = text;
+  else state.labels.push({ id:'ETQ-'+String(state.labels.length+1).padStart(3,'0'), run, text, dx:0, dy:-1500 });
+  drawLabels(); renderJSON();
+}
+function setLadderH(b, idx, val){   // val = null -> Auto
+  if(!b.ladderH) b.ladderH = Array(laddersOf(b)).fill(null);
+  b.ladderH[idx] = val;
+  if(b.ladderH.every(v=>v==null)) b.ladderH = undefined;
+}
+function parseNiveaux(s){ return String(s).split(/[;,\s]+/).map(Number).filter(n=>n>0).sort((a,b)=>a-b); }
+// +/- sur le nombre de niveaux : prolonge/retire le dernier niveau en gardant le pas en cours
+function bumpNiveaux(b, delta){
+  // redivise toujours les niveaux à parts égales sur la hauteur (formule standard H*(i+1)/(n+1))
+  const n = Math.min(6, Math.max(1, levelsY(b).length + delta));
+  b.customLevels = undefined; b.levels = n;
+}
+// les 2 échelles qui encadrent VRAIMENT une travée (gauche + droite) — pour une travée SUITE,
+// l'échelle de gauche est en fait dessinée/partagée par la travée précédente et n'apparaît donc
+// pas dans ladderHeights(b) (qui ne donne que ses propres échelles) ; on va la chercher ici.
+function bayLadderBounds(b){
+  const own = ladderHeights(b);
+  if(b.mode!=='suite') return own;
+  const bays = runBaysOf(b.run), idx = bays.indexOf(b);
+  if(idx<=0) return own;
+  const prev = bays[idx-1];
+  return [ladderHeights(prev)[laddersOf(prev)-1], ...own];
+}
+// bouton "+" de la vue de face : ajoute un niveau tout en haut, à la hauteur de l'échelle la
+// plus basse de la travée (gauche ou droite) ; renvoie false si aucune place (déjà au sommet).
+function addTopLevel(b){
+  const levels = levelsY(b).slice(), top = levels[levels.length-1] || 0;
+  const v = Math.round(Math.min(...bayLadderBounds(b))/50)*50;
+  if(v <= top + 100) return false;
+  levels.push(v);
+  b.customLevels = levels; b.levels = levels.length;
+  return true;
+}
+// croix de suppression d'un niveau (vue de face) : retire la lisse d'idx ; refuse s'il n'en reste qu'une
+function removeLevel(b, idx){
+  const levels = levelsY(b).slice();
+  if(levels.length<=1) return false;
+  levels.splice(idx,1);
+  b.customLevels = levels; b.levels = levels.length;
+  return true;
+}
+// bouton "=" (vue de face) : répartit les n niveaux à hauteurs égales — hauteur d'échelle (la plus
+// basse des deux) divisée par (n+1), pour garder un dégagement au-dessus du dernier niveau
+function equalizeLevels(b){
+  const n = levelsY(b).length, step = Math.min(...bayLadderBounds(b)) / (n+1);
+  b.customLevels = Array.from({length:n}, (_,i)=>Math.round(step*(i+1)/50)*50);
+  b.levels = n;
+}
+// vue de face du meuble (toutes les travées d'une file, échelles + lisses à leur hauteur réelle)
+function elevSVG(bays, availW){
+  if(!bays.length) return '';
+  let cx = 0; const offs = bays.map(b=>{ const o = cx; cx += bayW(b); return o; });
+  const totalW = cx || 1;
+  const maxH = Math.max(1, ...bays.map(b=>Math.max(...ladderHeights(b))));
+  const ml=22, mr=12, mt=24, mb=4;   // mt agrandi : évite que la hauteur d'échelle (texte tout en haut) soit coupée
+  // le bloc "vue de face" a une hauteur fixe (.svgbox) : l'échelle vise cette hauteur, mais est
+  // réduite si besoin pour que toutes les travées tiennent dans la largeur dispo, sans jamais
+  // dépasser le bloc ni défiler — hauteur affichée proportionnellement plus petite si le meuble est large
+  const scH = 230/maxH;
+  const scW = availW ? Math.max(0.02, (availW-ml-mr-4)/totalW) : scH;
+  const sc = Math.min(scH, scW);
+  const W = Math.round(totalW*sc+ml+mr), H = Math.round(maxH*sc+mt+mb);
+  const X = v => +(ml+v*sc).toFixed(1), Z = v => +(mt+(maxH-v)*sc).toFixed(1);
+  // data-sc/mt/maxh : pour que le glisser-déposer (wireElevDrag) puisse reconvertir une position
+  // écran en hauteur mm, en inversant exactement la formule de Z(v) ci-dessus.
+  let g = `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="Vue de face du meuble"
+    data-sc="${sc}" data-mt="${mt}" data-maxh="${maxH}">`;
+  g += `<line x1="${X(0)}" x2="${X(totalW)}" y1="${Z(0)}" y2="${Z(0)}" stroke="rgba(143,160,184,.45)"/>`;
+  bays.forEach((b,i)=>{
+    const p = parts(b);
+    const lvls = levelsY(b);
+    lvls.forEach((v,vi)=>{
+      const x1=offs[i]+p.beams[0].x, x2=x1+b.beam, ry=Z(v), rh=Math.max(3,b.section*sc), rx=X(x1), rw=X(x2)-X(x1);
+      g += `<g class="elevLevel" data-bay="${i}" data-level="${vi}" style="cursor:ns-resize;touch-action:none">
+        <rect x="${rx}" y="${ry-7}" width="${rw}" height="${rh+14}" fill="transparent"/>
+        <rect x="${rx}" y="${ry}" width="${rw}" height="${rh}" fill="${C.orange}" stroke="${C.orangeDark}"><title>Lisse ${b.beam} mm — niveau ${v} mm (glisser pour déplacer)</title></rect>
+      </g>`;
+      g += `<text x="${(rx+rx+rw)/2}" y="${ry-3}" font-size="10" fill="#8fa0b8" text-anchor="middle" font-family="Inter,sans-serif">${v}</text>`;
+      // bouton "−" de suppression, posé sur la lisse elle-même à son extrémité droite (jamais sur
+      // la travée suivante) ; hors groupe .elevLevel pour que ce soit un clic simple, pas un glisser
+      if(lvls.length>1){
+        const dcx=rx+rw-10, dcy=ry+rh/2;
+        g += `<g class="elevDelLevel" data-bay="${i}" data-level="${vi}" style="cursor:pointer">
+          <circle cx="${dcx}" cy="${dcy}" r="6" fill="#fff" stroke="#c0392b" stroke-width="1.4"><title>Supprimer ce niveau</title></circle>
+          <text x="${dcx}" y="${dcy+3.2}" font-size="10" font-weight="700" fill="#c0392b" text-anchor="middle" font-family="Inter,sans-serif" style="pointer-events:none">−</text>
+        </g>`;
+      }
+    });
+    // bouton "+" au-dessus du dernier niveau : n'apparaît que s'il reste de la place sous le
+    // sommet de l'échelle la plus basse (même logique que addTopLevel, pour rester cohérents)
+    { const levels = levelsY(b), top = levels[levels.length-1] || 0, addV = Math.round(Math.min(...bayLadderBounds(b))/50)*50;
+      if(addV > top + 100){
+        const x1=offs[i]+p.beams[0].x, x2=x1+b.beam, acx=(X(x1)+X(x2))/2, acy=Z(top)-18;
+        g += `<g class="elevAddLevel" data-bay="${i}" style="cursor:pointer">
+          <circle cx="${acx}" cy="${acy}" r="7" fill="#fff" stroke="${C.blue}" stroke-width="1.5"><title>Ajouter un niveau tout en haut (au niveau de l'échelle la plus basse)</title></circle>
+          <text x="${acx}" y="${acy+3.5}" font-size="11" font-weight="700" fill="${C.blue}" text-anchor="middle" font-family="Inter,sans-serif" style="pointer-events:none">+</text>
+        </g>`;
+      }
+    }
+    // bouton "=" en bas à droite de la travée : répartit les niveaux à hauteurs égales
+    { const n = lvls.length, x2b = offs[i]+p.beams[0].x+b.beam, ecx = X(x2b)-12, ecy = Z(0)-14;
+      g += `<g class="elevEqualize" data-bay="${i}" style="cursor:pointer">
+        <circle cx="${ecx}" cy="${ecy}" r="7" fill="#fff" stroke="${C.blue}" stroke-width="1.5"><title>Répartir les ${n} niveau${n>1?'x':''} à hauteurs égales</title></circle>
+        <text x="${ecx}" y="${ecy+3.5}" font-size="11" font-weight="700" fill="${C.blue}" text-anchor="middle" font-family="Inter,sans-serif" style="pointer-events:none">=</text>
+      </g>`;
+    }
+    p.ladders.forEach((r,j)=>{
+      const lx = X(offs[i]+r.x+r.w/2), h = ladderHeights(b)[j];
+      g += `<g class="elevLadder" data-bay="${i}" data-ladder="${j}" style="cursor:ns-resize;touch-action:none">
+        <line x1="${lx}" x2="${lx}" y1="${Z(0)}" y2="${Z(h)}" stroke="${C.blue}" stroke-width="4"/>
+        <circle cx="${lx}" cy="${Z(h)}" r="7" fill="${C.blue}" stroke="#fff" stroke-width="1.5"><title>Échelle ${h} mm (glisser pour changer la hauteur)</title></circle>
+      </g>`;
+      g += `<text x="${lx}" y="${Z(h)-9}" font-size="10" fill="#8fa0b8" text-anchor="middle" font-family="Inter,sans-serif">${h}</text>`;
+    });
+  });
+  return g+'</svg>';
+}
+// glisser-déposer sur la vue de face (#meubleElev) : déplace la hauteur d'une échelle (data-ladder)
+// ou d'un niveau de lisse (data-level) directement à la souris, sans passer par les sélecteurs.
+// branché UNE fois sur le conteneur (survit aux redraw() qui ne remplacent que son contenu).
+function wireElevDrag(el, run){
+  let active = null;
+  const snap = v => Math.round(v/50)*50;
+  const toMM = (svg, clientY) => {
+    const ctm = svg.getScreenCTM(); if(!ctm) return null;
+    const pt = svg.createSVGPoint(); pt.x = 0; pt.y = clientY;
+    const y = pt.matrixTransform(ctm.inverse()).y;
+    return +svg.dataset.maxh - (y - +svg.dataset.mt) / +svg.dataset.sc;
+  };
+  const liveRedraw = ()=>{ el.innerHTML = elevSVG(runBaysOf(run), el.clientWidth); };
+  el.addEventListener('pointerdown', e=>{
+    const g = e.target.closest('.elevLadder,.elevLevel');
+    if(!g) return;
+    e.preventDefault();
+    const isLadder = g.classList.contains('elevLadder');
+    active = { bi:+g.dataset.bay, isLadder, idx:+(isLadder?g.dataset.ladder:g.dataset.level) };
+    el.setPointerCapture(e.pointerId);
+  });
+  el.addEventListener('pointermove', e=>{
+    if(!active) return;
+    const svg = el.querySelector('svg'); if(!svg) return;
+    let v = toMM(svg, e.clientY); if(v==null) return;
+    const b = runBaysOf(run)[active.bi]; if(!b) return;
+    if(active.isLadder){
+      // plancher : jamais en dessous du niveau le plus haut qu'elle porte — ni celui de sa propre
+      // travée, ni (si c'est l'échelle partagée, dernier index) celui de la travée suivante —
+      // sinon les lisses dépassent le sommet de l'échelle et ne tiennent plus dans le vide
+      let minH = Math.max(500, ...levelsY(b));
+      if(active.idx === laddersOf(b)-1){ const nx = nextInRun(b); if(nx) minH = Math.max(minH, ...levelsY(nx)); }
+      // calée sur 500 mm, dans RACK_HEIGHTS : une hauteur d'échelle doit rester une référence de
+      // la nomenclature, sinon on ne la retrouve plus dans la liste des hauteurs disponibles
+      const rackMax = RACK_HEIGHTS[RACK_HEIGHTS.length-1];
+      const floor = RACK_HEIGHTS.find(h=>h>=minH) ?? rackMax;
+      v = Math.max(floor, Math.min(rackMax, Math.round(v/500)*500));
+      setLadderH(b, active.idx, v);
+    } else {
+      v = snap(v);
+      const levels = levelsY(b).slice(), idx = active.idx;
+      const lo = idx>0 ? levels[idx-1]+100 : 100;
+      const hi = idx<levels.length-1 ? levels[idx+1]-100 : Math.min(...bayLadderBounds(b))-100;
+      levels[idx] = Math.max(lo, Math.min(hi, v));
+      b.customLevels = levels; b.levels = levels.length;
+    }
+    liveRedraw();
+  });
+  const end = ()=>{
+    if(!active) return; active = null;
+    buildItems(); drawDims(null,false); refreshList(); renderJSON(); renderStats(); refresh3D(); renderProps();
+  };
+  el.addEventListener('pointerup', end);
+  el.addEventListener('pointercancel', end);
+  el.addEventListener('click', e=>{
+    const addG = e.target.closest('.elevAddLevel');
+    if(addG){
+      const b = runBaysOf(run)[+addG.dataset.bay]; if(!b) return;
+      if(addTopLevel(b)){ buildItems(); drawDims(null,false); refreshList(); renderJSON(); renderStats(); refresh3D(); renderProps(); }
+      return;
+    }
+    const delG = e.target.closest('.elevDelLevel');
+    if(delG){
+      const b = runBaysOf(run)[+delG.dataset.bay]; if(!b) return;
+      if(removeLevel(b, +delG.dataset.level)){ buildItems(); drawDims(null,false); refreshList(); renderJSON(); renderStats(); refresh3D(); renderProps(); }
+      return;
+    }
+    const eqG = e.target.closest('.elevEqualize');
+    if(eqG){
+      const b = runBaysOf(run)[+eqG.dataset.bay]; if(!b) return;
+      equalizeLevels(b);
+      buildItems(); drawDims(null,false); refreshList(); renderJSON(); renderStats(); refresh3D(); renderProps();
+    }
+  });
+}
 function renderProps(){
   updateSuiteBtns();
+  renderNewMeubleForm(document.getElementById('propsNew'));   // bloc « Nouveau » : toujours visible, reflète le prochain meuble
   const box = document.getElementById('props');
-  if(!state.selected.length){
-    box.innerHTML = '<p class="empty">Sélectionnez une travée pour éditer sa position, son gabarit et son orientation.</p>'; return; }
-  if(state.selected.length>1){
-    box.innerHTML = `<div class="card"><h3>${state.selected.length} travées sélectionnées</h3>
-      <p>Rotation, duplication et suppression s'appliquent à l'ensemble.</p></div>`; return; }
-  const b = state.bays.find(x=>x.id===state.selected[0]); if(!b) return;
-  box.innerHTML = `<div class="card">
-    <h3><i class="swatch" style="background:${b.mode==='depart'?'var(--blue)':'var(--orange)'}"></i>${b.id}</h3>
-    <div class="row"><label>Largeur échelle</label><select id="pU">${UPRIGHTS.map(v=>`<option ${v===b.upright?'selected':''}>${v}</option>`).join('')}</select></div>
-    <div class="row"><label>Hauteur échelle</label><select id="pH">${RACK_HEIGHTS.map(v=>`<option ${v===b.height?'selected':''}>${v}</option>`).join('')}</select></div>
-    <div class="row"><label>Longueur lisse</label><select id="pB">${BEAMS.map(v=>`<option ${v===b.beam?'selected':''}>${v}</option>`).join('')}</select></div>
-    <div class="row"><label>Palette</label><select id="pP" style="width:132px">${PALLETS.map(v=>`<option value="${v}" ${v===b.pallet?'selected':''}>${v}×1200</option>`).join('')}</select></div>
-    <div class="row"><label>Palettes / niveau</label><span class="val mono">${palsOf(b)}</span></div>
-    <div class="row"><label>Nivx de lisses</label>
-      <div class="stepper">
-        <button type="button" id="pLMinus" aria-label="Moins de niveaux">−</button>
-        <span class="sv">${b.levels} niv.</span>
-        <button type="button" id="pLPlus" aria-label="Plus de niveaux">+</button>
-      </div></div>
-    <div class="row"><label>Mode</label><select id="pM">
-      <option value="depart" ${b.mode==='depart'?'selected':''}>DÉPART</option>
-      <option value="suite" ${b.mode==='suite'?'selected':''}>SUITE</option></select></div>
-    <div class="row"><label>Rotation (°)</label>
-      <div class="stepper">
-        <button type="button" id="pRMinus" title="Rotation −15°" aria-label="Rotation moins 15 degrés">−</button>
-        <input type="number" class="sv" id="pR" step="15" value="${Math.round(b.rotation||0)}"
-          aria-label="Rotation en degrés">
-        <button type="button" id="pRPlus" title="Rotation +15°" aria-label="Rotation plus 15 degrés">+</button>
-      </div></div>
-    ${b.mode==='depart' ? `<div class="row"><label>Travées SUITE</label>
-      <div class="stepper">
-        <button type="button" id="pSMinus" title="Retirer la dernière travée SUITE" aria-label="Retirer une travée SUITE">−</button>
-        <span class="sv" id="pSVal">${suitesOf(b.run).length}</span>
-        <button type="button" id="pSPlus" title="Ajouter une travée SUITE" aria-label="Ajouter une travée SUITE">+</button>
-      </div></div>` : ''}
-    <div class="row"><label>Plancher fil</label><input type="checkbox" id="pDeck" ${b.deck===true?'checked':''}></div>
-    <div class="row"><label>Profondeur</label><span class="val mono">1100 mm</span></div>
-    <div class="row"><label>Pas des niveaux</label><span class="val mono">${fmt(b.height/((b.levels||2)+1))} mm</span></div>
-    <div class="row"><label style="white-space:nowrap">POS.</label>
-      <span class="val mono" style="white-space:nowrap;color:var(--txt-dim)"><input type="number" class="plainnum"
-        id="pX" step="${state.warehouse.gridSize}" value="${Math.round(b.x)}" aria-label="Position X en mm"> x <input
-        type="number" class="plainnum" id="pY" step="${state.warehouse.gridSize}" value="${Math.round(b.y)}"
-        aria-label="Position Y en mm"> mm</span></div>
-  </div>`;
-  const upd = ()=>{
-    b.x=+document.getElementById('pX').value; b.y=+document.getElementById('pY').value;
-    b.rotation=+document.getElementById('pR').value;
-    b.upright=+document.getElementById('pU').value; b.beam=+document.getElementById('pB').value;
-    b.height=+document.getElementById('pH').value; b.mode=document.getElementById('pM').value;
-    b.pallet=+document.getElementById('pP').value;
-    b.deck=document.getElementById('pDeck').checked;
-    buildItems(); drawDims(b,false); refreshList(); renderJSON(); renderProps();
-  };
-  ['pX','pY','pR','pU','pH','pB','pP','pM','pDeck'].forEach(id=>document.getElementById(id).addEventListener('change',upd));
-  // niveaux : même curseur − / + que le bloc Données
-  const li = LEVELS.indexOf(b.levels), lm = document.getElementById('pLMinus'), lp = document.getElementById('pLPlus');
-  lm.disabled = li <= 0; lp.disabled = li >= LEVELS.length-1;
-  lm.onclick = ()=>{ b.levels = LEVELS[li-1]; upd(); };
-  lp.onclick = ()=>{ b.levels = LEVELS[li+1]; upd(); };
-  const rp = document.getElementById('pRPlus'), rm = document.getElementById('pRMinus');
-  const bumpRot = d => {
-    const f = document.getElementById('pR');
-    f.value = ((Math.round(+f.value || 0) + d) % 360 + 360) % 360;
-    upd();
-  };
-  rp.onclick = ()=> bumpRot(15);
-  rm.onclick = ()=> bumpRot(-15);
-  const sp = document.getElementById('pSPlus'), sm = document.getElementById('pSMinus');
-  if(sp && sm){
-    sm.disabled = !suitesOf(b.run).length;   // plus de SUITE : le « − » ne fait plus rien
-    sp.onclick = ()=> addSuiteToRun(b);
-    sm.onclick = ()=> removeLastSuite(b);
+  const selSection = document.getElementById('selSection');
+  const sel = state.selected.map(id=>state.bays.find(b=>b.id===id)).filter(Boolean);
+  const runs = new Set(sel.map(b=>b.run));
+  selSection.hidden = !sel.length;
+  if(!sel.length){ box.innerHTML=''; document.getElementById('meubleElev')?.remove(); return; }
+  if(runs.size > 1){
+    box.innerHTML = `<div class="card"><p>${sel.length} travées de ${runs.size} meubles différents sont sélectionnées.</p>
+      <p>Rotation, duplication et suppression (barre d'outils) s'appliquent à toute la sélection. Cliquez une seule travée dans la liste ci-dessous pour éditer un meuble.</p></div>`;
+    document.getElementById('meubleElev')?.remove();
+    return;
   }
+  const run = [...runs][0];
+  const bays = runBaysOf(run);
+  const depart = bays.find(x=>x.mode==='depart') || bays[0];
+  const partner = partnerRunOf(depart);
+  const last = bays[bays.length-1];
+  box.innerHTML = `<div class="card">
+    <div class="mhead">
+      <label class="narrow">Nom<input type="text" id="mName" value="${(nameOfRun(run)||'').replace(/"/g,'&quot;')}" placeholder="${runLabel(run)}" maxlength="24"></label>
+      <label class="narrow">Origine X<input type="number" id="mX0" step="${state.warehouse.gridSize}" value="${Math.round(depart.x)}"></label>
+      <label class="mrot">Rotation<div class="stepper">
+        <button type="button" id="mRMinus">−</button>
+        <span class="sv" id="mRVal">${Math.round(depart.rotation||0)}°</span>
+        <button type="button" id="mRPlus">+</button>
+      </div></label>
+    </div>
+    <div class="fieldcap">Largeur et hauteur de l'échelle :</div>
+    <div class="mhead">
+      <label class="narrow"><select id="mU" aria-label="Largeur échelle">${UPRIGHTS.map(v=>`<option ${v===depart.upright?'selected':''}>${v}</option>`).join('')}</select></label>
+      <label class="narrow" title="Échelle de départ (tout à gauche du meuble)"><select id="mDep" aria-label="Hauteur 1ère échelle">${RACK_HEIGHTS.map(v=>`<option value="${v}" ${v===ladderHeights(depart)[0]?'selected':''}>${v}</option>`).join('')}</select></label>
+      <span style="flex:0 0 auto;align-self:center;background:#f2f5f9;border:1px solid var(--line);
+        border-radius:6px;padding:5px 8px;color:var(--txt-dim);font-size:var(--text-sm);white-space:nowrap"
+        title="Profondeur (fixe)">P.${DEPTH}</span>
+      <label class="mface" title="Simple face"><input type="checkbox" id="mFaceSF" ${partner?'':'checked'}>SF</label>
+      <label class="mface" title="Double face"><input type="checkbox" id="mFaceDF" ${partner?'checked':''}>DF</label>
+    </div>
+    <h3 style="margin-top:12px;display:flex;align-items:center;gap:6px">
+      <span style="flex:1 1 auto">Travées</span>
+      <button type="button" class="btn ghost" id="mRemT" title="Retirer la dernière travée" aria-label="Retirer la dernière travée"
+        style="padding:3px;border-radius:5px;flex:0 0 auto">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/></svg>
+      </button>
+      <button type="button" class="btn ghost" id="mAddT" title="Ajouter une travée" aria-label="Ajouter une travée"
+        style="padding:3px;border-radius:5px;flex:0 0 auto">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+      </button>
+    </h3>
+    ${bays.map((b,i)=>`<div class="trow" data-i="${i}">
+      <div class="tline">
+        <span class="tn">T${i+1}</span>
+        <select data-f="h" title="Hauteur échelle droite">${RACK_HEIGHTS.map(v=>`<option value="${v}" ${v===ladderHeights(b)[laddersOf(b)-1]?'selected':''}>Éch. dr. ${v}</option>`).join('')}</select>
+        <select data-f="beam" title="Longueur de lisse">${BEAMS.map(v=>`<option value="${v}" ${v===b.beam?'selected':''}>Lisse ${v}</option>`).join('')}</select>
+        <button type="button" class="btn ghost" data-act="dupT" style="padding:3px 6px" title="Dupliquer cette travée" aria-label="Dupliquer cette travée">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/></svg>
+        </button>
+        <button type="button" class="btn ghost danger" data-act="delT" style="padding:3px 8px" title="Retirer cette travée">&times;</button>
+      </div>
+      <div class="tline">
+        <input type="text" data-f="niv" value="${levelsY(b).join(', ')}" placeholder="Niveaux, ex. 2000, 4000" title="Hauteurs de lisses (mm), séparées par des virgules">
+        <div class="stepper" title="Nombre de niveaux">
+          <button type="button" data-act="nlMinus">−</button>
+          <span class="sv">${levelsY(b).length} niv.</span>
+          <button type="button" data-act="nlPlus">+</button>
+        </div>
+        <label class="chk"><input type="checkbox" data-f="deck" ${b.deck===true?'checked':''}>Plancher fil</label>
+      </div>
+    </div>`).join('')}
+  </div>
+  <div class="svgbox" id="meubleElev" style="margin-top:8px"></div>`;
+
+  const redraw = ()=>{ const el = document.getElementById('meubleElev'); el.innerHTML = elevSVG(runBaysOf(run), el.clientWidth); };
+  redraw();
+  wireElevDrag(document.getElementById('meubleElev'), run);
+  const refreshAll = ()=>{ buildItems(); drawDims(bays.length===1?bays[0]:null,false); refreshList(); renderJSON(); renderStats(); renderProps(); };
+  const removeTravee = ()=>{ removeLastSuite(last); if(partner) removeLastSuite(lastOfRun(partner)); renderProps(); refreshAll(); };
+
+  document.getElementById('mName').addEventListener('change', e=>setNameOfRun(run, e.target.value));
+  document.getElementById('mU').addEventListener('change', e=>{
+    const v = +e.target.value; bays.forEach(b=>b.upright=v);
+    if(partner) runBaysOf(partner).forEach(b=>b.upright=v);
+    refreshAll();
+  });
+  document.getElementById('mDep').addEventListener('change', e=>{ setLadderH(depart, 0, +e.target.value); refreshAll(); });
+  document.getElementById('mX0').addEventListener('change', e=>{
+    const dx = Math.round(+e.target.value) - Math.round(depart.x);
+    if(!dx) return;
+    moveRun(run, dx, 0); if(partner) moveRun(partner, dx, 0);
+    refreshAll();
+  });
+  const bumpRot = d=>{
+    const v = ((Math.round(depart.rotation||0)+d)%360+360)%360;
+    bays.forEach(b=>b.rotation=v); if(partner) runBaysOf(partner).forEach(b=>b.rotation=v);
+    refreshAll();
+  };
+  document.getElementById('mRPlus').onclick = ()=>bumpRot(15);
+  document.getElementById('mRMinus').onclick = ()=>bumpRot(-15);
+  document.getElementById('mFaceSF').onchange = e=>{
+    if(!e.target.checked){ e.target.checked = true; return; } // une des deux doit rester cochée
+    if(!partner) return;
+    state.bays = state.bays.filter(b=>b.run!==partner);
+    state.labels = state.labels.filter(l=>l.run!==partner);
+    toast('Face arrière retirée');
+    select([depart.id]);
+  };
+  document.getElementById('mFaceDF').onchange = e=>{
+    if(!e.target.checked){ e.target.checked = true; return; }
+    if(partner) return;
+    const newRun = 'R'+state.runSeq++;   // une seule file pour tout le dos, pas une par travée
+    const made = bays.map(b=>({ ...b, id:uid(), run:newRun, y:b.y+DEPTH+back() }));
+    state.bays.push(...made);
+    toast('Face arrière ajoutée (ensemble double-face)');
+    select([depart.id]);
+  };
+  box.querySelectorAll('.trow').forEach(row=>{
+    const i = +row.dataset.i, b = bays[i];
+    row.querySelector('[data-f=h]').addEventListener('change', e=>{ setLadderH(b, laddersOf(b)-1, +e.target.value); refreshAll(); });
+    row.querySelector('[data-f=beam]').addEventListener('change', e=>{ b.beam=+e.target.value; refreshAll(); });
+    row.querySelector('[data-f=deck]').addEventListener('change', e=>{ b.deck=e.target.checked; refreshAll(); });
+    row.querySelector('[data-act=nlMinus]').addEventListener('click', ()=>{ bumpNiveaux(b,-1); refreshAll(); });
+    row.querySelector('[data-act=nlPlus]').addEventListener('click', ()=>{ bumpNiveaux(b,1); refreshAll(); });
+    row.querySelector('[data-f=niv]').addEventListener('change', e=>{
+      const niv = parseNiveaux(e.target.value);
+      if(niv.length){ b.customLevels = niv; b.levels = niv.length; } else { b.customLevels = undefined; }
+      refreshAll();
+    });
+    const delBtn = row.querySelector('[data-act=delT]');
+    if(delBtn) delBtn.onclick = ()=>removeOneTravee(b);
+    const dupBtn = row.querySelector('[data-act=dupT]');
+    if(dupBtn) dupBtn.onclick = ()=>duplicateTravee(b);
+  });
+  document.getElementById('mAddT').onclick = ()=>{
+    state.face = partner ? 'DF' : 'SF';   // addSuiteToRun() mire la file adossée via ce réglage global
+    addSuiteToRun(last); renderProps(); refreshAll();
+  };
+  document.getElementById('mRemT').onclick = removeTravee;
+}
+// duplique le meuble entier actuellement sélectionné (toutes ses travées + sa face adossée en DF),
+// à l'identique, sur une zone libre — réutilise dupSel() (bouton « Dupliquer » de la barre d'outils)
+function duplicateSelectedMeuble(){
+  const sel = state.selected.map(id=>state.bays.find(b=>b.id===id)).filter(Boolean);
+  if(!sel.length) return;
+  const run = sel[0].run;
+  const depart = runBaysOf(run).find(x=>x.mode==='depart') || runBaysOf(run)[0];
+  const partnerRun = partnerRunOf(depart);
+  state.selected = runBaysOf(run).map(b=>b.id).concat(partnerRun ? runBaysOf(partnerRun).map(b=>b.id) : []);
+  dupSel();
+}
+// supprime le meuble actuellement sélectionné (bouton poubelle à côté du titre « Meuble »)
+function deleteSelectedMeuble(){
+  const sel = state.selected.map(id=>state.bays.find(b=>b.id===id)).filter(Boolean);
+  if(!sel.length) return;
+  const run = sel[0].run;
+  const depart = runBaysOf(run).find(x=>x.mode==='depart') || runBaysOf(run)[0];
+  const partner = partnerRunOf(depart);
+  state.bays = state.bays.filter(b=>b.run!==run && b.run!==partner);
+  state.labels = state.labels.filter(l=>l.run!==run && l.run!==partner);
+  select([]);
+  buildItems(); drawDims(null,false); refreshList(); renderJSON(); renderStats();
+}
+// aucun meuble sélectionné : petit formulaire de création (remplace l'ancien bloc « Données »)
+function renderNewMeubleForm(box){
+  box.innerHTML = `<div class="card">
+    <div class="fieldcap">Largeur et hauteur de l'échelle :</div>
+    <div class="mhead">
+      <label class="narrow"><select id="nmU" aria-label="Largeur échelle">${UPRIGHTS.map(v=>`<option ${v===state.upright?'selected':''}>${v}</option>`).join('')}</select></label>
+      <label class="narrow"><select id="nmH" aria-label="Hauteur échelle">${RACK_HEIGHTS.map(v=>`<option ${v===state.rackH?'selected':''}>${v}</option>`).join('')}</select></label>
+      <span style="flex:0 0 auto;align-self:center;background:#f2f5f9;border:1px solid var(--line);
+        border-radius:6px;padding:5px 8px;color:var(--txt-dim);font-size:var(--text-sm);white-space:nowrap"
+        title="Profondeur (fixe)">P.${DEPTH}</span>
+      <label class="mface" title="Simple face"><input type="checkbox" id="nmFaceSF" ${state.face==='DF'?'':'checked'}>SF</label>
+      <label class="mface" title="Double face"><input type="checkbox" id="nmFaceDF" ${state.face==='DF'?'checked':''}>DF</label>
+    </div>
+    <div class="mhead">
+      <label>Longueur lisse<select id="nmB">${BEAMS.map(v=>`<option ${v===state.beam?'selected':''}>${v}</option>`).join('')}</select></label>
+      <label title="Nombre de niveaux"><div class="stepper">
+        <button type="button" id="nmLevMinus" aria-label="Moins de niveaux">−</button>
+        <span class="sv" id="nmLevVal">${state.levels} niv.</span>
+        <button type="button" id="nmLevPlus" aria-label="Plus de niveaux">+</button>
+      </div></label>
+    </div>
+    <div class="row"><label>Plancher fil</label><input type="checkbox" id="nmDeck" ${state.deck?'checked':''}></div>
+  </div>`;
+  // ces réglages servent de modèle pour le prochain meuble créé via le bouton « + » du titre
+  document.getElementById('nmFaceSF').onchange = e=>{ if(!e.target.checked){ e.target.checked=true; return; } document.getElementById('nmFaceDF').checked=false; setFace('SF'); };
+  document.getElementById('nmFaceDF').onchange = e=>{ if(!e.target.checked){ e.target.checked=true; return; } document.getElementById('nmFaceSF').checked=false; setFace('DF'); };
+  document.getElementById('nmU').onchange = e=>state.upright=+e.target.value;
+  document.getElementById('nmH').onchange = e=>state.rackH=+e.target.value;
+  document.getElementById('nmB').onchange = e=>state.beam=+e.target.value;
+  const nmLevVal = document.getElementById('nmLevVal');
+  document.getElementById('nmLevMinus').onclick = ()=>{ state.levels = Math.max(LEVELS[0], state.levels-1); nmLevVal.textContent = state.levels+' niv.'; };
+  document.getElementById('nmLevPlus').onclick = ()=>{ state.levels = Math.min(LEVELS[LEVELS.length-1], state.levels+1); nmLevVal.textContent = state.levels+' niv.'; };
+  document.getElementById('nmDeck').onchange = e=>state.deck=e.target.checked;
 }
 function refreshList(){
   const box = document.getElementById('list');
@@ -1401,7 +1879,7 @@ function refreshList(){
     renderStats(); renderJSON(); return; }
   box.innerHTML = state.bays.map(b=>`<div class="item ${state.selected.includes(b.id)?'sel':''}" data-id="${b.id}">
     <i class="swatch" style="background:${b.mode==='depart'?'var(--blue)':'var(--orange)'}"></i>
-    <span>${b.id}</span><span class="tag">${b.mode==='depart'?'DÉPART':'SUITE'}</span>
+    <span>${meubleLabelOf(b)} · ${b.id}</span><span class="tag">${b.mode==='depart'?'DÉPART':'SUITE'}</span>
     <span class="n">${b.upright}/${b.beam}/${b.levels}N</span></div>`).join('');
   box.querySelectorAll('.item').forEach(n=>n.onclick = e =>
     select(e.shiftKey ? [...state.selected, n.dataset.id] : [n.dataset.id]));
@@ -1483,14 +1961,137 @@ function downloadBom(){
   a.download = 'nomenclature-racks.csv'; a.click(); URL.revokeObjectURL(a.href);
   toast('Nomenclature exportée ('+rows.length+' références)');
 }
+/* ---------- Export SketchUp (.rb) ----------
+   Place les composants réels "Epsirak_Echelle" et "Epsirak_paire_lisses_ass"
+   (ouverts au préalable dans le modèle SketchUp actif) sur tout le plan.
+   Constantes de géométrie validées manuellement (hauteur/longueur de base des
+   composants, recul de platine, longueur/insertion du connecteur de lisse) :
+   voir l'historique de debug pour le détail de chaque valeur. */
+function exportSketchUpScript(){
+  if(!state.bays.length) return toast('Aucune travée : rien à exporter');
+  const PLATE_OVERHANG = 40;      // mm, coin de platine -> nu du poteau (fixe, composant réel)
+  const CONNECTOR = 60;           // mm, longueur du connecteur de lisse
+  const CONNECTOR_INSERTION = 3;  // mm, pénétration du connecteur dans le poteau (de chaque côté)
+  const LISSE_Y = 15;             // mm, décalage profondeur (axe Y) du tube -- non testé en rotation
+  const LISSE_HEIGHT = 70;        // mm, hauteur de profil réelle de la lisse (confirmée)
+  const r2 = n => Math.round(n*100)/100;
+  const L = [];
+  L.push('# ==============================================================');
+  L.push('# PlanRack3D -> SketchUp : export complet du plan');
+  L.push('# Généré depuis "' + (state.name||'sans nom').replace(/["\n\r]/g,'') + '" le ' + new Date().toLocaleString('fr-FR') + '.');
+  L.push('# ' + state.bays.length + ' travée(s).');
+  L.push('#');
+  L.push('# Mode d\'emploi :');
+  L.push('#   1) Ouvrez (ou insérez) les composants "Epsirak_Echelle" et');
+  L.push('#      "Epsirak_paire_lisses_ass" dans le modèle actif.');
+  L.push('#   2) Fenêtre > Console Ruby, collez tout ce script, Entrée.');
+  L.push('#');
+  L.push('# Les travées à rotation non nulle n\'ont pas encore été vérifiées visuellement');
+  L.push('# (seules des travées à 0° ont été testées) -- à contrôler après génération.');
+  L.push('# ==============================================================');
+  L.push('');
+  L.push('model = Sketchup.active_model');
+  L.push('defs  = model.definitions');
+  L.push('');
+  L.push('def find_def(defs, name, guid_fallback = nil)');
+  L.push('  defs[name] || defs.find { |d| d.name.downcase.start_with?(name.downcase) } || (guid_fallback && defs[guid_fallback])');
+  L.push('end');
+  L.push('');
+  L.push('def paint_recursive(entities, color)');
+  L.push('  entities.each do |e|');
+  L.push('    case e');
+  L.push('    when Sketchup::Face');
+  L.push('      e.material = color; e.back_material = color');
+  L.push('    when Sketchup::Group');
+  L.push('      paint_recursive(e.entities, color)');
+  L.push('    when Sketchup::ComponentInstance');
+  L.push('      paint_recursive(e.definition.entities, color)');
+  L.push('    end');
+  L.push('  end');
+  L.push('end');
+  L.push('');
+  L.push('def scale_about(point, sx, sy, sz)');
+  L.push('  to_o = Geom::Transformation.translation(Geom::Vector3d.new(-point.x, -point.y, -point.z))');
+  L.push('  back = Geom::Transformation.translation(Geom::Vector3d.new(point.x, point.y, point.z))');
+  L.push('  back * Geom::Transformation.scaling(sx, sy, sz) * to_o');
+  L.push('end');
+  L.push('');
+  L.push('def place_echelle(model, base_def, target_mm, world_xyz, rotation_deg = 0, mm_per_in = 25.4, base_height_mm = 3000.0)');
+  L.push('  bb = base_def.bounds');
+  L.push('  scale = target_mm / base_height_mm');
+  L.push('  scale_tr = scale_about(bb.min, 1.0, 1.0, scale)');
+  L.push('  rot_tr = Geom::Transformation.rotation(bb.min, Z_AXIS, rotation_deg.degrees)');
+  L.push('  target_in = world_xyz.map { |v| v / mm_per_in }');
+  L.push('  delta = [target_in[0] - bb.min.x, target_in[1] - bb.min.y, target_in[2] - bb.min.z]');
+  L.push('  place_tr = Geom::Transformation.new(delta)');
+  L.push('  model.entities.add_instance(base_def, place_tr * rot_tr * scale_tr)');
+  L.push('end');
+  L.push('');
+  L.push('def place_lisse(model, base_def, target_mm, world_xyz, rotation_deg = 0, mm_per_in = 25.4, base_width_mm = 1825.0)');
+  L.push('  bb = base_def.bounds');
+  L.push('  scale = target_mm / base_width_mm');
+  L.push('  scale_tr = scale_about(bb.min, scale, 1.0, 1.0)');
+  L.push('  rot_tr = Geom::Transformation.rotation(bb.min, Z_AXIS, rotation_deg.degrees)');
+  L.push('  target_in = world_xyz.map { |v| v / mm_per_in }');
+  L.push('  delta = [target_in[0] - bb.min.x, target_in[1] - bb.min.y, target_in[2] - bb.min.z]');
+  L.push('  place_tr = Geom::Transformation.new(delta)');
+  L.push('  model.entities.add_instance(base_def, place_tr * rot_tr * scale_tr)');
+  L.push('end');
+  L.push('');
+  L.push('ech_def   = find_def(defs, "Epsirak_Echelle", "87577702-ced8-46c2-bacd-5a4dd12949ec")');
+  L.push('lisse_def = find_def(defs, "Epsirak_paire_lisses_ass", "8a7e6920-7b3a-4fa1-a40b-3136fe5b5103")');
+  L.push('');
+  L.push('if ech_def.nil? || lisse_def.nil?');
+  L.push('  noms = defs.map(&:name).join(", ")');
+  L.push('  noms = "(aucun composant chargé)" if noms.empty?');
+  L.push('  UI.messagebox("Introuvable dans ce modèle : " +');
+  L.push('    [ech_def ? nil : "Epsirak_Echelle", lisse_def ? nil : "Epsirak_paire_lisses_ass"].compact.join(" et ") +');
+  L.push('    ".\\nComposants présents dans le modèle actif : #{noms}")');
+  L.push('else');
+  L.push('  model.entities.grep(Sketchup::ComponentInstance)');
+  L.push('    .select { |i| i.definition == ech_def || i.definition == lisse_def }');
+  L.push('    .each { |i| model.entities.erase_entities(i) }');
+  L.push('  paint_recursive(lisse_def.entities, "e25303")');
+  L.push('  lisse_h_mm = ' + LISSE_HEIGHT.toFixed(1) + '   # hauteur de profil réelle (confirmée, pas lue via bounds)');
+  L.push('');
+
+  state.bays.forEach(b=>{
+    const rot = Math.round(b.rotation||0), rad = rot*Math.PI/180, cs=Math.cos(rad), sn=Math.sin(rad);
+    const toWorld = (lx,ly) => [ b.x + lx*cs - ly*sn, b.y + lx*sn + ly*cs ];
+    const P = parts(b), heights = ladderHeights(b);
+    L.push('  # ' + b.id + ' (' + b.mode + ') -- hauteur(s) ' + heights.join('/') + 'mm, lisse ' + b.beam + 'mm, ' + b.levels + ' niveau(x)');
+    P.ladders.forEach((lad,i)=>{
+      const [wx,wy] = toWorld(lad.x - PLATE_OVERHANG, 0);
+      L.push('  place_echelle(model, ech_def, ' + heights[i] + ', [' + r2(wx) + ', ' + r2(wy) + ', 0], ' + rot + ')');
+    });
+    const beamX = P.beams[0].x, lisseStartLocal = beamX - CONNECTOR, lisseTarget = r2(b.beam - 2*CONNECTOR_INSERTION);
+    const [sx,sy] = toWorld(lisseStartLocal, LISSE_Y);
+    levelsY(b).forEach(ly=>{
+      L.push('  place_lisse(model, lisse_def, ' + lisseTarget + ', [' + r2(sx) + ', ' + r2(sy) + ', ' + ly + ' - lisse_h_mm], ' + rot + ')');
+    });
+  });
+
+  L.push('');
+  L.push('  model.active_view.zoom_extents');
+  L.push('  puts "Plan posé : ' + state.bays.length + ' travée(s)."');
+  L.push('end');
+
+  const blob = new Blob([L.join('\n')], {type:'text/plain;charset=utf-8'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = 'export-sketchup-' + String(state.name||'plan').replace(/[^\w-]+/g,'_').slice(0,40) + '.rb';
+  a.click(); URL.revokeObjectURL(a.href);
+  toast('Script SketchUp exporté : '+a.download);
+}
 function toJSON(){
-  return { version:3, unit:'mm', name:state.name, sabots:state.sabots, deck:state.deck, galva:state.galva, warehouse:{...state.warehouse},
+  return { version:3, unit:'mm', name:state.name, sabots:state.sabots, deck:state.deck, galva:state.galva, gridVisible:state.gridVisible, labelsVisible:state.labelsVisible, warehouse:{...state.warehouse},
     cotes: state.cotes.map(c=>({...c})),
     labels: state.labels.map(l=>({...l})),
     texts: state.texts.map(t=>({...t})),
     bays: state.bays.map(b=>({ id:b.id, mode:b.mode, x:Math.round(b.x), y:Math.round(b.y),
       upright:b.upright, beam:b.beam, levels:b.levels, height:b.height, pallet:b.pallet, depth:b.depth, section:b.section,
-      rotation:Math.round(b.rotation||0), run:b.run, deck:b.deck===true })) };
+      rotation:Math.round(b.rotation||0), run:b.run, deck:b.deck===true,
+      ...(Array.isArray(b.ladderH) ? {ladderH:b.ladderH} : {}),
+      ...(Array.isArray(b.customLevels) && b.customLevels.length ? {customLevels:b.customLevels} : {}) })) };
 }
 function renderJSON(){
   const d = toJSON();
@@ -1514,7 +2115,9 @@ function loadData(d){
     id:safeId(r.id, uid()), mode:r.mode==='suite'?'suite':'depart', x:+r.x||0, y:+r.y||0,
     upright:+r.upright||100, beam:+r.beam||2700, levels:+r.levels||2, height:+r.height||+d.rackHeight||3500, pallet:+r.pallet||800,
     depth:DEPTH, section:SECTION,
-    rotation:+r.rotation||0, run:safeId(r.run,'R1'), deck:r.deck===true }));
+    rotation:+r.rotation||0, run:safeId(r.run,'R1'), deck:r.deck===true,
+    ladderH: Array.isArray(r.ladderH) ? r.ladderH.map(v=>v==null?null:+v) : undefined,
+    customLevels: Array.isArray(r.customLevels) && r.customLevels.length ? r.customLevels.map(v=>+v) : undefined }));
   state.cotes = Array.isArray(d.cotes) ? d.cotes.map((c,i)=>({ id:safeId(c.id, 'COT-'+String(i+1).padStart(3,'0')),
     x1:+c.x1, y1:+c.y1, x2:+c.x2, y2:+c.y2, value:Math.round(+c.value) })) : [];
   refreshCoteList();
@@ -1523,6 +2126,11 @@ function loadData(d){
   state.deck = d.deck === true; document.getElementById('tDeck').classList.toggle('on', state.deck);
   document.getElementById('dDeck').checked = state.deck;
   state.galva = d.galva !== false; document.getElementById('tGalva').classList.toggle('on', !state.galva);
+  state.gridVisible = d.gridVisible !== false;
+  document.getElementById('gridOn').checked = state.gridVisible;
+  document.getElementById('gridSel').disabled = !state.gridVisible;
+  state.labelsVisible = d.labelsVisible !== false;
+  document.getElementById('bLabel').classList.toggle('on', state.labelsVisible);
   state.labels = Array.isArray(d.labels) ? d.labels.map((l,i)=>({ id:safeId(l.id, 'ETQ-'+String(i+1).padStart(3,'0')),
     run:safeId(l.run,'R1'), text:String(l.text||('Rack '+LETTERS[i%26])), dx:+l.dx||0, dy:+l.dy||-1500 })) : [];
   state.texts = Array.isArray(d.texts) ? d.texts.map((t,i)=>({ id:safeId(t.id, 'TXT-'+String(i+1).padStart(3,'0')),
@@ -1534,6 +2142,7 @@ function loadData(d){
   document.getElementById('whD').value = state.warehouse.depth;
   document.getElementById('whAisle').value = state.warehouse.aisle;
   document.getElementById('whBack').value = state.warehouse.back;
+  document.getElementById('whPal').value = String(state.pallet);
   document.getElementById('gridSel').value = String(state.warehouse.gridSize);
   document.getElementById('fGrid').textContent = state.warehouse.gridSize+' mm';
   state.selected = []; selLabel = null;
@@ -1686,7 +2295,7 @@ function rotatePlan(){
 }
 
 /* ---------- Impression ---------- */
-function printPlan(){
+async function printPlan(){
   if(!state.bays.length) return notice('Le plan est vide — ajoutez une travée avant d\'imprimer');
   const sel = state.selected.slice();
   const selTB = selTxt;   // le cadre rouge + ✎/✕ ne doivent pas apparaître dans le PDF
@@ -1706,11 +2315,17 @@ function printPlan(){
   // restauration de la vue à l'écran
   Object.assign(C, bak);
   stage.width(wBak); stage.height(hBak); zoom = zBak; applyScale(); stage.position(pBak);
-  state.selected = sel; selTxt = selTB; drawGrid(); buildItems();
-  drawDims(sel.length===1 ? state.bays.find(b=>b.id===sel[0]) : null);
+  drawGrid(); buildItems();
 
-  const img3d = View3D.snapshot(2000, 1150);   // page 2 : vue 3D recadrée
-  const hs = [...new Set(state.bays.map(b=>b.height))].sort((a,b)=>a-b).map(fmt).join(' / ');
+  // state.selected reste vide pendant les captures 3D : le cadre cyan de sélection ne doit
+  // apparaître ni sur la vue 3D de la page 3, ni sur une élévation qui contiendrait par hasard
+  // la travée sélectionnée à l'écran.
+  const img3d = View3D.snapshot(2000, 1150);   // page 3 : vue 3D recadrée
+  const elevs = View3D.elevations(1300, 1000); // page 2 : une vue de côté (à plat) par hauteur d'échelle distincte
+  state.selected = sel; selTxt = selTB; buildItems(); View3D.refresh();
+  drawDims(sel.length===1 ? state.bays.find(b=>b.id===sel[0]) : null);
+  const by3d = RKP.lic ? (RKP.lic.revendeur || RKP.lic.nomExport || '') : '';
+  const link3d = location.href.split('#')[0] + '#3d=' + await packPlan({...toJSON(), by:by3d});   // lien de la page 3
   const rows = bom();
   const dep = state.bays.filter(b=>b.mode==='depart').length;
   const st = [
@@ -1748,25 +2363,39 @@ function printPlan(){
       </div>
       <div class="p-sub" style="text-align:right">${brandRight}</div>
     </div>
-    <div class="p-body">
-      <div class="p-side">
-        <h2>Récapitulatif</h2><table>${st.map(r=>`<tr><td>${r[0]}</td><td class="n">${r[1]}</td></tr>`).join('')}</table>
-        <h2>Nomenclature</h2><table><tr><th>Désignation</th><th class="n">Qté</th></tr>
-          ${rows.map(r=>`<tr><td>${r.designation.replace(/\s*\(section \d+ mm\)/,'')}</td><td class="n">${r.qte}</td></tr>`).join('')}</table>
-      </div>
-      <div class="p-plan"><img src="${url}" alt="Plan"></div>
-    </div>
+    <div class="p-plan-full"><img src="${url}" alt="Plan"></div>
     ${lic}
+    <div class="p-elev-page">
+      <div class="p-head">
+        <div style="display:flex;align-items:center;gap:10px">
+          ${brandLogo}
+          <div><h1>${nm ? nm + ' — élévations' : 'Élévations des échelles'}</h1>
+            <div class="p-sub">Une vue de côté par hauteur d'échelle distincte, palettes incluses</div></div>
+        </div>
+        <div class="p-sub" style="text-align:right">${brandRight}</div>
+      </div>
+      <div class="p-body">
+        <div class="p-side">
+          <h2>Récapitulatif</h2><table>${st.map(r=>`<tr><td>${r[0]}</td><td class="n">${r[1]}</td></tr>`).join('')}</table>
+          <h2>Nomenclature</h2><table><tr><th>Désignation</th><th class="n">Qté</th></tr>
+            ${rows.map(r=>`<tr><td>${r.designation.replace(/\s*\(section \d+ mm\)/,'')}</td><td class="n">${r.qte}</td></tr>`).join('')}</table>
+        </div>
+        <div class="p-elev-grid">
+          ${elevs.map(e=>`<div class="p-elev-cell"><img src="${e.img}" alt="Élévation"><div class="p-elev-cap">Échelle H ${e.heights.map(fmt).join(' / ')} mm${e.doubleFace?' · double-face':''}</div></div>`).join('')}
+        </div>
+      </div>
+      ${lic}
+    </div>
     ${img3d ? `<div class="p-page2">
       <div class="p-head">
         <div style="display:flex;align-items:center;gap:10px">
           ${brandLogo}
-          <div><h1>${nm ? nm + ' — vue 3D' : 'Vue 3D — élévation des racks'}</h1>
-            <div class="p-sub">Échelles H ${hs} mm · ${state.bays.length} travée${state.bays.length>1?'s':''} · lisses à H / (N + 1) · cotes en mm</div></div>
+          <div><h1>Vue 3D</h1></div>
         </div>
         <div class="p-sub" style="text-align:right">${brandRight}</div>
       </div>
       <img class="p-3d" src="${img3d}" alt="Vue 3D">
+      <div class="p-sub" style="margin-top:3mm"><a href="${esc(link3d)}">Lien 3D dynamique</a></div>
       ${lic}
     </div>` : ''}`;
   document.body.classList.add('printing');
@@ -1816,6 +2445,8 @@ function dupSel(){
   // on décale vers le bas jusqu'à trouver une zone libre (jamais de doublon caché)
   copies = freeZone(copies, []);
   copies.forEach(c=>state.bays.push(c));
+  // même règle qu'à la création : la lettre auto de chaque nouvelle file devient un vrai nom tout de suite
+  Object.values(runMap).forEach(run=>setNameOfRun(run, runLabel(run)));
   select(copies.map(c=>c.id));
   ensureVisible(copies[0]);
   toast(copies.length+' travée(s) dupliquée(s) sur une zone libre'
@@ -1911,6 +2542,65 @@ function removeLastSuite(ref){
   select(keep ? [keep.id] : []); refreshList(); renderJSON();
   toast(`Travée SUITE ${last.id} retirée — ${suitesOf(ref.run).length} SUITE restante(s)`);
 }
+// recale en chaîne les travées d'une file à partir de la 2e (position = bord de la précédente) ;
+// utile après le retrait d'une travée qui n'était pas la dernière, pour refermer le trou
+function rechainRun(run){
+  const bs = runBaysOf(run);
+  for(let i=1;i<bs.length;i++){
+    const prev = bs[i-1], cur = bs[i];
+    const r = (prev.rotation||0)*Math.PI/180, adv = bayW(prev);
+    cur.x = Math.round(prev.x + adv*Math.cos(r));
+    cur.y = Math.round(prev.y + adv*Math.sin(r));
+    cur.rotation = prev.rotation||0;
+  }
+}
+// retire UNE travée quelconque (pas forcément la dernière), avec sa correspondante sur la file adossée en DF.
+// si c'était la DÉPART et qu'il reste des travées, la suivante devient la nouvelle DÉPART (ancre conservée) ;
+// si c'était la seule travée, le meuble entier (+ face adossée) est supprimé
+function removeOneTravee(b){
+  const run = b.run;
+  const depart = runBaysOf(run).find(x=>x.mode==='depart') || runBaysOf(run)[0];
+  const partnerRun = partnerRunOf(depart);
+  const idx = runBaysOf(run).indexOf(b);
+  const removeAt = (r, i) => {
+    const list = runBaysOf(r);
+    if(i<0 || i>=list.length) return;
+    if(list.length<=1){
+      state.bays = state.bays.filter(x=>x.run!==r);
+      state.labels = state.labels.filter(l=>l.run!==r);
+      return;
+    }
+    const target = list[i];
+    if(target.mode==='depart') list[1].mode='depart';
+    state.bays = state.bays.filter(x=>x!==target);
+    rechainRun(r);
+  };
+  removeAt(run, idx);
+  if(partnerRun) removeAt(partnerRun, idx);
+  const survivors = state.bays.filter(x=>x.run===run);
+  const keep = survivors.find(x=>x.mode==='depart') || survivors[0];
+  select(keep ? [keep.id] : []);
+  buildItems(); drawDims(null,false); refreshList(); renderJSON(); renderStats();
+  toast('Travée retirée');
+}
+// duplique une travée (mêmes dimensions) et l'ajoute à la fin du meuble sélectionné (+ file adossée en DF)
+function duplicateTravee(b){
+  const clone = (ref, run) => {
+    const last = lastOfRun(run);
+    const r = (last.rotation||0)*Math.PI/180, adv = bayW(last);
+    return { ...ref, id:uid(), mode:'suite', run, rotation:last.rotation||0,
+      x:Math.round(last.x + adv*Math.cos(r)), y:Math.round(last.y + adv*Math.sin(r)),
+      ladderH: ref.ladderH ? [...ref.ladderH] : undefined,
+      customLevels: ref.customLevels ? [...ref.customLevels] : undefined };
+  };
+  state.bays.push(clone(b, b.run));
+  const depart = runBaysOf(b.run).find(x=>x.mode==='depart') || runBaysOf(b.run)[0];
+  const partnerRun = partnerRunOf(depart);
+  if(partnerRun) state.bays.push(clone(b, partnerRun));
+  buildItems(); drawDims(null,false); refreshList(); renderJSON(); renderStats();
+  select([depart.id]);
+  toast('Travée dupliquée');
+}
 
 document.getElementById('fSF').onclick = ()=> setFace('SF');
 document.getElementById('fDF').onclick = ()=> setFace('DF');
@@ -1936,15 +2626,13 @@ document.getElementById('tSab').onclick = e=>{
   toast(state.sabots ? 'Sabots de protection affichés' : 'Sabots de protection masqués');
 };
 document.getElementById('tDeck').onclick = e=>{
-  // « Plancher fil partout » : applique le plateau fil grillé à toutes les travées existantes.
-  // Un second clic (dévalidation) ne retire pas les plateaux déjà posés : il décoche juste
-  // le sélecteur « Plancher fil » du bloc Données (défaut pour les prochaines travées).
+  // « Plancher fil partout » : applique (ou retire) le plateau fil grillé sur toutes les travées.
   state.deck = !state.deck;
-  if(state.deck) state.bays.forEach(b=>{ b.deck = true; });
+  state.bays.forEach(b=>{ b.deck = state.deck; });
   e.currentTarget.classList.toggle('on', state.deck);
   document.getElementById('dDeck').checked = state.deck;
-  if(state.deck){ buildItems(); View3D.refresh(); renderJSON(); renderStats(); renderProps(); }
-  toast(state.deck ? 'Plateau fil ajouté à toutes les travées' : 'Les nouvelles travées n\'auront pas de plateau fil');
+  buildItems(); View3D.refresh(); renderJSON(); renderStats(); renderProps();
+  toast(state.deck ? 'Plateau fil ajouté à toutes les travées' : 'Plateau fil retiré de toutes les travées');
 };
 document.getElementById('tGalva').onclick = e=>{
   // Échelles bleu RAL 5002 sur tout le plan ; bouton non validé = échelles galva (défaut)
@@ -1963,23 +2651,19 @@ document.getElementById('bPrint').onclick = printPlan;
 document.getElementById('bRotAll').onclick = rotatePlan;
 document.getElementById('bUndo').onclick = undo;
 document.getElementById('bRedo').onclick = redo;
-document.getElementById('bLabel').onclick = addLabel;
+document.getElementById('bLabel').classList.toggle('on', state.labelsVisible);
+document.getElementById('bLabel').onclick = e=>{
+  state.labelsVisible = !state.labelsVisible;
+  e.currentTarget.classList.toggle('on', state.labelsVisible);
+  drawLabels();
+  toast('Noms des meubles '+(state.labelsVisible?'affichés':'masqués'));
+};
 document.getElementById('bText').onclick = addText;
-document.getElementById('lblNo').onclick = closeLblDlg;
-document.getElementById('lblYes').onclick = ()=>{
-  const v = document.getElementById('lblVal').value.trim();
-  if(lblEdit && v){ lblEdit.text = v; }
-  closeLblDlg(); drawLabels(); renderJSON(); toast(v ? 'Étiquette renommée : '+v : 'Étiquette inchangée');
-};
-document.getElementById('lblDel').onclick = ()=>{
-  if(lblEdit){ state.labels = state.labels.filter(o=>o.id!==lblEdit.id); if(selLabel===lblEdit.id) selLabel=null; }
-  closeLblDlg(); drawLabels(); renderJSON(); toast('Étiquette supprimée');
-};
-document.getElementById('lblDlg').onclick = e=>{ if(e.target.id==='lblDlg') closeLblDlg(); };
-document.getElementById('lblVal').onkeydown = e=>{
-  if(e.key==='Enter') document.getElementById('lblYes').click();
-  if(e.key==='Escape') closeLblDlg();
-};
+function openInfoDlg(){ renderStats(); refreshCoteList(); renderJSON(); document.getElementById('infoDlg').hidden = false; }
+function closeInfoDlg(){ document.getElementById('infoDlg').hidden = true; }
+document.getElementById('bInfo').onclick = openInfoDlg;
+document.getElementById('infoClose').onclick = closeInfoDlg;
+document.getElementById('infoDlg').onclick = e=>{ if(e.target.id==='infoDlg') closeInfoDlg(); };
 document.getElementById('bCoteClr').onclick = ()=>{
   if(!state.cotes.length) return toast('Aucune cote à effacer');
   const n = state.cotes.length; state.cotes = [];
@@ -2019,6 +2703,25 @@ function jsonFileName(){
 // File System Access (Chrome/Edge) : une fois un fichier .rsl ouvert ou enregistré une première
 // fois, « Enregistrer » réécrit directement ce même fichier sans redemander où le mettre.
 // Navigateurs sans cette API (Firefox, Safari) : repli sur le téléchargement / <input type=file> classique.
+// Brouillage léger du contenu .rsl : un fichier seul, sans l'appli, n'est plus du JSON lisible
+// tel quel (éditeur de texte, IA…). Ce n'est pas un chiffrement fort — la clé vit dans ce même
+// fichier HTML, donc quiconque lit le code source de l'appli peut la retrouver — mais ça suffit
+// à empêcher une lecture directe et immédiate du contenu.
+const RSL_KEY = 'RackPlan-RSL-2D3D-v1';
+const RSL_MAGIC = 'RSLX1';
+function obfuscate(str){
+  const bytes = new TextEncoder().encode(str);
+  let bin = '';
+  for(let i=0;i<bytes.length;i++) bin += String.fromCharCode(bytes[i] ^ RSL_KEY.charCodeAt(i % RSL_KEY.length));
+  return RSL_MAGIC + btoa(bin);
+}
+function deobfuscate(str){
+  if(!str.startsWith(RSL_MAGIC)) return str;   // ancien .rsl en JSON clair : rétrocompatible
+  const bin = atob(str.slice(RSL_MAGIC.length));
+  const bytes = new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++) bytes[i] = bin.charCodeAt(i) ^ RSL_KEY.charCodeAt(i % RSL_KEY.length);
+  return new TextDecoder().decode(bytes);
+}
 let rslHandle = null;
 const rslFSOk = () => !!(window.showSaveFilePicker && window.showOpenFilePicker);
 async function rslWritable(h){
@@ -2027,20 +2730,20 @@ async function rslWritable(h){
   catch(e){ return false; }
 }
 async function doSave(){
-  const json = JSON.stringify(toJSON(), null, 2);
+  const payload = obfuscate(JSON.stringify(toJSON()));
   if(rslFSOk()){
     try{
       let h = rslHandle;
       if(!h || !(await rslWritable(h)))
         h = await window.showSaveFilePicker({ suggestedName: jsonFileName(),
-          types: [{ description:'Plan RSL', accept:{ 'application/json':['.rsl'] } }] });
-      const w = await h.createWritable(); await w.write(json); await w.close();
+          types: [{ description:'Plan RSL', accept:{ 'application/octet-stream':['.rsl'] } }] });
+      const w = await h.createWritable(); await w.write(payload); await w.close();
       rslHandle = h;
       toast('Plan enregistré : '+h.name);
       return true;
     }catch(err){ if(err.name !== 'AbortError') notice('Enregistrement impossible : '+err.message); return false; }
   }
-  const blob = new Blob([json],{type:'application/json'});
+  const blob = new Blob([payload],{type:'application/octet-stream'});
   const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
   a.download = jsonFileName();
   a.click(); URL.revokeObjectURL(a.href);
@@ -2048,15 +2751,16 @@ async function doSave(){
   return true;
 }
 document.getElementById('bSave').onclick = doSave;
+document.getElementById('bSketchUp').onclick = exportSketchUpScript;
 document.getElementById('bBom').onclick = downloadBom;
 document.getElementById('bBom2').onclick = downloadBom;
 async function doOpen(){
   if(rslFSOk()){
     try{
       const [h] = await window.showOpenFilePicker({ types: [{ description:'Plan RSL',
-        accept:{ 'application/json':['.rsl'] } }] });
+        accept:{ 'application/octet-stream':['.rsl'] } }] });
       const text = await (await h.getFile()).text();
-      loadData(JSON.parse(text));
+      loadData(JSON.parse(deobfuscate(text)));
       rslHandle = h;
       toast('Plan rechargé : '+state.bays.length+' travée(s), '+state.cotes.length+' cote(s), '+state.labels.length+' étiquette(s)');
     }catch(err){ if(err.name !== 'AbortError') notice('Fichier illisible : '+err.message); }
@@ -2068,7 +2772,7 @@ document.getElementById('bLoad').onclick = doOpen;
 document.getElementById('fLoad').onchange = e=>{
   const f = e.target.files[0]; if(!f) return;
   const r = new FileReader();
-  r.onload = ()=>{ try{ rslHandle = null; loadData(JSON.parse(r.result)); toast('Plan rechargé : '+state.bays.length+' travée(s), '+state.cotes.length+' cote(s), '+state.labels.length+' étiquette(s)'); }
+  r.onload = ()=>{ try{ rslHandle = null; loadData(JSON.parse(deobfuscate(r.result))); toast('Plan rechargé : '+state.bays.length+' travée(s), '+state.cotes.length+' cote(s), '+state.labels.length+' étiquette(s)'); }
     catch(err){ notice('Fichier illisible : '+err.message); } };
   r.readAsText(f); e.target.value=''; };
 function applyWarehouse(){
@@ -2114,6 +2818,23 @@ document.getElementById('gridSel').onchange = e=>{
   state.warehouse.gridSize = +e.target.value;
   document.getElementById('fGrid').textContent = state.warehouse.gridSize+' mm';
   drawGrid(); renderJSON(); toast('Pas de grille : '+state.warehouse.gridSize+' mm'); };
+document.getElementById('gridOn').checked = state.gridVisible;
+document.getElementById('gridSel').disabled = !state.gridVisible;
+document.getElementById('gridOn').onchange = e=>{
+  state.gridVisible = e.target.checked;
+  document.getElementById('gridSel').disabled = !state.gridVisible;
+  drawGrid(); renderJSON();
+};
+document.getElementById('mNewBtn').onclick = ()=>doDepart();
+document.getElementById('mDupMeuble').onclick = ()=>duplicateSelectedMeuble();
+document.getElementById('mDelAll').onclick = ()=>deleteSelectedMeuble();
+// Palette : même dimension pour tout l'entrepôt — s'applique à toutes les travées déjà posées
+document.getElementById('whPal').onchange = e=>{
+  state.pallet = +e.target.value;
+  state.bays.forEach(b=>b.pallet=state.pallet);
+  buildItems(); refresh3D(); renderJSON(); renderProps();
+  toast('Palette '+state.pallet+'×1200 appliquée à tout l\'entrepôt');
+};
 
 const paintEch = selList('echSel', UPRIGHTS, 'upright', '');
 const paintLis = selList('lisSel', BEAMS, 'beam', '');
@@ -2188,7 +2909,7 @@ window.addEventListener('keyup', e=>{ if(e.code==='Space') spaceDown=false; });
 
 /* ---------- Démo ---------- */
 /* ---------- État initial : une seule travée DÉPART ---------- */
-function resetPlan(silent){
+function resetPlan(silent, withDepart=true){
   rslHandle = null;   // nouveau plan : « Enregistrer » redemandera un fichier, pas d'écrasement de l'ancien
   state.warehouse = { width:30000, depth:18000, gridSize:100, aisle:3000, back:200 };
   state.bays = []; state.selected = []; state.seq = 1; state.runSeq = 1; state.cotes = []; state.labels = []; selLabel = null;
@@ -2207,15 +2928,21 @@ function resetPlan(silent){
   document.getElementById('gridSel').value = state.warehouse.gridSize;
   document.getElementById('fGrid').textContent = state.warehouse.gridSize+' mm';
   chipsAll(); drawGrid();
-  const b0 = addDepart(200, 200);
-  // vue de départ : zoom 50 %, centrée sur la travée
   zoom = 0.5; applyScale();
-  stage.position({ x: stage.width()/2 - (b0.x + bayW(b0)/2)*scale(),
-                   y: stage.height()/2 - (b0.y + DEPTH/2)*scale() });
-  drawGrid(); buildItems(); refreshList(); select([state.bays[0].id]);
+  if(withDepart){
+    const b0 = addDepart(200, 200);
+    // vue de départ : centrée sur la travée
+    stage.position({ x: stage.width()/2 - (b0.x + bayW(b0)/2)*scale(),
+                     y: stage.height()/2 - (b0.y + DEPTH/2)*scale() });
+  } else {
+    // pas de travée : origine du plan calée dans l'angle haut-gauche
+    stage.position({ x: 40, y: 40 });
+  }
+  drawGrid(); buildItems(); refreshList();
+  if(withDepart) select([state.bays[0].id]); else renderProps();
   // vue de départ propre : pas de cotation affichée
   lDim.destroyChildren(); lDim.batchDraw();
-  if(!silent) toast('Plan remis à zéro : une travée DÉPART');
+  if(!silent) toast(withDepart ? 'Plan remis à zéro : une travée DÉPART' : 'Plan remis à zéro');
 }
 /* ---------- Confirmation RESET ---------- */
 (function(){
@@ -2255,10 +2982,10 @@ function resetPlan(silent){
   }, true);
 })();
 
-resetPlan(true);
+resetPlan(true, false);
 histInit();
 setInterval(histWatch, 450);
-toast('Nouveau plan : travée DÉPART 2700 mm · échelles 80 mm · + et − pour ajouter / retirer une travée SUITE');
+toast('Nouveau plan vide — touche + (ou D) pour créer une travée DÉPART');
 
 /* ====================== VUE 3D ======================
    Moteur et rendu repris tels quels du configurateur EPSIRACK 3D :
@@ -2267,16 +2994,16 @@ toast('Nouveau plan : travée DÉPART 2700 mm · échelles 80 mm · + et − pou
    hauteur d'échelles commune, lisses à H / (N + 1), sol = 1er niveau.
    ===================================================== */
 const View3D = (function(){
-  const CFG = { jeuVertical:100 };                  // valeur du configurateur
   const PAL = { h:1000 };                           // hauteur chargée 1000 (défaut configurateur)
   const SEC = 110;                                   // hauteur de lisse dessinée (profil 110×50)
+  const CLEARANCE = 200;                              // mm, espace sous la lisse du dessus nécessaire pour soulever la palette
   const $ = s => document.querySelector(s);
   const v3 = (x,y,z) => new THREE.Vector3(x,y,z);
   const V = { el:$('#viewer3d'), on:false, key:'', maxD:150 };
-  let showPal = true, showCot = true, viewMode = 'iso', GEO = new Map(), EDG = new Map();
-  // hauteur chargée : 1000 mm, réduite si le pas des niveaux ne la laisse pas passer
-  const palH = b => { const h = Math.min(PAL.h, b.height/((b.levels||2)+1) - SEC - CFG.jeuVertical);
-    return h >= 200 ? h : 0; };
+  let showPal = true, showCot = true, viewMode = 'iso', GEO = new Map(), EDG = new Map(), elevCam = null;
+  // hauteur chargée (mm) à la position y (dessus de lisse ou sol), bornée pour garder 200mm sous la prochaine lisse.
+  // clear=0 pour le dernier niveau (pas de lisse au-dessus, donc pas de dégagement de levage à réserver).
+  const palHAt = (ceil, y, clear) => { const h = Math.min(PAL.h, ceil - y - clear); return h >= 200 ? h : 0; };
 
   function init3D(){
     if(!window.THREE){ V.el.insertAdjacentHTML('beforeend','<div class="verr">Visualisation 3D indisponible (Three.js non chargé).</div>'); return false; }
@@ -2308,11 +3035,22 @@ const View3D = (function(){
     };
     // orbite maison du configurateur + déplacement (clic droit / Maj / 2 doigts)
     const cv=r.domElement, pts=new Map(); let pinch0=0, mid0=null, panMode=false;
+    // curseur façon SketchUp pour le panoramique (Maj + glisser / clic droit / clic molette) :
+    // petite souris avec une flèche rouge de chaque côté
+    const PAN_CURSOR = 'url("data:image/svg+xml,' + encodeURIComponent(
+      '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">'+
+      '<rect x="12" y="7" width="8" height="15" rx="4" fill="#fff" stroke="#333" stroke-width="1.5"/>'+
+      '<path d="M5 16 L10 11.5 L10 20.5 Z" fill="#e11d2e"/>'+
+      '<path d="M27 16 L22 11.5 L22 20.5 Z" fill="#e11d2e"/>'+
+      '</svg>') + '") 16 16, move';
     cv.addEventListener('contextmenu',e=>e.preventDefault());
     cv.addEventListener('pointerdown',e=>{ cv.setPointerCapture(e.pointerId); pts.set(e.pointerId,{x:e.clientX,y:e.clientY,x0:e.clientX,y0:e.clientY});
-      if(pts.size===1) panMode = e.button===1 || e.button===2 || e.shiftKey;
+      if(pts.size===1){ panMode = e.button===1 || e.button===2 || e.shiftKey; if(panMode) cv.style.cursor = PAN_CURSOR; }
       if(pts.size===2){ const [a,b]=[...pts.values()]; pinch0=Math.hypot(a.x-b.x,a.y-b.y); mid0={x:(a.x+b.x)/2,y:(a.y+b.y)/2}; }
       setView(null); });
+    // indique le panoramique dès que Maj est tenu, avant même de glisser (comme SketchUp)
+    window.addEventListener('keydown', e=>{ if(e.key==='Shift' && pts.size===0) cv.style.cursor = PAN_CURSOR; });
+    window.addEventListener('keyup', e=>{ if(e.key==='Shift' && pts.size===0) cv.style.cursor = ''; });
     cv.addEventListener('pointermove',e=>{ if(!pts.has(e.pointerId)) return; const p=pts.get(e.pointerId);
       if(pts.size===1){
         if(panMode) pan(e.clientX-p.x, e.clientY-p.y);
@@ -2325,7 +3063,8 @@ const View3D = (function(){
     const up=e=>{ const p=pts.get(e.pointerId);
       // clic (quasi) sans glisser, bouton gauche, un seul doigt/pointeur : sélectionne la travée visée
       if(p && pts.size===1 && !panMode && Math.hypot(e.clientX-p.x0,e.clientY-p.y0)<6) pickBay(e.clientX,e.clientY);
-      pts.delete(e.pointerId); pinch0=0; mid0=null; };
+      pts.delete(e.pointerId); pinch0=0; mid0=null;
+      if(pts.size===0) cv.style.cursor = e.shiftKey ? PAN_CURSOR : ''; };
     cv.addEventListener('pointerup',up); cv.addEventListener('pointercancel',up);
     cv.addEventListener('wheel',e=>{ e.preventDefault(); V.orb.dist=Math.max(1.5,Math.min(V.maxD,V.orb.dist*(1+Math.sign(e.deltaY)*0.1))); render(); },{passive:false});
     new ResizeObserver(resize).observe(V.el);
@@ -2413,12 +3152,15 @@ const View3D = (function(){
     m.quaternion.setFromRotationMatrix(new THREE.Matrix4().makeBasis(xAxis,yAxis,zAxis));
     m.position.copy(mid); m.renderOrder=depthTest?0:10; g.add(m);
   }
-  function cote(g,a,b,txt,off,red=false,depthTest=false){
+  function cote(g,a,b,txt,off,red=false,depthTest=false,textOff){
     const mat = red ? V.mat.cotRed : V.mat.cot;
     const pts=[a.clone().add(off),b.clone().add(off)];
     g.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),mat));
     [a,b].forEach(p=>g.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([p,p.clone().add(off.clone().multiplyScalar(1.15))]),mat)));
-    const m=pts[0].clone().add(pts[1]).multiplyScalar(0.5);
+    // le texte peut être décalé plus loin que la ligne elle-même (textOff), pour ne pas être posé dessus
+    const to = textOff || off;
+    const tpts=[a.clone().add(to),b.clone().add(to)];
+    const m=tpts[0].clone().add(tpts[1]).multiplyScalar(0.5);
     if(red) label(g,txt,m.x,m.y,m.z,0.28,"rgba(198,40,40,.95)",undefined,depthTest);
     else coteText(g,txt,m,pts[1].clone().sub(pts[0]),'#2563eb',depthTest);
   }
@@ -2466,9 +3208,9 @@ const View3D = (function(){
         // sabot de protection : uniquement en façade (côté allée), fine plaque debout devant le poteau
         if(state.sabots){ const sw=u+0.04, sh=0.4, sd=0.05, front=frontByRun[b.run];
           box(bg,sw,sh,sd,x,sh/2,front?-ud:D+ud,M.sabot); }
-        // treillis
-        const dz=D-ud, n=Math.max(2,Math.round((H-0.3)/Math.max(0.55,dz*0.9)));
-        const y0=0.15, y1=H-0.12, st=(y1-y0)/n;
+        // treillis : pas réel du zigzag EPSIRACK ≈ 546mm (mesuré sur la référence SketchUp), répété
+        // sur toute la hauteur plutôt que recalculé pour "remplir" — une échelle haute a plus de barres, pas des barres plus espacées
+        const y0=0.15, y1=H-0.12, n=Math.max(2,Math.round((y1-y0)/0.546)), st=(y1-y0)/n;
         bar(bg,v3(x,y0,zFront),v3(x,y0,zBack),0.03,echMat);
         bar(bg,v3(x,y1,zFront),v3(x,y1,zBack),0.03,echMat);
         for(let j=0;j<n;j++){ const a=j%2?zFront:zBack, c=j%2?zBack:zFront;
@@ -2482,18 +3224,32 @@ const View3D = (function(){
         const dmat=meshMatFor(wmm,b.depth), pg=new THREE.PlaneGeometry(pw2-0.01,D-0.01);
         ys.forEach(y=>{ for(let q=0;q<cnt;q++){ const px=xs+gap2+pw2/2+q*(pw2+gap2);
           const pm=new THREE.Mesh(pg,dmat); pm.rotation.x=-Math.PI/2; pm.position.set(px,y+0.006,D/2); bg.add(pm); } }); } }
-      // palettes : sol + chaque niveau de lisses
-      const nP=palsOf(b), ph=palH(b)*k, pw=b.pallet*k;
-      if(showPal && nP>0 && ph>0){
+      // palettes : sol + chaque niveau de lisses — hauteur de charge calculée par niveau,
+      // pour garder 200mm sous la lisse du dessus ; le dernier niveau n'a pas de lisse au-dessus,
+      // donc pas de dégagement à réserver (sinon la palette disparaît quand il reste peu de place en haut de l'échelle)
+      const nP=palsOf(b), pw=b.pallet*k, rowsMM=[0,...levelsY(b)];
+      if(showPal && nP>0){
         const gap=(L-nP*pw)/(nP+1);
-        [0,...ys].forEach(py=>{ for(let q=0;q<nP;q++){
-          const px=xs+gap+pw/2+q*(pw+gap), pz=D/2;
-          box(bg,pw,0.022,pd,px,py+0.133,pz,M.wood);
-          [-1,0,1].forEach(t=>box(bg,0.1,0.122,pd,px+t*(pw/2-0.05),py+0.061,pz,M.wood));
-          const bh=Math.max(0.05,ph-0.144);
-          const lb=box(bg,pw-0.02,bh,pd-0.02,px,py+0.144+bh/2,pz,M.box[Math.floor(rnd()*4)]);
-          const ed=new THREE.LineSegments(edges(lb.geometry),M.edge); ed.position.copy(lb.position); bg.add(ed);
-        }});
+        let prevPh = 0;
+        rowsMM.forEach((yMM,i)=>{
+          const hasAbove = i+1<rowsMM.length;
+          const ceilMM = hasAbove ? rowsMM[i+1]-SEC : Math.min(...lh);   // dernier niveau : plafond = vrai sommet d'échelle, pas b.height (nominal, peut être dépassé par un glisser d'échelle)
+          let phMM = palHAt(ceilMM, yMM, hasAbove ? CLEARANCE : 0);
+          // dernier niveau sans assez de dégagement calculé : on dessine quand même la palette,
+          // à la même hauteur que celle du niveau du dessous, plutôt que de ne rien dessiner
+          if(phMM<=0 && !hasAbove && prevPh>0) phMM = prevPh;
+          if(phMM<=0) return;
+          prevPh = phMM;
+          const ph=phMM*k, py=yMM*k;
+          for(let q=0;q<nP;q++){
+            const px=xs+gap+pw/2+q*(pw+gap), pz=D/2;
+            box(bg,pw,0.022,pd,px,py+0.133,pz,M.wood);
+            [-1,0,1].forEach(t=>box(bg,0.1,0.122,pd,px+t*(pw/2-0.05),py+0.061,pz,M.wood));
+            const bh=Math.max(0.05,ph-0.144);
+            const lb=box(bg,pw-0.02,bh,pd-0.02,px,py+0.144+bh/2,pz,M.box[Math.floor(rnd()*4)]);
+            const ed=new THREE.LineSegments(edges(lb.geometry),M.edge); ed.position.copy(lb.position); bg.add(ed);
+          }
+        });
       }
       // cadre de sélection : reprend la travée sélectionnée dans la vue 2D
       if(state.selected.includes(b.id)){
@@ -2504,10 +3260,20 @@ const View3D = (function(){
       }
     });
     if(showCot) cotes(g, frontByRun);
-    // étiquettes de rack du plan (« Rack A »…) au-dessus de la file
-    state.labels.forEach(l=>{ const f=firstBay(l.run); if(!f) return; const a=aabb(f);
-      const H=Math.max(...state.bays.filter(b=>b.run===l.run).map(b=>b.height))*k;
-      label(g,l.text,(a.x1+a.x2)/2*k,H+(showCot?0.95:0.5),(a.y1+a.y2)/2*k,0.45,'#fbbf24','#0b1220'); });
+    // étiquettes de rack (« A », « B »… ou le nom saisi) au-dessus de chaque meuble — une par
+    // meuble, avec repli sur la lettre auto si rien n'a été nommé (même logique qu'en 2D/drawLabels,
+    // qui lui affiche déjà la lettre par défaut sans attendre qu'on la "matérialise")
+    { const seen = new Set();
+      state.bays.forEach(bay=>{
+        if(bay.mode!=='depart' || seen.has(bay.run)) return;
+        const partner = partnerRunOf(bay);
+        seen.add(bay.run); if(partner) seen.add(partner);
+        const f = firstBay(bay.run); if(!f) return;
+        const a = aabb(f);
+        const H = Math.max(...state.bays.filter(b=>b.run===bay.run || b.run===partner).map(b=>b.height))*k;
+        label(g, meubleLabelOf(bay), (a.x1+a.x2)/2*k, H+(showCot?0.95:0.5), (a.y1+a.y2)/2*k, 0.45, '#fbbf24', '#0b1220');
+      });
+    }
     // ombres calées sur l'ensemble
     const bb=new THREE.Box3().setFromObject(g); V.bb=bb;
     if(!bb.isEmpty()){
@@ -2534,7 +3300,7 @@ const View3D = (function(){
       const cg=new THREE.Group(); cg.position.set(f.x*k,0,f.y*k); cg.rotation.y=-r; g.add(cg);
       // cote de travée au sol : masquée normalement si un rack placé devant la cache (inutile de la voir au travers)
       items.forEach((it,i)=>{ const bx=(it.x0+parts(it.b).beams[0].x)*k;
-        cote(cg,v3(bx,0.02,zf),v3(bx+it.b.beam*k,0.02,zf),`T${i+1} · L ${it.b.beam}`,v3(0,0,0.45*s),false,true); });
+        cote(cg,v3(bx,0.02,zf),v3(bx+it.b.beam*k,0.02,zf),`T${i+1} · L ${it.b.beam}`,v3(0,0,0.45*s),false,true,v3(0,0,0.85*s)); });
       cote(cg,v3(x0*k-0.02,0,zf),v3(x0*k-0.02,h0*k,zf),`H ${h0}`,v3(-0.55,0,0.35*s),true);
       // hauteur différente dans la file : repère au-dessus de la travée (comme H intermédiaire du configurateur)
       items.forEach(it=>{ if(it.b.height!==h0) label(cg,`H ${it.b.height}`,(it.x0+bayW(it.b)/2)*k,it.b.height*k+0.15,zf,0.22); });
@@ -2589,6 +3355,59 @@ const View3D = (function(){
     Object.assign(V.orb,orb); V.r.setPixelRatio(Math.min(2,devicePixelRatio)); resize(); render();
     return c.toDataURL('image/jpeg',0.92);
   }
+  // cadrage ORTHOGRAPHIQUE (pas de perspective) d'une bbox, vu selon la direction horizontale V.orb.az
+  // (V.orb.el doit être 0 : à plat). Les deux échelles d'une même travée (avant/arrière de la lisse),
+  // qui ne diffèrent que selon cet axe de vue, se superposent alors exactement dans l'image — plus
+  // d'« échelle fantôme » décalée par la perspective. padding 8%, cadré à l'aspect w/h du canevas.
+  function flatFrame(cam, bb, w, h){
+    const o=V.orb, dir=v3(Math.sin(o.az),0,Math.cos(o.az));
+    const c=bb.getCenter(new THREE.Vector3()), diag=bb.getSize(new THREE.Vector3()).length();
+    cam.position.copy(c).addScaledVector(dir, Math.max(5,diag));
+    cam.up.set(0,1,0); cam.lookAt(c); cam.updateMatrixWorld();
+    const rt=new THREE.Vector3().setFromMatrixColumn(cam.matrixWorld,0), up=new THREE.Vector3().setFromMatrixColumn(cam.matrixWorld,1);
+    let hw=0, hh=0;
+    [bb.min.x,bb.max.x].forEach(x=>[bb.min.y,bb.max.y].forEach(y=>[bb.min.z,bb.max.z].forEach(z=>{
+      const d=v3(x,y,z).sub(c); hw=Math.max(hw,Math.abs(d.dot(rt))); hh=Math.max(hh,Math.abs(d.dot(up)));
+    })));
+    hw*=1.08; hh*=1.08;
+    const asp=w/h; if(hw/hh>asp) hh=hw/asp; else hw=hh*asp;
+    cam.left=-hw; cam.right=hw; cam.top=hh; cam.bottom=-hh; cam.near=0.05; cam.far=Math.max(10,diag*3);
+    cam.updateProjectionMatrix();
+  }
+  // vues de côté pour le PDF : une par hauteur d'échelle distincte (regroupement = hauteur seule),
+  // caméra ORTHOGRAPHIQUE tournée perpendiculairement aux lisses, à plat (dans le repère propre de la
+  // travée si elle est pivotée) ; palettes toujours visibles ; un ensemble dos-à-dos (même logique
+  // géométrique que mirrorLastBay) est rendu en une seule image avec les deux faces. state.bays/V.orb/
+  // showPal/V.cam sont restaurés à la fin.
+  function elevations(w,h){
+    if(!state.bays.length || (!V.r && !init3D())) return [];
+    const savedBays = state.bays, savedPal = showPal, savedCam = V.cam, orb = {...V.orb};
+    showPal = true;
+    if(!elevCam) elevCam = new THREE.OrthographicCamera(-1,1,1,-1,0.05,400);
+    V.cam = elevCam;
+    const partner = ref => savedBays.find(o => o.run!==ref.run && (o.rotation||0)===(ref.rotation||0)
+      && (Math.abs(o.y-(ref.y+ref.depth+back()))<=60 || Math.abs(ref.y-(o.y+o.depth+back()))<=60)
+      && Math.max(ref.x,o.x) < Math.min(ref.x+bayW(ref), o.x+bayW(o)));
+    const heights = [...new Set(savedBays.map(b=>b.height))].sort((a,c)=>a-c);
+    V.r.setPixelRatio(1); V.r.setSize(w,h,false);
+    const seen = new Set(), out = [];
+    heights.forEach(ht=>{
+      const rep = savedBays.find(b=>b.height===ht);
+      if(seen.has(rep.id)) return;              // déjà rendu comme partenaire dos-à-dos d'une hauteur précédente
+      const p = partner(rep);
+      seen.add(rep.id); if(p) seen.add(p.id);
+      state.bays = p ? [rep,p] : [rep];
+      V.orb.az = Math.PI/2 - (rep.rotation||0)*Math.PI/180; V.orb.el = 0;
+      build3D(false); flatFrame(elevCam, V.bb, w, h); V.r.render(V.scene, elevCam);
+      const c=document.createElement('canvas'); c.width=w; c.height=h; const x=c.getContext('2d');
+      const gr=x.createLinearGradient(0,0,0,h); gr.addColorStop(0,'#e9eef4'); gr.addColorStop(1,'#d5dde6');
+      x.fillStyle=gr; x.fillRect(0,0,w,h); x.drawImage(V.r.domElement,0,0,w,h);
+      out.push({ heights:[...new Set(p?[ht,p.height]:[ht])], doubleFace:!!p, img:c.toDataURL('image/jpeg',0.92) });
+    });
+    state.bays = savedBays; showPal = savedPal; V.cam = savedCam; Object.assign(V.orb, orb);
+    V.r.setPixelRatio(Math.min(2,devicePixelRatio)); resize(); build3D(false); render();
+    return out;
+  }
   function show(){
     V.on=true; V.el.hidden=false; document.body.classList.add('v3d');
     $('#vw3d').classList.add('on'); $('#vw2d').classList.remove('on');
@@ -2603,7 +3422,7 @@ const View3D = (function(){
   // toute modification du plan (clavier, panneau, annuler…) se répercute en 3D
   setInterval(()=>{ if(V.on && V.r && snapKey()!==V.key) build3D(false); }, 450);
   $('#vw2d').onclick=hide; $('#vw3d').onclick=show;
-  return { show, hide, snapshot, toggle:()=>V.on?hide():show(), refresh:()=>{ if(V.on && V.r) build3D(false); } };
+  return { show, hide, snapshot, elevations, toggle:()=>V.on?hide():show(), refresh:()=>{ if(V.on && V.r) build3D(false); } };
 })();
 
 /* ====================== LICENCE RACKPLAN ======================

@@ -3722,31 +3722,31 @@ function rkpGate(){
   g.style.cssText = 'position:fixed;inset:0;z-index:9999;display:none;align-items:center;'
     + 'justify-content:center;background:rgba(7,11,17,.82);backdrop-filter:blur(3px)';
   g.innerHTML = `
-    <div style="width:min(440px,92vw);background:var(--panel);border:1px solid var(--line);
+    <div style="width:min(440px,92vw);background:#fff;color:#000;border:1px solid #d8dee8;
                 border-radius:14px;padding:26px 24px;box-shadow:0 24px 64px rgba(0,0,0,.55)">
-      <h3 style="font-size:1.05rem;font-weight:700;margin-bottom:6px">Activer RackPlan 2D/3D</h3>
-      <p style="font-size:.8rem;color:var(--txt-dim);line-height:1.55;margin-bottom:16px">
+      <h3 style="font-size:1.05rem;font-weight:700;margin-bottom:6px;color:#000">Activer RackPlan 2D/3D</h3>
+      <p style="font-size:.8rem;color:#000;line-height:1.55;margin-bottom:16px">
         Saisissez votre e-mail professionnel et la clé de licence de votre société.
         Les deux doivent correspondre à un accès ouvert. Sans cela, l'application reste
         utilisable en démonstration&nbsp;: ${RKP.demoMaxBays} travées maximum, exports désactivés.</p>
       <input id="rkpMail" type="email" autocomplete="email" spellcheck="false"
              placeholder="prenom.nom@societe.fr"
-             style="width:100%;background:#0e1622;border:1px solid var(--line);border-radius:8px;
+             style="width:100%;background:#fff;color:#000;border:1px solid #d8dee8;border-radius:8px;
                     padding:10px 12px;margin-bottom:8px">
       <input id="rkpKey" type="password" autocomplete="off" spellcheck="false"
              placeholder="RKP-XXXX-XXXX-XXXX"
-             style="width:100%;background:#0e1622;border:1px solid var(--line);border-radius:8px;
+             style="width:100%;background:#fff;color:#000;border:1px solid #d8dee8;border-radius:8px;
                     padding:10px 12px;font-family:Inter,system-ui,sans-serif;letter-spacing:.06em;
                     text-transform:uppercase">
-      <div id="rkpMsg" style="min-height:20px;font-size:.78rem;margin:10px 2px 0;color:#ffb3c0"></div>
+      <div id="rkpMsg" style="min-height:20px;font-size:.78rem;margin:10px 2px 0;color:#c0152b"></div>
       <div style="display:flex;gap:8px;margin-top:14px">
-        <button id="rkpDemo" class="btn ghost" style="flex:1;justify-content:center">Continuer en démo</button>
-        <button id="rkpGo" class="btn primary" style="flex:1;justify-content:center">Activer</button>
+        <button id="rkpDemo" class="btn ghost" style="flex:1;justify-content:center;color:#000;border-color:#d8dee8">Continuer en démo</button>
+        <button id="rkpGo" class="btn primary" style="flex:1;justify-content:center;background:#fff;color:#000;border-color:#2f5ea8">Activer</button>
       </div>
-      <p style="font-size:.7rem;color:var(--txt-mute);margin-top:14px;line-height:1.5">
+      <p style="font-size:.7rem;color:#000;margin-top:14px;line-height:1.5">
         Version ${RKP.version} · Les exports portent le nom de votre société et votre e-mail.<br>
         <button id="rkpForget" type="button" style="background:none;border:0;padding:4px 0;
-          color:var(--txt-dim);font-size:.7rem;text-decoration:underline;cursor:pointer">
+          color:#000;font-size:.7rem;text-decoration:underline;cursor:pointer">
           Oublier la licence enregistrée sur ce poste</button></p>
     </div>`;
   document.body.appendChild(g);

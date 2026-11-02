@@ -3545,7 +3545,7 @@ const RKP = {
   api: 'https://hook.eu2.make.com/y6lu0d6cpwwvtgwuwcq32ab5hmsr5q7c',
   version: 1,
   demoMaxBays: 12,
-  revalidateMs: 15 * 60 * 1000,
+  revalidateMs: 24 * 60 * 60 * 1000,      // 1 fois par jour : chaque vérification coûte 5 crédits Make
   key: '', email: '', lic: null, demo: true, lastOk: 0,
   // en-tête PDF du revendeur : saisie locale uniquement, jamais envoyée à Airtable
   brand: { nom: rkpGet('rkp.brand.nom'), adresse: rkpGet('rkp.brand.adresse'), logo: rkpGet('rkp.brand.logo') }

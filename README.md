@@ -49,7 +49,7 @@ Domaines autorisés : l'origine exacte depuis laquelle la clé peut servir,
 par exemple `https://app.rackplan.fr`. Plusieurs origines se séparent par des
 virgules. `*` autorise tout : à réserver aux tests.
 Pour suspendre un client, passez Statut à `Suspendue` ou `Révoquée` :
-l'effet est immédiat au prochain démarrage, et au plus tard 15 minutes après
+l'effet est immédiat au prochain démarrage, et au plus tard 24 heures après
 pour une session déjà ouverte.
 4. Vendre une mise à jour
 Dupliquez `v1/` en `v2/`.

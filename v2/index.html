@@ -3575,7 +3575,7 @@ async function rkpValidate(key, email){
     let d = null;
     try { d = JSON.parse(await r.text()); } catch(e){}
     if(d && d.ok === true) return d;
-    return { ok:false, motif:(d && d.motif) || 'INCONNUE' };
+    return { ok:false, motif:(d && d.motif) || (d ? 'INCONNUE' : 'RESEAU') };  // réponse non-JSON = scénario Make coupé ou quota épuisé, pas une mauvaise clé
   }catch(e){ return { ok:false, motif:'RESEAU' }; }
 }
 

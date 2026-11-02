@@ -209,7 +209,7 @@ pre{background:var(--canvas);border:1px solid var(--line);border-radius:8px;padd
   font-size:11px;color:#a8c3e0;max-height:196px;overflow:auto;line-height:1.5}
 .toast{position:fixed;left:50%;bottom:56px;transform:translate(-50%,20px);opacity:0;background:var(--panel-2);
   border:1px solid var(--accent);color:#d8f2ff;padding:9px 16px;border-radius:999px;font-size:var(--text-sm);
-  transition:.25s ease;pointer-events:none}
+  transition:.25s ease;pointer-events:none;z-index:10000}   /* au-dessus de la vue 3D et des fenêtres de licence */
 .toast.show{opacity:1;transform:translate(-50%,0)}
 .notice{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) scale(.96);opacity:0;pointer-events:none;
   background:var(--panel-2);border:1px solid #3a4a66;border-radius:12px;padding:18px 22px;max-width:420px;

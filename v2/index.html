@@ -1538,6 +1538,15 @@ function bayLadderBounds(b){
   const prev = bays[idx-1];
   return [ladderHeights(prev)[laddersOf(prev)-1], ...own];
 }
+// hauteur des échelles de RIVE (extrémités) de la file : pour la sécurité, seules ces échelles
+// doivent monter à la hauteur des palettes. Les échelles intermédiaires peuvent être plus basses
+// sans réduire la hauteur de charge — c'est ce plafond qu'utilise la palette du dernier niveau en 3D.
+function riveHeight(b){
+  const bays = runBaysOf(b.run);
+  if(!bays.length) return Math.max(...ladderHeights(b));
+  const first = ladderHeights(bays[0]), last = ladderHeights(bays[bays.length-1]);
+  return Math.min(first[0], last[last.length-1]);
+}
 // bouton "+" de la vue de face : ajoute un niveau tout en haut, à la hauteur de l'échelle la
 // plus basse de la travée (gauche ou droite) ; renvoie false si aucune place (déjà au sommet).
 function addTopLevel(b){
@@ -3382,7 +3391,7 @@ const View3D = (function(){
         let prevPh = 0;
         rowsMM.forEach((yMM,i)=>{
           const hasAbove = i+1<rowsMM.length;
-          const ceilMM = hasAbove ? rowsMM[i+1]-SEC : Math.min(...lh);   // dernier niveau : plafond = vrai sommet d'échelle, pas b.height (nominal, peut être dépassé par un glisser d'échelle)
+          const ceilMM = hasAbove ? rowsMM[i+1]-SEC : riveHeight(b);   // dernier niveau : plafond fixé par les échelles de RIVE (extrémités), pas par les échelles intermédiaires (sécurité) ni par b.height
           let phMM = palHAt(ceilMM, yMM, hasAbove ? CLEARANCE : 0);
           // dernier niveau sans assez de dégagement calculé : on dessine quand même la palette,
           // à la même hauteur que celle du niveau du dessous, plutôt que de ne rien dessiner

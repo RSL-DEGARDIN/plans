@@ -712,6 +712,21 @@ const levelsY = b => {
   if(b.customLevels && b.customLevels.length) return b.customLevels.slice().sort((x,y)=>x-y);
   const n = b.levels || 2;
   return Array.from({length:n}, (_,i)=> Math.round(b.height*(i+1)/(n+1))); };
+// plancher d'un niveau donné (index dans levelsY, du bas vers le haut) : 'F' fil, 'B' bois, '' aucun.
+// b.lvlDeck (détail par niveau) prime ; sinon on retombe sur le réglage uniforme de la travée.
+const deckAt = (b, vi) => (Array.isArray(b.lvlDeck) && vi < b.lvlDeck.length)
+  ? (b.lvlDeck[vi] || '') : (b.deck===true ? 'F' : b.deckWood===true ? 'B' : '');
+const filLevels  = b => levelsY(b).reduce((s,_,vi)=> s + (deckAt(b,vi)==='F' ? 1 : 0), 0);
+const woodLevels = b => levelsY(b).reduce((s,_,vi)=> s + (deckAt(b,vi)==='B' ? 1 : 0), 0);
+// pose/retire un plateau sur un niveau ; initialise le détail depuis le réglage uniforme en cours
+// pour ne pas effacer l'existant, puis garde b.deck/b.deckWood vrais seulement si tout est uniforme.
+function setLevelDeck(b, vi, kind){
+  const n = levelsY(b).length, base = b.deck===true ? 'F' : b.deckWood===true ? 'B' : '';
+  const old = Array.isArray(b.lvlDeck) ? b.lvlDeck : [];
+  b.lvlDeck = Array.from({length:n}, (_,i)=> old[i] || base);
+  b.lvlDeck[vi] = (b.lvlDeck[vi]===kind) ? '' : kind;
+  b.deck = b.lvlDeck.every(x=>x==='F'); b.deckWood = b.lvlDeck.every(x=>x==='B');
+}
 // travée SUITE accrochée à droite de b (même file, angle en contact)
 const nextInRun = b => { const r=(b.rotation||0)*Math.PI/180, w=bayW(b), x=b.x+w*Math.cos(r), y=b.y+w*Math.sin(r);
   return state.bays.find(o=>o!==b && o.run===b.run && o.mode==='suite' && Math.abs(o.x-x)<2 && Math.abs(o.y-y)<2); };
@@ -1508,7 +1523,7 @@ function parseNiveaux(s){ return String(s).split(/[;,\s]+/).map(Number).filter(n
 function bumpNiveaux(b, delta){
   // redivise toujours les niveaux à parts égales sur la hauteur (formule standard H*(i+1)/(n+1))
   const n = Math.min(6, Math.max(1, levelsY(b).length + delta));
-  b.customLevels = undefined; b.levels = n;
+  b.customLevels = undefined; b.levels = n; b.lvlDeck = undefined;
 }
 // les 2 échelles qui encadrent VRAIMENT une travée (gauche + droite) — pour une travée SUITE,
 // l'échelle de gauche est en fait dessinée/partagée par la travée précédente et n'apparaît donc
@@ -1529,6 +1544,7 @@ function addTopLevel(b){
   if(v <= top + 100) return false;
   levels.push(v);
   b.customLevels = levels; b.levels = levels.length;
+  if(Array.isArray(b.lvlDeck)) b.lvlDeck.push('');
   return true;
 }
 // croix de suppression d'un niveau (vue de face) : retire la lisse d'idx ; refuse s'il n'en reste qu'une
@@ -1537,6 +1553,7 @@ function removeLevel(b, idx){
   if(levels.length<=1) return false;
   levels.splice(idx,1);
   b.customLevels = levels; b.levels = levels.length;
+  if(Array.isArray(b.lvlDeck)) b.lvlDeck.splice(idx,1);
   return true;
 }
 // bouton "=" (vue de face) : répartit les n niveaux à hauteurs égales — hauteur d'échelle (la plus
@@ -1576,6 +1593,14 @@ function elevSVG(bays, availW){
         <rect x="${rx}" y="${ry}" width="${rw}" height="${rh}" fill="${C.orange}" stroke="${C.orangeDark}"><title>Lisse ${b.beam} mm — niveau ${v} mm (glisser pour déplacer)</title></rect>
       </g>`;
       g += `<text x="${(rx+rx+rw)/2}" y="${ry-3}" font-size="10" fill="#8fa0b8" text-anchor="middle" font-family="Inter,sans-serif">${v}</text>`;
+      // pastilles F (plateau fil) / B (plateau bois) par niveau, posées à gauche de la lisse
+      { const dA=deckAt(b,vi), by=ry+rh/2;
+        [['F',rx+9],['B',rx+24]].forEach(([kd,bx])=>{ const on=dA===kd, col=kd==='F'?'#2f5ea8':'#8a5a2b';
+          g += `<g class="elevDeck" data-bay="${i}" data-level="${vi}" data-kind="${kd}" style="cursor:pointer">`
+            + `<circle cx="${bx}" cy="${by}" r="6.5" fill="${on?col:'#fff'}" stroke="${col}" stroke-width="1.3"><title>${kd==='F'?'Plateau fil':'Plateau bois'} sur ce niveau (cliquer pour poser ou retirer)</title></circle>`
+            + `<text x="${bx}" y="${by+3.2}" font-size="9" font-weight="700" fill="${on?'#fff':col}" text-anchor="middle" font-family="Inter,sans-serif" style="pointer-events:none">${kd}</text></g>`;
+        });
+      }
       // bouton "−" de suppression, posé sur la lisse elle-même à son extrémité droite (jamais sur
       // la travée suivante) ; hors groupe .elevLevel pour que ce soit un clic simple, pas un glisser
       if(lvls.length>1){
@@ -1684,6 +1709,13 @@ function wireElevDrag(el, run){
   el.addEventListener('pointerup', end);
   el.addEventListener('pointercancel', end);
   el.addEventListener('click', e=>{
+    const deckG = e.target.closest('.elevDeck');
+    if(deckG){
+      const b = runBaysOf(run)[+deckG.dataset.bay]; if(!b) return;
+      setLevelDeck(b, +deckG.dataset.level, deckG.dataset.kind);
+      buildItems(); drawDims(null,false); refreshList(); renderJSON(); renderStats(); refresh3D(); renderProps();
+      return;
+    }
     const addG = e.target.closest('.elevAddLevel');
     if(addG){
       const b = runBaysOf(run)[+addG.dataset.bay]; if(!b) return;
@@ -1864,11 +1896,11 @@ function renderProps(){
     row.querySelector('[data-f=h]').addEventListener('change', e=>{ setLadderH(b, laddersOf(b)-1, +e.target.value); refreshAll(); });
     row.querySelector('[data-f=beam]').addEventListener('change', e=>{ b.beam=+e.target.value; refreshAll(); });
     row.querySelector('[data-f=deckFil]').addEventListener('change', e=>{
-      b.deck = e.target.checked; if(b.deck) b.deckWood=false;
+      b.deck = e.target.checked; if(b.deck) b.deckWood=false; b.lvlDeck=undefined;
       refreshAll();
     });
     row.querySelector('[data-f=deckBois]').addEventListener('change', e=>{
-      b.deckWood = e.target.checked; if(b.deckWood) b.deck=false;
+      b.deckWood = e.target.checked; if(b.deckWood) b.deck=false; b.lvlDeck=undefined;
       refreshAll();
     });
     row.querySelector('[data-act=nlMinus]').addEventListener('click', ()=>{ bumpNiveaux(b,-1); refreshAll(); });
@@ -1876,6 +1908,7 @@ function renderProps(){
     row.querySelector('[data-f=niv]').addEventListener('change', e=>{
       const niv = parseNiveaux(e.target.value);
       if(niv.length){ b.customLevels = niv; b.levels = niv.length; } else { b.customLevels = undefined; }
+      b.lvlDeck = undefined;
       refreshAll();
     });
     const delBtn = row.querySelector('[data-act=delT]');
@@ -1991,12 +2024,12 @@ function bom(){
   }).filter(r=>r.qte);
   // plancher bois : 1 unité par niveau complet (L × DEPTH), pas par lame individuelle
   const deckWoods = BEAMS.map(l=>{
-    const qte = state.bays.filter(b=>b.beam===l).reduce((s,b)=>s+(b.deckWood===true ? (b.levels||2) : 0), 0);
+    const qte = state.bays.filter(b=>b.beam===l).reduce((s,b)=>s+woodLevels(b), 0);
     return { famille:'Plancher', ref:`PLB-${l}`, designation:`PLANCHER BOIS L.${l} P.${DEPTH}`, dim:`${l} × ${DEPTH}`, qte, ml:0 };
   }).filter(r=>r.qte);
   return [...ladders, ...beams, ...sabots, ...decks, ...deckWoods];
 }
-const decksOf = b => { const dk=deckOf(b); return (dk && b.deck===true) ? dk[0]*(b.levels||2) : 0; };
+const decksOf = b => { const dk=deckOf(b); return dk ? dk[0]*filLevels(b) : 0; };
 function renderStats(){
   const dep = state.bays.filter(b=>b.mode==='depart').length, sui = state.bays.length - dep;
   const ladders = state.bays.reduce((s,b)=>s+laddersOf(b),0);
@@ -2175,6 +2208,7 @@ function toJSON(){
       upright:b.upright, beam:b.beam, levels:b.levels, height:b.height, pallet:b.pallet, depth:b.depth, section:b.section,
       rotation:Math.round(b.rotation||0), run:b.run, deck:b.deck===true, deckWood:b.deckWood===true,
       ...(Array.isArray(b.ladderH) ? {ladderH:b.ladderH} : {}),
+      ...(Array.isArray(b.lvlDeck) && b.lvlDeck.some(x=>x) ? {lvlDeck:b.lvlDeck.slice()} : {}),
       ...(Array.isArray(b.customLevels) && b.customLevels.length ? {customLevels:b.customLevels} : {}) })) };
 }
 function renderJSON(){
@@ -2201,7 +2235,8 @@ function loadData(d){
     depth:DEPTH, section:SECTION,
     rotation:+r.rotation||0, run:safeId(r.run,'R1'), deck:r.deck===true, deckWood:r.deckWood===true,
     ladderH: Array.isArray(r.ladderH) ? r.ladderH.map(v=>v==null?null:+v) : undefined,
-    customLevels: Array.isArray(r.customLevels) && r.customLevels.length ? r.customLevels.map(v=>+v) : undefined }));
+    customLevels: Array.isArray(r.customLevels) && r.customLevels.length ? r.customLevels.map(v=>+v) : undefined,
+    lvlDeck: Array.isArray(r.lvlDeck) && r.lvlDeck.length ? r.lvlDeck.map(x=> x==='F'||x==='B' ? x : '') : undefined }));
   state.cotes = Array.isArray(d.cotes) ? d.cotes.map((c,i)=>({ id:safeId(c.id, 'COT-'+String(i+1).padStart(3,'0')),
     x1:+c.x1, y1:+c.y1, x2:+c.x2, y2:+c.y2, value:Math.round(+c.value) })) : [];
   refreshCoteList();
@@ -2716,8 +2751,8 @@ document.getElementById('tSab').onclick = e=>{
 // « Plancher fil/bois partout » : applique (ou retire) le plateau choisi sur toutes les travées ;
 // les 2 types de plancher sont mutuellement exclusifs (un seul à la fois par travée)
 function setDeckAll(kind, on){
-  if(kind==='fil'){ state.deck=on; state.bays.forEach(b=>{ b.deck=on; if(on) b.deckWood=false; }); if(on) state.deckWood=false; }
-  else { state.deckWood=on; state.bays.forEach(b=>{ b.deckWood=on; if(on) b.deck=false; }); if(on) state.deck=false; }
+  if(kind==='fil'){ state.deck=on; state.bays.forEach(b=>{ b.deck=on; if(on) b.deckWood=false; b.lvlDeck=undefined; }); if(on) state.deckWood=false; }
+  else { state.deckWood=on; state.bays.forEach(b=>{ b.deckWood=on; if(on) b.deck=false; b.lvlDeck=undefined; }); if(on) state.deck=false; }
   document.getElementById('tDeck3')?.classList.toggle('on', state.deck);
   document.getElementById('tWood3')?.classList.toggle('on', state.deckWood);
   document.getElementById('dDeck').checked = state.deck;
@@ -3323,16 +3358,17 @@ const View3D = (function(){
       // lisses avant / arrière
       const xs=p.beams[0].x*k, xc=xs+L/2, sH=SEC*k, ys=levelsY(b).map(v=>v*k);
       ys.forEach(y=>{ box(bg,L,sH,0.05,xc,y-sH/2,0.025,M.orange); box(bg,L,sH,0.05,xc,y-sH/2,D-0.025,M.orange); });
-      // plancher fil grillé : plateaux ajourés posés sur les lisses de chaque niveau (sauf travée décochée)
-      if(b.deck===true){ const dk=deckOf(b); if(dk){ const [cnt,wmm]=dk, pw2=wmm*k, gap2=(L-cnt*pw2)/(cnt+1);
-        const dmat=meshMatFor(wmm,b.depth), pg=new THREE.PlaneGeometry(pw2-0.01,D-0.01);
-        ys.forEach(y=>{ for(let q=0;q<cnt;q++){ const px=xs+gap2+pw2/2+q*(pw2+gap2);
-          const pm=new THREE.Mesh(pg,dmat); pm.rotation.x=-Math.PI/2; pm.position.set(px,y+0.006,D/2); bg.add(pm); } }); } }
-      // plancher bois : lames posées sur les lisses de chaque niveau, même logique de répartition que le fil
-      if(b.deckWood===true){
+      // planchers posés par niveau : fil grillé (ajouré) ou bois (lames), selon le choix de chaque niveau
+      { const dk=deckOf(b);
+        const dmat = dk ? meshMatFor(dk[1],b.depth) : null, pgFil = dk ? new THREE.PlaneGeometry(dk[1]*k-0.01,D-0.01) : null;
         const cntW=woodCountFor(b.beam), pw3=WOOD_W*k, gap3=(L-cntW*pw3)/(cntW+1), th=WOOD_T*k;
-        ys.forEach(y=>{ for(let q=0;q<cntW;q++){ const px=xs+gap3+pw3/2+q*(pw3+gap3);
-          box(bg,pw3-0.002,th,D-0.01,px,y+th/2,D/2,M.wood); } });
+        ys.forEach((y,vi)=>{ const t=deckAt(b,vi);
+          if(t==='F' && dk){ const [cnt,wmm]=dk, pw2=wmm*k, gap2=(L-cnt*pw2)/(cnt+1);
+            for(let q=0;q<cnt;q++){ const px=xs+gap2+pw2/2+q*(pw2+gap2);
+              const pm=new THREE.Mesh(pgFil,dmat); pm.rotation.x=-Math.PI/2; pm.position.set(px,y+0.006,D/2); bg.add(pm); } }
+          else if(t==='B'){ for(let q=0;q<cntW;q++){ const px=xs+gap3+pw3/2+q*(pw3+gap3);
+              box(bg,pw3-0.002,th,D-0.01,px,y+th/2,D/2,M.wood); } }
+        });
       }
       // palettes : sol + chaque niveau de lisses — hauteur de charge calculée par niveau,
       // pour garder 200mm sous la lisse du dessus ; le dernier niveau n'a pas de lisse au-dessus,

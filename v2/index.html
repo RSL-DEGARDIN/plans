@@ -1462,7 +1462,7 @@ function selectLive(ids){
     r.dash(ko ? [40,30] : (sel ? null : [90,70]));
     // l'étiquette suit la sélection comme le cadre ; sans ça elle garde
     // la couleur de la sélection précédente jusqu'au prochain redessin complet
-    const t = g.findOne('Text'); if(t) t.fill(sel ? '#bfe9ff' : '#7f94b0');
+    const t = g.findOne('Text'); if(t) t.fill(sel ? C.selTxt : '#7f94b0');
   });
   lItems.batchDraw();
   drawDims(ids.length===1 ? state.bays.find(b=>b.id===ids[0]) : null, false);

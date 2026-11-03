@@ -1814,8 +1814,12 @@ function renderProps(){
     </div>
     <div style="display:flex;align-items:center;gap:6px;margin-top:8px">
       <span style="flex:1 1 auto;font-size:var(--text-sm);color:var(--txt-dim)">Vue de face</span>
-      <button type="button" class="btn ghost" id="elevZoomOut" title="Dézoomer la vue de face" aria-label="Dézoomer la vue de face" style="padding:3px 8px;flex:0 0 auto">−</button>
-      <button type="button" class="btn ghost" id="elevZoomIn" title="Zoomer la vue de face" aria-label="Zoomer la vue de face" style="padding:3px 8px;flex:0 0 auto">+</button>
+      <button type="button" class="btn ghost" id="elevZoomOut" title="Dézoomer la vue de face" aria-label="Dézoomer la vue de face" style="padding:2px 5px;flex:0 0 auto">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M21 21l-5-5"/><path d="M7.5 10.5h6"/></svg>
+      </button>
+      <button type="button" class="btn ghost" id="elevZoomIn" title="Zoomer la vue de face" aria-label="Zoomer la vue de face" style="padding:2px 5px;flex:0 0 auto">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M21 21l-5-5"/><path d="M10.5 7.5v6"/><path d="M7.5 10.5h6"/></svg>
+      </button>
     </div>
     <div class="svgbox" id="meubleElev" style="margin-top:4px"></div>
     <h3 style="margin-top:12px;display:flex;align-items:center;gap:6px">
@@ -1859,8 +1863,11 @@ function renderProps(){
   const redraw = ()=>{ const el = document.getElementById('meubleElev'); el.innerHTML = elevSVG(runBaysOf(run), el.clientWidth); };
   redraw();
   wireElevDrag(document.getElementById('meubleElev'), run);
-  document.getElementById('elevZoomIn').onclick  = ()=>{ elevZoom = Math.min(3, +(elevZoom*1.25).toFixed(3)); redraw(); };
-  document.getElementById('elevZoomOut').onclick = ()=>{ elevZoom = Math.max(0.4, +(elevZoom/1.25).toFixed(3)); redraw(); };
+  const elevZoomBy = f => { elevZoom = Math.max(0.4, Math.min(3, +(elevZoom*f).toFixed(3)));
+    redraw(); const el = document.getElementById('meubleElev');
+    if(el) el.scrollTop = el.scrollHeight; };   // garder le sol (bas du meuble) visible en zoomant
+  document.getElementById('elevZoomIn').onclick  = ()=>elevZoomBy(1.25);
+  document.getElementById('elevZoomOut').onclick = ()=>elevZoomBy(1/1.25);
   const refreshAll = ()=>{ buildItems(); drawDims(bays.length===1?bays[0]:null,false); refreshList(); renderJSON(); renderStats(); renderProps(); };
   const removeTravee = ()=>{ removeLastSuite(last); if(partner) removeLastSuite(lastOfRun(partner)); renderProps(); refreshAll(); };
 

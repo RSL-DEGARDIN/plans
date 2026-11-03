@@ -203,7 +203,7 @@ footer b{color:var(--txt-dim);font-weight:500}
 .trow select,.trow input[type=text]{width:auto;flex:1 1 72px;min-width:0;text-align:left;font-size:12px;padding:5px 6px}
 .trow .tline:first-child select{flex-basis:58px}
 .trow .tn{font:700 11px Inter,sans-serif;color:var(--txt-mute);flex:0 0 16px}
-.svgbox{background:var(--canvas);border:1px solid var(--line);border-radius:8px;overflow-x:auto;overflow-y:hidden;padding:4px;height:258px}
+.svgbox{background:var(--canvas);border:1px solid var(--line);border-radius:8px;overflow:auto;padding:4px;height:258px}
 .svgbox svg{display:block;min-width:260px}
 .popup-tabs h3{margin-top:14px}
 .popup-tabs h3:first-child{margin-top:0}
@@ -1574,20 +1574,17 @@ function equalizeLevels(b){
   b.customLevels = Array.from({length:n}, (_,i)=>Math.round(step*(i+1)/50)*50);
   b.levels = n;
 }
+let elevZoom = 1;   // zoom manuel de la vue de face (boutons +/-)
 // vue de face du meuble (toutes les travées d'une file, échelles + lisses à leur hauteur réelle)
 function elevSVG(bays, availW){
   if(!bays.length) return '';
   let cx = 0; const offs = bays.map(b=>{ const o = cx; cx += bayW(b); return o; });
   const totalW = cx || 1;
   const maxH = Math.max(1, ...bays.map(b=>Math.max(...ladderHeights(b))));
-  const ml=22, mr=34, mt=24;   // mt agrandi : évite que la hauteur d'échelle (texte tout en haut) soit coupée ; mr agrandi : place pour le bouton "+" d'ajout de travée
-  // le bloc "vue de face" garde une hauteur fixe (.svgbox) : l'échelle vise TOUJOURS cette hauteur,
-  // donc l'échelle la plus haute remplit le bloc. Si toutes les travées ne tiennent pas en largeur,
-  // le dessin déborde et le bloc défile horizontalement — on réserve alors ~20px en bas pour la barre.
-  const scFull = 230/maxH;
-  const willScroll = !!availW && (totalW*scFull + ml + mr) > availW;
-  const sc = willScroll ? 214/maxH : scFull;
-  const mb = willScroll ? 20 : 4;
+  const ml=22, mr=34, mt=24, mb=10;   // mt : place pour la hauteur d'échelle en haut ; mr : bouton "+" d'ajout de travée ; mb : marge basse (barre de défilement)
+  // échelle pilotée par la hauteur du bloc (l'échelle la plus haute remplit la vue) × le zoom manuel
+  // (boutons +/-). Si le dessin dépasse, le bloc défile : horizontalement, et verticalement en zoom.
+  const sc = (210/maxH) * elevZoom;
   const W = Math.round(totalW*sc+ml+mr), H = Math.round(maxH*sc+mt+mb);
   const X = v => +(ml+v*sc).toFixed(1), Z = v => +(mt+(maxH-v)*sc).toFixed(1);
   // data-sc/mt/maxh : pour que le glisser-déposer (wireElevDrag) puisse reconvertir une position
@@ -1815,7 +1812,12 @@ function renderProps(){
         border-radius:6px;padding:5px 8px;color:var(--txt-dim);font-size:var(--text-sm);white-space:nowrap"
         title="Profondeur (fixe)">P.${DEPTH}</span>
     </div>
-    <div class="svgbox" id="meubleElev" style="margin-top:8px"></div>
+    <div style="display:flex;align-items:center;gap:6px;margin-top:8px">
+      <span style="flex:1 1 auto;font-size:var(--text-sm);color:var(--txt-dim)">Vue de face</span>
+      <button type="button" class="btn ghost" id="elevZoomOut" title="Dézoomer la vue de face" aria-label="Dézoomer la vue de face" style="padding:3px 8px;flex:0 0 auto">−</button>
+      <button type="button" class="btn ghost" id="elevZoomIn" title="Zoomer la vue de face" aria-label="Zoomer la vue de face" style="padding:3px 8px;flex:0 0 auto">+</button>
+    </div>
+    <div class="svgbox" id="meubleElev" style="margin-top:4px"></div>
     <h3 style="margin-top:12px;display:flex;align-items:center;gap:6px">
       <span style="flex:1 1 auto">Travées</span>
       <button type="button" class="btn ghost" id="mRemT" title="Retirer la dernière travée" aria-label="Retirer la dernière travée"
@@ -1857,6 +1859,8 @@ function renderProps(){
   const redraw = ()=>{ const el = document.getElementById('meubleElev'); el.innerHTML = elevSVG(runBaysOf(run), el.clientWidth); };
   redraw();
   wireElevDrag(document.getElementById('meubleElev'), run);
+  document.getElementById('elevZoomIn').onclick  = ()=>{ elevZoom = Math.min(3, +(elevZoom*1.25).toFixed(3)); redraw(); };
+  document.getElementById('elevZoomOut').onclick = ()=>{ elevZoom = Math.max(0.4, +(elevZoom/1.25).toFixed(3)); redraw(); };
   const refreshAll = ()=>{ buildItems(); drawDims(bays.length===1?bays[0]:null,false); refreshList(); renderJSON(); renderStats(); renderProps(); };
   const removeTravee = ()=>{ removeLastSuite(last); if(partner) removeLastSuite(lastOfRun(partner)); renderProps(); refreshAll(); };
 

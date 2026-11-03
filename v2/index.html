@@ -203,7 +203,7 @@ footer b{color:var(--txt-dim);font-weight:500}
 .trow select,.trow input[type=text]{width:auto;flex:1 1 72px;min-width:0;text-align:left;font-size:12px;padding:5px 6px}
 .trow .tline:first-child select{flex-basis:58px}
 .trow .tn{font:700 11px Inter,sans-serif;color:var(--txt-mute);flex:0 0 16px}
-.svgbox{background:var(--canvas);border:1px solid var(--line);border-radius:8px;overflow:hidden;padding:4px;height:258px}
+.svgbox{background:var(--canvas);border:1px solid var(--line);border-radius:8px;overflow-x:auto;overflow-y:hidden;padding:4px;height:258px}
 .svgbox svg{display:block;min-width:260px}
 .popup-tabs h3{margin-top:14px}
 .popup-tabs h3:first-child{margin-top:0}
@@ -1571,13 +1571,14 @@ function elevSVG(bays, availW){
   let cx = 0; const offs = bays.map(b=>{ const o = cx; cx += bayW(b); return o; });
   const totalW = cx || 1;
   const maxH = Math.max(1, ...bays.map(b=>Math.max(...ladderHeights(b))));
-  const ml=22, mr=34, mt=24, mb=4;   // mt agrandi : évite que la hauteur d'échelle (texte tout en haut) soit coupée ; mr agrandi : place pour le bouton "+" d'ajout de travée, posé à droite de la dernière échelle
-  // le bloc "vue de face" a une hauteur fixe (.svgbox) : l'échelle vise cette hauteur, mais est
-  // réduite si besoin pour que toutes les travées tiennent dans la largeur dispo, sans jamais
-  // dépasser le bloc ni défiler — hauteur affichée proportionnellement plus petite si le meuble est large
-  const scH = 230/maxH;
-  const scW = availW ? Math.max(0.02, (availW-ml-mr-4)/totalW) : scH;
-  const sc = Math.min(scH, scW);
+  const ml=22, mr=34, mt=24;   // mt agrandi : évite que la hauteur d'échelle (texte tout en haut) soit coupée ; mr agrandi : place pour le bouton "+" d'ajout de travée
+  // le bloc "vue de face" garde une hauteur fixe (.svgbox) : l'échelle vise TOUJOURS cette hauteur,
+  // donc l'échelle la plus haute remplit le bloc. Si toutes les travées ne tiennent pas en largeur,
+  // le dessin déborde et le bloc défile horizontalement — on réserve alors ~20px en bas pour la barre.
+  const scFull = 230/maxH;
+  const willScroll = !!availW && (totalW*scFull + ml + mr) > availW;
+  const sc = willScroll ? 214/maxH : scFull;
+  const mb = willScroll ? 20 : 4;
   const W = Math.round(totalW*sc+ml+mr), H = Math.round(maxH*sc+mt+mb);
   const X = v => +(ml+v*sc).toFixed(1), Z = v => +(mt+(maxH-v)*sc).toFixed(1);
   // data-sc/mt/maxh : pour que le glisser-déposer (wireElevDrag) puisse reconvertir une position

@@ -1574,7 +1574,7 @@ function equalizeLevels(b){
   b.customLevels = Array.from({length:n}, (_,i)=>Math.round(step*(i+1)/50)*50);
   b.levels = n;
 }
-let elevZoom = 1;   // zoom manuel de la vue de face (boutons +/-)
+let elevZoom = 1, elevScrollX = 0, lastElevRun = null;   // zoom manuel + position de défilement horizontal conservée (repart à gauche seulement quand on change de meuble)
 // vue de face du meuble (toutes les travées d'une file, échelles + lisses à leur hauteur réelle)
 function elevSVG(bays, availW){
   if(!bays.length) return '';
@@ -1675,7 +1675,8 @@ function wireElevDrag(el, run){
     const y = pt.matrixTransform(ctm.inverse()).y;
     return +svg.dataset.maxh - (y - +svg.dataset.mt) / +svg.dataset.sc;
   };
-  const liveRedraw = ()=>{ el.innerHTML = elevSVG(runBaysOf(run), el.clientWidth); };
+  const liveRedraw = ()=>{ el.innerHTML = elevSVG(runBaysOf(run), el.clientWidth); el.scrollLeft = elevScrollX; };
+  el.addEventListener('scroll', ()=>{ elevScrollX = el.scrollLeft; }, {passive:true});
   el.addEventListener('pointerdown', e=>{
     const g = e.target.closest('.elevLadder,.elevLevel');
     if(!g) return;
@@ -1860,7 +1861,8 @@ function renderProps(){
     </div>`).join('')}
   </div>`;
 
-  const redraw = ()=>{ const el = document.getElementById('meubleElev'); el.innerHTML = elevSVG(runBaysOf(run), el.clientWidth); };
+  if(run !== lastElevRun){ elevScrollX = 0; lastElevRun = run; }   // autre meuble sélectionné : repart à gauche
+  const redraw = ()=>{ const el = document.getElementById('meubleElev'); el.innerHTML = elevSVG(runBaysOf(run), el.clientWidth); el.scrollLeft = elevScrollX; };
   redraw();
   wireElevDrag(document.getElementById('meubleElev'), run);
   const elevZoomBy = f => { elevZoom = Math.max(0.4, Math.min(3, +(elevZoom*f).toFixed(3)));

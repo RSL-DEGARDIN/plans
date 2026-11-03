@@ -302,7 +302,7 @@ body.share .sharetag{display:block}
       <rect x="10" y="5" width="12" height="3" rx="1" fill="#f97316"/>
       <rect x="10" y="24" width="12" height="3" rx="1" fill="#f97316"/>
     </svg>
-    <div>RackPlan 2D/3D</div>
+    <div>RackPlan</div>
   </div>
   <div class="toolbar">
     <button class="btn ghost" id="bUndo" title="Annuler (Ctrl+Z)" aria-label="Annuler" disabled>
@@ -3631,25 +3631,50 @@ async function rkpValidate(key, email){
 /* ---------- bandeau d'état dans l'en-tête ---------- */
 function rkpBadge(){
   let b = document.getElementById('rkpBadge');
+  let tg = document.getElementById('rkpToggle');
   if(!b){
+    // chevron de repli (comme le bloc Entrepôt) : réduit la zone licence pour gagner de la place.
+    // la bordure du chevron garde la couleur du statut (rouge = démo, bleu = licence active),
+    // donc on voit l'état d'un coup d'œil même replié.
+    tg = document.createElement('button');
+    tg.id = 'rkpToggle'; tg.type = 'button'; tg.title = 'Licence — replier / déplier';
+    tg.style.cssText = 'margin-left:14px;display:inline-flex;align-items:center;justify-content:center;'
+      + 'background:transparent;border:1px solid var(--line);border-radius:8px;padding:5px 7px;cursor:pointer';
+    tg.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" '
+      + 'stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="transition:transform .15s">'
+      + '<path d="M6 9l6 6 6-6"/></svg>';
     b = document.createElement('button');
     b.id = 'rkpBadge'; b.type = 'button';
-    b.style.cssText = 'margin-left:14px;background:transparent;border:1px solid var(--line);'
+    b.style.cssText = 'margin-left:8px;background:transparent;border:1px solid var(--line);'
       + 'border-radius:8px;padding:5px 10px;font-size:11px;letter-spacing:.05em;cursor:pointer';
     b.onclick = rkpOpen;
     const brand = document.querySelector('header .brand');
-    if(brand && brand.parentNode) brand.parentNode.insertBefore(b, brand.nextSibling);
-    else document.querySelector('header').appendChild(b);
+    if(brand && brand.parentNode){ const a = brand.nextSibling;
+      brand.parentNode.insertBefore(tg, a); brand.parentNode.insertBefore(b, a); }
+    else { const h = document.querySelector('header'); h.appendChild(tg); h.appendChild(b); }
+    // état de repli mémorisé sur ce poste (confort d'affichage uniquement) ; replié par défaut
+    let collapsed; try { const v = localStorage.getItem('rkp.hdrCollapsed'); collapsed = v===null ? true : v==='1'; }
+      catch(e){ collapsed = true; }
+    const apply = ()=>{ const bb = document.getElementById('rkpBrandBtn');
+      [b, bb].forEach(el=>{ if(el) el.style.display = collapsed ? 'none' : ''; });
+      tg.querySelector('svg').style.transform = collapsed ? 'rotate(-90deg)' : ''; };
+    tg.onclick = ()=>{ collapsed = !collapsed;
+      try { localStorage.setItem('rkp.hdrCollapsed', collapsed ? '1' : '0'); } catch(e){}
+      apply(); };
+    tg._apply = apply;
   }
   if(RKP.demo){
     b.textContent = 'DÉMO — activer une licence';
     b.style.color = '#ffb3c0'; b.style.borderColor = 'rgba(244,63,94,.55)';
+    tg.style.color = '#ffb3c0'; tg.style.borderColor = 'rgba(244,63,94,.55)';
   } else {
     b.textContent = 'Licence ' + (RKP.lic.revendeur || RKP.lic.nomExport || 'active');
     b.style.color = '#bfe9ff'; b.style.borderColor = '#2f5ea8';
+    tg.style.color = '#bfe9ff'; tg.style.borderColor = '#2f5ea8';
   }
   rkpLockUI();
   rkpBrandBtn();
+  if(tg && tg._apply) tg._apply();   // ré-applique le repli (le bouton En-tête PDF vient peut-être d'être créé)
 }
 
 /* ---------- en-tête PDF (nom, adresse, logo du revendeur) ----------

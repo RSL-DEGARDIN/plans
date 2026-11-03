@@ -2039,7 +2039,12 @@ function bom(){
     const qte = state.bays.filter(b=>b.beam===l).reduce((s,b)=>s+woodLevels(b), 0);
     return { famille:'Plancher', ref:`PLB-${l}`, designation:`PLANCHER BOIS L.${l} P.${DEPTH}`, dim:`${l} × ${DEPTH}`, qte, ml:0 };
   }).filter(r=>r.qte);
-  return [...ladders, ...beams, ...sabots, ...decks, ...deckWoods];
+  // chevilles de fixation : 2 par échelle + 4 par sabot (les sabots ne comptent que s'ils sont posés)
+  const totLad = state.bays.reduce((s,b)=>s+laddersOf(b),0);
+  const totSab = state.sabots ? state.bays.reduce((s,b)=>s+sabotsOf(b),0) : 0;
+  const nChev = 2*totLad + 4*totSab;
+  const chevilles = nChev>0 ? [{ famille:'Fixation', ref:'CHV', designation:'CHEVILLE DE FIXATION', dim:'', qte:nChev, ml:0 }] : [];
+  return [...ladders, ...beams, ...sabots, ...decks, ...deckWoods, ...chevilles];
 }
 const decksOf = b => { const dk=deckOf(b); return dk ? dk[0]*filLevels(b) : 0; };
 function renderStats(){

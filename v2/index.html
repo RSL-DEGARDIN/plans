@@ -744,10 +744,10 @@ const ladderHeights = b => { const out = ladderDefaultHeights(b);
   return out; };
 
 const C = { blue:'#3b82f6', blueDark:'#1d4ed8', orange:'#f97316', orangeDark:'#b4520c',
-  accent:'#38bdf8', grid:'#18222f', gridMajor:'#22303f', floor:'#0d131b', wall:'#2b3a4f', lbl:'#556982', txt:'#e6edf7' };
+  accent:'#38bdf8', grid:'#18222f', gridMajor:'#22303f', floor:'#0d131b', wall:'#2b3a4f', lbl:'#556982', txt:'#e6edf7', selTxt:'#bfe9ff' };
 // mode sombre/blanc (test) : variantes des couleurs du plan 2D (fond canvas en CSS, voir --canvas)
 const C_DARK = {...C};
-const C_LIGHT = { grid:'#c7cfd9', gridMajor:'#a9b4c2', floor:'#ffffff', wall:'#aab4c2', lbl:'#5b6b82', txt:'#1b2330' };
+const C_LIGHT = { grid:'#c7cfd9', gridMajor:'#a9b4c2', floor:'#ffffff', wall:'#aab4c2', lbl:'#5b6b82', txt:'#1b2330', selTxt:'#1d4ed8' };
 const ICON_MOON = '<path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"/>';
 const ICON_SUN = '<circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.9 4.9 1.4 1.4"/><path d="m17.7 17.7 1.4 1.4"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.3 17.7-1.4 1.4"/><path d="m19.1 4.9-1.4 1.4"/>';
 function applyTheme(light, redraw){
@@ -909,7 +909,7 @@ function buildItems(){
     // étiquette : longueur de lisse + nombre de niveaux, seulement si lisible (masquée en vue palettes)
     if(w*s > 70 && !state.showPal){
       const t = new Konva.Text({ text:`${b.beam} · ${b.levels}N`, fontSize:15,
-        fontFamily:'Inter', fontStyle:'700', fill: sel?'#bfe9ff':'#7f94b0', listening:false });
+        fontFamily:'Inter', fontStyle:'700', fill: sel?C.selTxt:'#7f94b0', listening:false });
       t.scale({x:1/s,y:1/s});
       t.position({ x: w/2 - (t.width()/s)/2, y: h/2 - (t.height()/s)/2 });
       g.add(t);
@@ -917,7 +917,7 @@ function buildItems(){
     // repère T1, T2… sous la travée, comme en vue 3D
     if(!state.showPal){
       const tn = new Konva.Text({ text:`T${runBaysOf(b.run).indexOf(b)+1}`, fontSize:11,
-        fontFamily:'Inter', fontStyle:'700', fill: sel?'#bfe9ff':'#7f94b0', listening:false });
+        fontFamily:'Inter', fontStyle:'700', fill: sel?C.selTxt:'#7f94b0', listening:false });
       tn.scale({x:1/s,y:1/s});
       tn.position({ x: w/2 - (tn.width()/s)/2, y: h + 6/s });
       g.add(tn);

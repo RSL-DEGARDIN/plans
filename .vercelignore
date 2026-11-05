@@ -1,3 +1,5 @@
-# Source lisible et outils : conservés dans le dépôt (à garder privé) mais JAMAIS servis en ligne
+# Conservés dans le dépôt (à garder privé) mais JAMAIS servis en ligne
 v2/index.src.html
 tools/
+# Ancienne version v1 : gardée dans le dépôt, non déployée (plus accessible sur le site)
+v1/

@@ -3,5 +3,5 @@
   "private": true,
   "type": "module",
   "scripts": { "obfuscate": "node build-obf.mjs ../v2/index.src.html ../v2/index.html" },
-  "devDependencies": { "javascript-obfuscator": "4.1.1" }
+  "devDependencies": { "javascript-obfuscator": "4.1.1", "html-minifier-terser": "7.2.0" }
 }

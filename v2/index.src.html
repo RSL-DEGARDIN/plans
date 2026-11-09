@@ -1519,6 +1519,10 @@ function setLadderH(b, idx, val){   // val = null -> Auto
   if(!b.ladderH) b.ladderH = Array(laddersOf(b)).fill(null);
   b.ladderH[idx] = val;
   if(b.ladderH.every(v=>v==null)) b.ladderH = undefined;
+  // si toutes les échelles de la travée sont à la même hauteur, c'est la hauteur du meuble :
+  // b.height suit alors (cote « H », niveaux par défaut, titre 3D, légende et nomenclature concordent)
+  const hs = ladderHeights(b);
+  if(hs.length && hs.every(h => h === hs[0])){ b.height = hs[0]; b.ladderH = undefined; }
 }
 function parseNiveaux(s){ return String(s).split(/[;,\s]+/).map(Number).filter(n=>n>0).sort((a,b)=>a-b); }
 // +/- sur le nombre de niveaux : prolonge/retire le dernier niveau en gardant le pas en cours

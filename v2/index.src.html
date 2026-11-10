@@ -385,7 +385,7 @@ body.share .sharetag{display:block}
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
         stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 19V5a2 2 0 0 1 2-2h4.5a2 2 0 0 1 1.6.8l1.1 1.4a2 2 0 0 0 1.6.8H18a2 2 0 0 1 2 2v1.5"/><path d="M2 19h15.2a2 2 0 0 0 1.9-1.4l2-6.1A1.5 1.5 0 0 0 19.7 9.5H8.6a2 2 0 0 0-1.9 1.4L4 19"/></svg>
     </button>
-    <input type="file" id="fLoad" accept=".rsl" hidden>
+    <input type="file" id="fLoad" accept=".rsl,.json" hidden>
     <span class="tsep"></span>
     <button class="btn warn" id="bReset" title="Tout effacer et repartir de zéro" aria-label="Tout effacer et repartir de zéro">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -2896,7 +2896,9 @@ async function doSave(){
       rslHandle = h;
       toast('Plan enregistré : '+h.name);
       return true;
-    }catch(err){ if(err.name !== 'AbortError') notice('Enregistrement impossible : '+err.message); return false; }
+    }catch(err){ if(err.name === 'AbortError') return false;   // annulé par l'utilisateur
+      /* API File System Access bloquée ou en échec (Edge, stratégie d'entreprise…) : on bascule
+         sur le téléchargement classique ci-dessous plutôt que d'échouer sans recours */ }
   }
   const blob = new Blob([payload],{type:'application/octet-stream'});
   const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
@@ -2909,20 +2911,10 @@ document.getElementById('bSave').onclick = doSave;
 document.getElementById('bSketchUp').onclick = exportSketchUpScript;
 document.getElementById('bBom').onclick = downloadBom;
 document.getElementById('bBom2').onclick = downloadBom;
-async function doOpen(){
-  if(rslFSOk()){
-    try{
-      const [h] = await window.showOpenFilePicker({ types: [{ description:'Plan RSL',
-        accept:{ 'application/octet-stream':['.rsl'] } }] });
-      const text = await (await h.getFile()).text();
-      loadData(JSON.parse(deobfuscate(text)));
-      rslHandle = h;
-      toast('Plan rechargé : '+state.bays.length+' travée(s), '+state.cotes.length+' cote(s), '+state.labels.length+' étiquette(s)');
-    }catch(err){ if(err.name !== 'AbortError') notice('Fichier illisible : '+err.message); }
-    return;
-  }
-  document.getElementById('fLoad').click();
-}
+// Ouverture via la fenêtre de fichier standard (input) : marche sur TOUS les navigateurs.
+// On n'utilise plus l'API File System Access ici — réservée à Chrome/Edge et qui échouait
+// parfois sans repli (cas Edge signalé). La lecture réelle se fait dans fLoad.onchange ci-dessous.
+function doOpen(){ document.getElementById('fLoad').click(); }
 document.getElementById('bLoad').onclick = doOpen;
 document.getElementById('fLoad').onchange = e=>{
   const f = e.target.files[0]; if(!f) return;
